@@ -18,7 +18,7 @@ import us.dot.its.jpo.ode.plugin.j2735.J2735TransmissionState;
 import us.dot.its.jpo.ode.plugin.j2735.J2735VehicleSize;
 
 public class ProcessedBsmTest {
-    BsmFeature<Point> feature;
+    ProcessedBsm<Point> feature;
 
     @Before
     public void setup() {
@@ -57,29 +57,21 @@ public class ProcessedBsmTest {
         properties.setSpeed(new BigDecimal(100));
         properties.setTransmission(J2735TransmissionState.FORWARDGEARS);
 
-        double[] coordinates = new double[] { 40.5671913, -105.0342901 };
+        double[] coordinates = new double[] {40.5671913, -105.0342901};
         Point geometry = new Point(coordinates);
 
-        feature = new BsmFeature<Point>(null, geometry, properties);
-    }
-
-    @SuppressWarnings("unchecked")
-    @Test
-    public void testBsmFeatureCollectionGeoJson() {
-        BsmFeature<Point>[] expectedFeatureList = new BsmFeature[] { feature };
-        ProcessedBsm<Point> object = new ProcessedBsm<Point>(expectedFeatureList);
-        assertEquals(expectedFeatureList, object.getFeatures());
+        feature = new ProcessedBsm<Point>(null, geometry, properties);
     }
 
     @Test
     public void testEquals() {
-        ProcessedBsm<Point> object = new ProcessedBsm<Point>(null);
-        object.setOriginIp("10.0.0.15");
-        ProcessedBsm<Point> otherObject = new ProcessedBsm<Point>(null);
+        ProcessedBsm<Point> object = new ProcessedBsm<Point>(null, null, new BsmProperties());
+        object.getProperties().setOriginIp("10.0.0.15");
+        ProcessedBsm<Point> otherObject = new ProcessedBsm<Point>(null, null, new BsmProperties());
 
         boolean equals = object.equals(object);
         assertEquals(true, equals);
-        
+
         boolean otherEquals = object.equals(otherObject);
         assertEquals(false, otherEquals);
 
@@ -87,14 +79,14 @@ public class ProcessedBsmTest {
         boolean notEquals = otherObject.equals(string);
         assertEquals(false, notEquals);
     }
-    
+
     @Test
     public void testHashCode() {
         ProcessedMap<LineString> ProcessedMapPojo = new ProcessedMap<LineString>();
         Integer hash = ProcessedMapPojo.hashCode();
         assertNotNull(hash);
     }
-    
+
     @Test
     public void testToString() {
         ProcessedMap<LineString> ProcessedMapPojo = new ProcessedMap<LineString>();
