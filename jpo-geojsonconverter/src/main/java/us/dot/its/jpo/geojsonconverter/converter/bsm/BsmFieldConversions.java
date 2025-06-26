@@ -5,6 +5,9 @@ import java.math.RoundingMode;
 
 public class BsmFieldConversions {
     public static Double convertLong(long j2735Long) {
+        // Longitude ::= INTEGER (-1799999999..1800000001)
+        // -- LSB = 1/10 microdegree
+        // -- Providing a range of plus-minus 180 degrees
         Double returnValue = null;
         if (j2735Long != 1800000001) {
             returnValue = BigDecimal.valueOf(j2735Long, 7).doubleValue();
