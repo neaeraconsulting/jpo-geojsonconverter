@@ -8,7 +8,7 @@ import us.dot.its.jpo.ode.plugin.j2735.OdePosition3D;
 import us.dot.its.jpo.geojsonconverter.DateJsonMapper;
 import us.dot.its.jpo.geojsonconverter.pojos.ProcessedValidationMessage;
 import us.dot.its.jpo.ode.plugin.j2735.J2735RegulatorySpeedLimit;
-import us.dot.its.jpo.ode.model.OdeMapMetadata.MapSource;
+import us.dot.its.jpo.ode.model.OdeMessageFrameMetadata.Source;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +38,7 @@ public class MapSharedProperties {
     private List<ProcessedValidationMessage> validationMessages;
     private Integer laneWidth;
     private List<J2735RegulatorySpeedLimit> speedLimits;
-    private MapSource mapSource;
+    private Source mapSource;
     private ZonedDateTime timeStamp;
 
     public int getSchemaVersion() {
@@ -153,11 +153,11 @@ public class MapSharedProperties {
         return this.speedLimits;
     }
 
-    public void setMapSource(MapSource mapSource) {
+    public void setMapSource(Source mapSource) {
         this.mapSource = mapSource;
     }
 
-    public MapSource getMapSource() {
+    public Source getMapSource() {
         return this.mapSource;
     }
 
@@ -177,13 +177,29 @@ public class MapSharedProperties {
             return false;
         }
         MapSharedProperties mapSharedProperties = (MapSharedProperties) o;
-        return Objects.equals(messageType, mapSharedProperties.messageType) && Objects.equals(odeReceivedAt, mapSharedProperties.odeReceivedAt) && Objects.equals(originIp, mapSharedProperties.originIp) && Objects.equals(intersectionName, mapSharedProperties.intersectionName) && Objects.equals(region, mapSharedProperties.region) && Objects.equals(intersectionId, mapSharedProperties.intersectionId) && Objects.equals(msgIssueRevision, mapSharedProperties.msgIssueRevision) && Objects.equals(revision, mapSharedProperties.revision) && Objects.equals(refPoint, mapSharedProperties.refPoint) && Objects.equals(cti4501Conformant, mapSharedProperties.cti4501Conformant) && Objects.equals(validationMessages, mapSharedProperties.validationMessages) && Objects.equals(laneWidth, mapSharedProperties.laneWidth) && Objects.equals(speedLimits, mapSharedProperties.speedLimits) && Objects.equals(mapSource, mapSharedProperties.mapSource) && Objects.equals(timeStamp, mapSharedProperties.timeStamp);
+        return Objects.equals(messageType, mapSharedProperties.messageType)
+                && Objects.equals(odeReceivedAt, mapSharedProperties.odeReceivedAt)
+                && Objects.equals(originIp, mapSharedProperties.originIp)
+                && Objects.equals(intersectionName, mapSharedProperties.intersectionName)
+                && Objects.equals(region, mapSharedProperties.region)
+                && Objects.equals(intersectionId, mapSharedProperties.intersectionId)
+                && Objects.equals(msgIssueRevision, mapSharedProperties.msgIssueRevision)
+                && Objects.equals(revision, mapSharedProperties.revision)
+                && Objects.equals(refPoint, mapSharedProperties.refPoint)
+                && Objects.equals(cti4501Conformant, mapSharedProperties.cti4501Conformant)
+                && Objects.equals(validationMessages, mapSharedProperties.validationMessages)
+                && Objects.equals(laneWidth, mapSharedProperties.laneWidth)
+                && Objects.equals(speedLimits, mapSharedProperties.speedLimits)
+                && Objects.equals(mapSource, mapSharedProperties.mapSource)
+                && Objects.equals(timeStamp, mapSharedProperties.timeStamp);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(messageType, odeReceivedAt, originIp, intersectionName, region, intersectionId, msgIssueRevision, revision, refPoint, cti4501Conformant, validationMessages, laneWidth, speedLimits, mapSource, timeStamp);
-    }   
+        return Objects.hash(messageType, odeReceivedAt, originIp, intersectionName, region, intersectionId,
+                msgIssueRevision, revision, refPoint, cti4501Conformant, validationMessages, laneWidth, speedLimits,
+                mapSource, timeStamp);
+    }
 
     @Override
     public String toString() {

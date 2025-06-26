@@ -3,21 +3,21 @@ package us.dot.its.jpo.geojsonconverter.pojos.geojson.map;
 import java.util.Objects;
 
 import us.dot.its.jpo.geojsonconverter.validator.JsonValidatorResult;
-import us.dot.its.jpo.ode.model.OdeMapData;
+import us.dot.its.jpo.ode.model.OdeMessageFrameData;
 
 public class DeserializedRawMap {
-    
-    OdeMapData odeMapOdeMapData;
+
+    OdeMessageFrameData odeMapMessageFrameData;
     JsonValidatorResult validatorResults;
     Boolean validationFailure = false;
     String failedMessage = null;
 
-    public OdeMapData getOdeMapOdeMapData() {
-        return this.odeMapOdeMapData;
+    public OdeMessageFrameData getOdeMapMessageFrameData() {
+        return this.odeMapMessageFrameData;
     }
 
-    public void setOdeMapOdeMapData(OdeMapData odeMapOdeSpat) {
-        this.odeMapOdeMapData = odeMapOdeSpat;
+    public void setOdeMapMessageFrameData(OdeMessageFrameData odeMapMessageFrameData) {
+        this.odeMapMessageFrameData = odeMapMessageFrameData;
     }
 
     public JsonValidatorResult getValidatorResults() {
@@ -52,25 +52,25 @@ public class DeserializedRawMap {
             return false;
         }
         DeserializedRawMap deserializedRawMap = (DeserializedRawMap) o;
-        return Objects.equals(odeMapOdeMapData, deserializedRawMap.odeMapOdeMapData) && Objects.equals(validatorResults, deserializedRawMap.validatorResults) && Objects.equals(validationFailure, deserializedRawMap.validationFailure) && Objects.equals(failedMessage, deserializedRawMap.failedMessage);
+        return Objects.equals(odeMapMessageFrameData, deserializedRawMap.odeMapMessageFrameData)
+                && Objects.equals(validatorResults, deserializedRawMap.validatorResults)
+                && Objects.equals(validationFailure, deserializedRawMap.validationFailure)
+                && Objects.equals(failedMessage, deserializedRawMap.failedMessage);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(odeMapOdeMapData, validatorResults, validationFailure, failedMessage);
+        return Objects.hash(odeMapMessageFrameData, validatorResults, validationFailure, failedMessage);
     }
 
 
     @Override
     public String toString() {
-        return "{" +
-            " odeMapOdeSpat='" + getOdeMapOdeMapData() + "'" +
-            ", validatorResults='" + getValidatorResults() + "'" +
-            ", validationFailure='" + getValidationFailure() + "'" +
-            ", failedMessage='" + getFailedMessage() + "'" +
-            "}";
+        return "{" + " odeMapOdeSpat='" + getOdeMapMessageFrameData() + "'" + ", validatorResults='"
+                + getValidatorResults() + "'" + ", validationFailure='" + getValidationFailure() + "'"
+                + ", failedMessage='" + getFailedMessage() + "'" + "}";
     }
 
-    
+
 
 }

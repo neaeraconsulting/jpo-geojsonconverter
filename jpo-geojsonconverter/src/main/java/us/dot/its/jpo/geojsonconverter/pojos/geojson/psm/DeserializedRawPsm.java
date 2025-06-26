@@ -3,21 +3,21 @@ package us.dot.its.jpo.geojsonconverter.pojos.geojson.psm;
 import java.util.Objects;
 
 import us.dot.its.jpo.geojsonconverter.validator.JsonValidatorResult;
-import us.dot.its.jpo.ode.model.OdePsmData;
+import us.dot.its.jpo.ode.model.OdeMessageFrameData;
 
 public class DeserializedRawPsm {
-    
-    OdePsmData odePsmData;
+
+    OdeMessageFrameData odePsmMessageFrameData;
     JsonValidatorResult validatorResults;
     Boolean validationFailure = false;
     String failedMessage = null;
 
-    public OdePsmData getOdePsmData() {
-        return this.odePsmData;
+    public OdeMessageFrameData getOdePsmMessageFrameData() {
+        return this.odePsmMessageFrameData;
     }
 
-    public void setOdePsmData(OdePsmData odePsmData) {
-        this.odePsmData = odePsmData;
+    public void setOdePsmMessageFrameData(OdeMessageFrameData odePsmMessageFrameData) {
+        this.odePsmMessageFrameData = odePsmMessageFrameData;
     }
 
     public JsonValidatorResult getValidatorResults() {
@@ -52,21 +52,21 @@ public class DeserializedRawPsm {
             return false;
         }
         DeserializedRawPsm deserializedRawPsm = (DeserializedRawPsm) o;
-        return Objects.equals(odePsmData, deserializedRawPsm.odePsmData) && Objects.equals(validatorResults, deserializedRawPsm.validatorResults) && Objects.equals(validationFailure, deserializedRawPsm.validationFailure) && Objects.equals(failedMessage, deserializedRawPsm.failedMessage);
+        return Objects.equals(odePsmMessageFrameData, deserializedRawPsm.odePsmMessageFrameData)
+                && Objects.equals(validatorResults, deserializedRawPsm.validatorResults)
+                && Objects.equals(validationFailure, deserializedRawPsm.validationFailure)
+                && Objects.equals(failedMessage, deserializedRawPsm.failedMessage);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(odePsmData, validatorResults, validationFailure, failedMessage);
+        return Objects.hash(odePsmMessageFrameData, validatorResults, validationFailure, failedMessage);
     }
 
     @Override
     public String toString() {
-        return "{" +
-            " odeSpatOdeSpat='" + getOdePsmData() + "'" +
-            ", validatorResults='" + getValidatorResults() + "'" +
-            ", validationFailure='" + getValidationFailure() + "'" +
-            ", failedMessage='" + getFailedMessage() + "'" +
-            "}";
+        return "{" + " odeSpatOdeSpat='" + getOdePsmMessageFrameData() + "'" + ", validatorResults='"
+                + getValidatorResults() + "'" + ", validationFailure='" + getValidationFailure() + "'"
+                + ", failedMessage='" + getFailedMessage() + "'" + "}";
     }
 }
