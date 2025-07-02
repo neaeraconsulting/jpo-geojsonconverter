@@ -51,7 +51,7 @@ public class BsmFieldConversions {
         // -- The value -127 shall be used for unavailable
         Double returnValue = null;
         if (accelVert != -127) {
-            returnValue = BigDecimal.valueOf(accelVert * 0.02).doubleValue();
+            returnValue = accelVert * 0.02;
         }
         return returnValue;
     }
@@ -118,7 +118,7 @@ public class BsmFieldConversions {
         // -- +127 to be used for unavai
         Double returnValue = null;
         if (angle >= -126 && angle < 127) {
-            returnValue = BigDecimal.valueOf(angle * 1.5).doubleValue();
+            returnValue = angle * 1.5;
         }
         return returnValue;
     }
@@ -129,7 +129,7 @@ public class BsmFieldConversions {
         // -- A range of 0 to 359.9875 degrees
         Double returnValue = null;
         if (angle >= 0 && angle <= 28800) {
-            returnValue = BigDecimal.valueOf(angle * 0.0125).doubleValue();
+            returnValue = angle * 0.0125;
         }
         return returnValue;
     }
@@ -140,7 +140,7 @@ public class BsmFieldConversions {
         // -- speed is unavailable
         Double returnValue = null;
         if (speed >= 0 && speed < 8191) {
-            returnValue = BigDecimal.valueOf(speed * 0.02).doubleValue();
+            returnValue = speed * 0.02;
         }
         return returnValue;
     }

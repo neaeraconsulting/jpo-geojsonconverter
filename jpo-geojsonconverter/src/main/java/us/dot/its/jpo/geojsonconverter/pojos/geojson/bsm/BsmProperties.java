@@ -2,7 +2,6 @@ package us.dot.its.jpo.geojsonconverter.pojos.geojson.bsm;
 
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import us.dot.its.jpo.asn.j2735.r2024.Common.BrakeSystemStatus;
@@ -57,29 +56,6 @@ public class BsmProperties {
     private VehicleSize size; // Width and height in cm
     private Double speed; // meters per second (m/s)
     private TransmissionState transmission;
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == this)
-            return true;
-        if (!(o instanceof BsmProperties)) {
-            return false;
-        }
-        BsmProperties bsmProperties = (BsmProperties) o;
-        return Objects.equals(accelSet, bsmProperties.getAccelSet())
-                && Objects.equals(accuracy, bsmProperties.getAccuracy())
-                && Objects.equals(angle, bsmProperties.getAngle()) && Objects.equals(brakes, bsmProperties.getBrakes())
-                && Objects.equals(heading, bsmProperties.getHeading()) && Objects.equals(id, bsmProperties.getId())
-                && Objects.equals(msgCnt, bsmProperties.getMsgCnt())
-                && Objects.equals(secMark, bsmProperties.getSecMark()) && Objects.equals(size, bsmProperties.getSize())
-                && Objects.equals(speed, bsmProperties.getSpeed())
-                && Objects.equals(transmission, bsmProperties.getTransmission());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(accelSet, accuracy, angle, brakes, heading, id, msgCnt, secMark, size, speed, transmission);
-    }
 
     @Override
     public String toString() {
