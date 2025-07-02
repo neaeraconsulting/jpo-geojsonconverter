@@ -1,7 +1,6 @@
 package us.dot.its.jpo.geojsonconverter.converter.bsm;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 
 public class BsmFieldConversions {
     public static Double convertLong(long j2735Long) {
@@ -34,11 +33,11 @@ public class BsmFieldConversions {
         // -- a value of 2001 means the value is unavailable
         Double returnValue = null;
         if (accelLatLong < -2000) {
-            returnValue = BigDecimal.valueOf(-2000, 2).doubleValue();
+            returnValue = -20.0;
         } else if (accelLatLong > 2001) {
-            returnValue = BigDecimal.valueOf(2000, 2).doubleValue();
+            returnValue = 20.0;
         } else if (accelLatLong != 2001) {
-            returnValue = BigDecimal.valueOf(accelLatLong, 2).doubleValue();
+            returnValue = accelLatLong * 0.01;
         }
         return returnValue;
     }
@@ -61,7 +60,7 @@ public class BsmFieldConversions {
         // -- LSB units of 0.01 degrees per second (signed)
         Double returnValue = null;
         if (accelYaw >= -32767 && accelYaw <= 32767) {
-            returnValue = BigDecimal.valueOf(accelYaw, 2).doubleValue();
+            returnValue = accelYaw * 0.01;
         }
         return returnValue;
     }
@@ -74,7 +73,7 @@ public class BsmFieldConversions {
         // -- 255 = unavailable semi-major axis value
         Double returnValue = null;
         if (semiMajor >= 0 && semiMajor < 255) {
-            returnValue = BigDecimal.valueOf(semiMajor * 5, 2).doubleValue();
+            returnValue = semiMajor * 0.05;
         }
         return returnValue;
     }
@@ -87,7 +86,7 @@ public class BsmFieldConversions {
         // -- 255 = unavailable semi-minor axis val
         Double returnValue = null;
         if (semiMinor >= 0 && semiMinor < 255) {
-            returnValue = BigDecimal.valueOf(semiMinor * 5, 2).doubleValue();
+            returnValue = semiMinor * 0.05;
         }
         return returnValue;
     }
@@ -103,8 +102,7 @@ public class BsmFieldConversions {
         // -- a value of 65535 shall be used for orientation unavailable
         Double returnValue = null;
         if (orientation >= 0 && orientation < 65535) {
-            returnValue =
-                    BigDecimal.valueOf(0.0054932479 * orientation).setScale(10, RoundingMode.HALF_EVEN).doubleValue();
+            returnValue = 0.0054932479 * orientation;
         }
         return returnValue;
     }
