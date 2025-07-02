@@ -25,6 +25,9 @@
         "logName" : {
           "type" : "string"
         },
+        "asn1" : {
+          "type" : "string"
+        },
         "messageType" : {
           "type" : "string"
         },

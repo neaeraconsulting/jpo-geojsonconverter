@@ -28,7 +28,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonPropertyOrder({"schemaVersion", "messageType", "odeReceivedAt", "timeStamp", "originIp", "logName",
+@JsonPropertyOrder({"schemaVersion", "messageType", "odeReceivedAt", "timeStamp", "originIp", "logName", "asn1",
         "validationMessages", "accelSet", "accuracy", "angle", "brakes", "heading", "id", "msgCnt", "secMark", "size",
         "speed", "transmission"})
 public class BsmProperties {
@@ -41,6 +41,7 @@ public class BsmProperties {
     private String odeReceivedAt;
     private String originIp;
     private String logName;
+    private String asn1;
     private List<ProcessedValidationMessage> validationMessages = null;
     private ZonedDateTime timeStamp;
 

@@ -95,9 +95,9 @@ public class BsmProcessedJsonConverter
             BasicSafetyMessageMessageFrame bsmMessageFrame, JsonValidatorResult validationMessages) {
 
         ProcessedBsm<Point> processedBsm = createProcessedBsmGeometryAndProperties(bsmMessageFrame);
-        processedBsm.getProperties().setOdeReceivedAt(metadata.getOdeReceivedAt()); // ISO 8601:
-                                                                                    // 2022-11-11T16:36:10.529530Z
-
+        // ISO 8601: 2022-11-11T16:36:10.529530Z
+        processedBsm.getProperties().setOdeReceivedAt(metadata.getOdeReceivedAt());
+        processedBsm.getProperties().setAsn1(metadata.getAsn1());
         if (metadata.getOriginIp() != null && !metadata.getOriginIp().isEmpty())
             processedBsm.getProperties().setOriginIp(metadata.getOriginIp());
         if (metadata.getLogFileName() != null && !metadata.getLogFileName().isEmpty())
