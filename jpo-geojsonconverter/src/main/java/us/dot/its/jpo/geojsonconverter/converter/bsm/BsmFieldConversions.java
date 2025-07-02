@@ -1,7 +1,5 @@
 package us.dot.its.jpo.geojsonconverter.converter.bsm;
 
-import java.math.BigDecimal;
-
 public class BsmFieldConversions {
     public static Double convertLong(long j2735Long) {
         // Longitude ::= INTEGER (-1799999999..1800000001)
@@ -9,7 +7,7 @@ public class BsmFieldConversions {
         // -- Providing a range of plus-minus 180 degrees
         Double returnValue = null;
         if (j2735Long != 1800000001) {
-            returnValue = BigDecimal.valueOf(j2735Long, 7).doubleValue();
+            returnValue = j2735Long * 1e-7;
         }
         return returnValue;
     }
@@ -20,7 +18,7 @@ public class BsmFieldConversions {
         // -- Providing a range of plus-minus 90 degrees
         Double returnValue = null;
         if (j2735Lat != 900000001) {
-            returnValue = BigDecimal.valueOf(j2735Lat, 7).doubleValue();
+            returnValue = j2735Lat * 1e-7;
         }
         return returnValue;
     }
