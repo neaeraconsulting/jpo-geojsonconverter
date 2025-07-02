@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Data
 @NoArgsConstructor
@@ -30,6 +31,7 @@ import lombok.NoArgsConstructor;
 @JsonPropertyOrder({"schemaVersion", "messageType", "odeReceivedAt", "timeStamp", "originIp", "logName", "asn1",
         "validationMessages", "accelSet", "accuracy", "angle", "brakes", "heading", "id", "msgCnt", "secMark", "size",
         "speed", "transmission"})
+@Slf4j
 public class BsmProperties {
     private static Logger logger = LoggerFactory.getLogger(BsmProperties.class);
 

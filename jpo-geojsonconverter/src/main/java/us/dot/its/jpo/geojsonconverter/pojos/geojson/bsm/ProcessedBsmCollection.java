@@ -10,11 +10,12 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import lombok.extern.slf4j.Slf4j;
 import us.dot.its.jpo.geojsonconverter.DateJsonMapper;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.BaseFeatureCollection;
 
 // This is a helper class to allow for a ProcessedBsmCollection to be created with a list of ProcessedBsm Features
+@Slf4j
 public class ProcessedBsmCollection<TGeometry> extends BaseFeatureCollection<ProcessedBsm<TGeometry>> {
     private static Logger logger = LoggerFactory.getLogger(ProcessedBsmCollection.class);
 

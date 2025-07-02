@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import us.dot.its.jpo.geojsonconverter.DateJsonMapper;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.psm.PsmProperties;
 
@@ -19,6 +20,7 @@ import us.dot.its.jpo.geojsonconverter.pojos.geojson.psm.PsmProperties;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonPropertyOrder({"semiMajor", "semiMinor", "orientation"})
+@Slf4j
 public class ProcessedBsmPositionalAccuracy {
     private static Logger logger = LoggerFactory.getLogger(PsmProperties.class);
 
