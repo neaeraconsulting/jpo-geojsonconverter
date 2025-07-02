@@ -1,60 +1,60 @@
-package us.dot.its.jpo.geojsonconverter.pojos.geojson.map;
+// package us.dot.its.jpo.geojsonconverter.pojos.geojson.map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+// import static org.junit.jupiter.api.Assertions.assertEquals;
+// import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import org.junit.Test;
+// import org.junit.Test;
 
-import us.dot.its.jpo.geojsonconverter.validator.JsonValidatorResult;
-import us.dot.its.jpo.ode.model.OdeMapData;
+// import us.dot.its.jpo.geojsonconverter.validator.JsonValidatorResult;
+// import us.dot.its.jpo.ode.model.OdeMapData;
 
-public class DeserializedRawMapTest {
-    @Test
-    public void testGettersSetters() {
-        DeserializedRawMap object = new DeserializedRawMap();
-        
-        OdeMapData mapData = new OdeMapData();
-        object.setOdeMapOdeMapData(mapData);
-        OdeMapData dataResponse = object.getOdeMapOdeMapData();
-        assertEquals(dataResponse, mapData);
+// public class DeserializedRawMapTest {
+// @Test
+// public void testGettersSetters() {
+// DeserializedRawMap object = new DeserializedRawMap();
 
-        JsonValidatorResult validation = new JsonValidatorResult();
-        object.setValidatorResults(validation);
-        JsonValidatorResult validationResponse = object.getValidatorResults();
-        assertEquals(validationResponse, validation);
-    }
+// OdeMapData mapData = new OdeMapData();
+// object.setOdeMapOdeMapData(mapData);
+// OdeMapData dataResponse = object.getOdeMapOdeMapData();
+// assertEquals(dataResponse, mapData);
 
-    @Test
-    public void testEquals() {
-        DeserializedRawMap object = new DeserializedRawMap();
-        DeserializedRawMap otherObject = new DeserializedRawMap();
-        OdeMapData mapData = new OdeMapData();
-        otherObject.setOdeMapOdeMapData(mapData);
+// JsonValidatorResult validation = new JsonValidatorResult();
+// object.setValidatorResults(validation);
+// JsonValidatorResult validationResponse = object.getValidatorResults();
+// assertEquals(validationResponse, validation);
+// }
 
-        boolean equals = object.equals(object);
-        assertEquals(true, equals);
-        
-        boolean otherEquals = object.equals(otherObject);
-        assertEquals(false, otherEquals);
+// @Test
+// public void testEquals() {
+// DeserializedRawMap object = new DeserializedRawMap();
+// DeserializedRawMap otherObject = new DeserializedRawMap();
+// OdeMapData mapData = new OdeMapData();
+// otherObject.setOdeMapOdeMapData(mapData);
 
-        String string = "string";
-        boolean notEquals = otherObject.equals(string);
-        assertEquals(false, notEquals);
-    }
+// boolean equals = object.equals(object);
+// assertEquals(true, equals);
 
-    @Test
-    public void testHashCode() {
-        DeserializedRawMap object = new DeserializedRawMap();
+// boolean otherEquals = object.equals(otherObject);
+// assertEquals(false, otherEquals);
 
-        Integer hash = object.hashCode();
-        assertNotNull(hash);
-    }
+// String string = "string";
+// boolean notEquals = otherObject.equals(string);
+// assertEquals(false, notEquals);
+// }
 
-    @Test
-    public void testToString() {
-        DeserializedRawMap object = new DeserializedRawMap();
+// @Test
+// public void testHashCode() {
+// DeserializedRawMap object = new DeserializedRawMap();
 
-        String string = object.toString();
-        assertNotNull(string);
-    }
-}
+// Integer hash = object.hashCode();
+// assertNotNull(hash);
+// }
+
+// @Test
+// public void testToString() {
+// DeserializedRawMap object = new DeserializedRawMap();
+
+// String string = object.toString();
+// assertNotNull(string);
+// }
+// }

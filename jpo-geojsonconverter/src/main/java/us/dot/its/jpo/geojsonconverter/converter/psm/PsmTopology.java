@@ -40,8 +40,8 @@ public class PsmTopology {
             DeserializedRawPsm deserializedRawPsm = new DeserializedRawPsm();
             try {
                 JsonValidatorResult validationResults = psmJsonValidator.validate(value.get());
-                deserializedRawPsm
-                        .setOdePsmData(JsonSerdes.OdePsm().deserializer().deserialize(psmOdeJsonTopic, value.get()));
+                deserializedRawPsm.setOdePsmMessageFrameData(
+                        JsonSerdes.OdeMessageFrame().deserializer().deserialize(psmOdeJsonTopic, value.get()));
                 deserializedRawPsm.setValidatorResults(validationResults);
                 logger.debug(validationResults.describeResults());
             } catch (Exception e) {
@@ -58,13 +58,13 @@ public class PsmTopology {
         });
 
         // Convert ODE PSM to GeoJSON
-        KStream<RsuPsmIdKey, ProcessedPsm<Point>> processedJsonPsmStream =
-                validatedOdePsmStream.transform(() -> new PsmProcessedJsonConverter());
+        // KStream<RsuPsmIdKey, ProcessedPsm<Point>> processedJsonPsmStream =
+        // validatedOdePsmStream.transform(() -> new PsmProcessedJsonConverter());
 
-        processedJsonPsmStream.to(
-                // Push the joined GeoJSON stream back out to the PSM GeoJSON topic
-                psmProcessedJsonTopic, Produced.with(JsonSerdes.RsuTypeIdKey(), JsonSerdes.ProcessedPsm(),
-                        new RsuPsmIdPartitioner<RsuPsmIdKey, ProcessedPsm<Point>>()));
+        // processedJsonPsmStream.to(
+        // // Push the joined GeoJSON stream back out to the PSM GeoJSON topic
+        // psmProcessedJsonTopic, Produced.with(JsonSerdes.RsuTypeIdKey(), JsonSerdes.ProcessedPsm(),
+        // new RsuPsmIdPartitioner<RsuPsmIdKey, ProcessedPsm<Point>>()));
 
         return builder.build();
     }

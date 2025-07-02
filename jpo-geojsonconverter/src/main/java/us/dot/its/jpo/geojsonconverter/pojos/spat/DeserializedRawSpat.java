@@ -3,21 +3,21 @@ package us.dot.its.jpo.geojsonconverter.pojos.spat;
 import java.util.Objects;
 
 import us.dot.its.jpo.geojsonconverter.validator.JsonValidatorResult;
-import us.dot.its.jpo.ode.model.OdeSpatData;
+import us.dot.its.jpo.ode.model.OdeMessageFrameData;
 
 public class DeserializedRawSpat {
-    
-    OdeSpatData odeSpatOdeSpat;
+
+    OdeMessageFrameData odeSpatMessageFrameData;
     JsonValidatorResult validatorResults;
     Boolean validationFailure = false;
     String failedMessage = null;
 
-    public OdeSpatData getOdeSpatOdeSpatData() {
-        return this.odeSpatOdeSpat;
+    public OdeMessageFrameData getOdeSpatMessageFrameData() {
+        return this.odeSpatMessageFrameData;
     }
 
-    public void setOdeSpatOdeSpatData(OdeSpatData odeSpatOdeSpatData) {
-        this.odeSpatOdeSpat = odeSpatOdeSpatData;
+    public void setOdeSpatMessageFrameData(OdeMessageFrameData odeSpatMessageFrameData) {
+        this.odeSpatMessageFrameData = odeSpatMessageFrameData;
     }
 
     public JsonValidatorResult getValidatorResults() {
@@ -52,22 +52,22 @@ public class DeserializedRawSpat {
             return false;
         }
         DeserializedRawSpat deserializedRawSpat = (DeserializedRawSpat) o;
-        return Objects.equals(odeSpatOdeSpat, deserializedRawSpat.odeSpatOdeSpat) && Objects.equals(validatorResults, deserializedRawSpat.validatorResults) && Objects.equals(validationFailure, deserializedRawSpat.validationFailure) && Objects.equals(failedMessage, deserializedRawSpat.failedMessage);
+        return Objects.equals(odeSpatMessageFrameData, deserializedRawSpat.odeSpatMessageFrameData)
+                && Objects.equals(validatorResults, deserializedRawSpat.validatorResults)
+                && Objects.equals(validationFailure, deserializedRawSpat.validationFailure)
+                && Objects.equals(failedMessage, deserializedRawSpat.failedMessage);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(odeSpatOdeSpat, validatorResults, validationFailure, failedMessage);
+        return Objects.hash(odeSpatMessageFrameData, validatorResults, validationFailure, failedMessage);
     }
 
     @Override
     public String toString() {
-        return "{" +
-            " odeSpatOdeSpat='" + getOdeSpatOdeSpatData() + "'" +
-            ", validatorResults='" + getValidatorResults() + "'" +
-            ", validationFailure='" + getValidationFailure() + "'" +
-            ", failedMessage='" + getFailedMessage() + "'" +
-            "}";
+        return "{" + " odeSpatOdeSpat='" + getOdeSpatMessageFrameData() + "'" + ", validatorResults='"
+                + getValidatorResults() + "'" + ", validationFailure='" + getValidationFailure() + "'"
+                + ", failedMessage='" + getFailedMessage() + "'" + "}";
     }
 
 }

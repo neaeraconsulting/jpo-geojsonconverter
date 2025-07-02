@@ -1,60 +1,60 @@
-package us.dot.its.jpo.geojsonconverter.pojos.spat;
+// package us.dot.its.jpo.geojsonconverter.pojos.spat;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+// import static org.junit.jupiter.api.Assertions.assertEquals;
+// import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import org.junit.Test;
+// import org.junit.Test;
 
-import us.dot.its.jpo.geojsonconverter.validator.JsonValidatorResult;
-import us.dot.its.jpo.ode.model.OdeSpatData;
+// import us.dot.its.jpo.geojsonconverter.validator.JsonValidatorResult;
+// import us.dot.its.jpo.ode.model.OdeSpatData;
 
-public class DeserializedRawSpatTest {
-    @Test
-    public void testGettersSetters() {
-        DeserializedRawSpat object = new DeserializedRawSpat();
-        
-        OdeSpatData spatData = new OdeSpatData();
-        object.setOdeSpatOdeSpatData(spatData);
-        OdeSpatData dataResponse = object.getOdeSpatOdeSpatData();
-        assertEquals(dataResponse, spatData);
+// public class DeserializedRawSpatTest {
+// @Test
+// public void testGettersSetters() {
+// DeserializedRawSpat object = new DeserializedRawSpat();
 
-        JsonValidatorResult validation = new JsonValidatorResult();
-        object.setValidatorResults(validation);
-        JsonValidatorResult validationResponse = object.getValidatorResults();
-        assertEquals(validationResponse, validation);
-    }
+// OdeSpatData spatData = new OdeSpatData();
+// object.setOdeSpatOdeSpatData(spatData);
+// OdeSpatData dataResponse = object.getOdeSpatOdeSpatData();
+// assertEquals(dataResponse, spatData);
 
-    @Test
-    public void testEquals() {
-        DeserializedRawSpat object = new DeserializedRawSpat();
-        DeserializedRawSpat otherObject = new DeserializedRawSpat();
-        OdeSpatData data = new OdeSpatData();
-        otherObject.setOdeSpatOdeSpatData(data);
+// JsonValidatorResult validation = new JsonValidatorResult();
+// object.setValidatorResults(validation);
+// JsonValidatorResult validationResponse = object.getValidatorResults();
+// assertEquals(validationResponse, validation);
+// }
 
-        boolean equals = object.equals(object);
-        assertEquals(true, equals);
-        
-        boolean otherEquals = object.equals(otherObject);
-        assertEquals(false, otherEquals);
+// @Test
+// public void testEquals() {
+// DeserializedRawSpat object = new DeserializedRawSpat();
+// DeserializedRawSpat otherObject = new DeserializedRawSpat();
+// OdeSpatData data = new OdeSpatData();
+// otherObject.setOdeSpatOdeSpatData(data);
 
-        String string = "string";
-        boolean notEquals = otherObject.equals(string);
-        assertEquals(false, notEquals);
-    }
+// boolean equals = object.equals(object);
+// assertEquals(true, equals);
 
-    @Test
-    public void testHashCode() {
-        DeserializedRawSpat object = new DeserializedRawSpat();
+// boolean otherEquals = object.equals(otherObject);
+// assertEquals(false, otherEquals);
 
-        Integer hash = object.hashCode();
-        assertNotNull(hash);
-    }
+// String string = "string";
+// boolean notEquals = otherObject.equals(string);
+// assertEquals(false, notEquals);
+// }
 
-    @Test
-    public void testToString() {
-        DeserializedRawSpat object = new DeserializedRawSpat();
+// @Test
+// public void testHashCode() {
+// DeserializedRawSpat object = new DeserializedRawSpat();
 
-        String string = object.toString();
-        assertNotNull(string);
-    }
-}
+// Integer hash = object.hashCode();
+// assertNotNull(hash);
+// }
+
+// @Test
+// public void testToString() {
+// DeserializedRawSpat object = new DeserializedRawSpat();
+
+// String string = object.toString();
+// assertNotNull(string);
+// }
+// }

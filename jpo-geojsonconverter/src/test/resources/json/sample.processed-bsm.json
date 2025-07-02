@@ -3,34 +3,33 @@
     "geometry": {
         "type": "Point",
         "coordinates": [
-            -105.0342901,
-            40.5671913
+            -105.0317754,
+            40.5659938
         ]
     },
     "properties": {
-        "schemaVersion": 1,
+        "schemaVersion": 9,
         "messageType": "BSM",
-        "odeReceivedAt": "2024-08-12T12:32:03.811Z",
-        "originIp": "172.19.0.1",
+        "odeReceivedAt": "2025-06-26T21:45:42.685Z",
+        "timeStamp": "2025-06-26T21:45:25.399Z",
+        "originIp": "172.18.0.1",
         "validationMessages": [],
-        "timeStamp": "2024-08-12T12:32:04.3034091Z",
         "accelSet": {
-            "accelLat": 2001,
-            "accelLong": 0,
-            "accelVert": -127,
-            "accelYaw": 0
+            "accelLat": 0.27,
+            "accelLong": 0.0,
+            "accelVert": 0.0,
+            "accelYaw": 0.0
         },
         "accuracy": {
-            "semiMajor": 5,
-            "semiMinor": 2,
-            "orientation": 0
+            "semiMajor": 9.3,
+            "semiMinor": 12.05
         },
         "brakes": {
             "wheelBrakes": {
-                "leftFront": false,
-                "rightFront": false,
                 "unavailable": true,
+                "leftFront": false,
                 "leftRear": false,
+                "rightFront": false,
                 "rightRear": false
             },
             "traction": "unavailable",
@@ -39,14 +38,15 @@
             "brakeBoost": "unavailable",
             "auxBrakes": "unavailable"
         },
-        "heading": 359.4,
-        "id": "12A7A951",
-        "msgCnt": 25,
-        "secMark": 2800,
+        "heading": 313.25,
+        "id": "31325433",
+        "msgCnt": 37,
+        "secMark": 25399,
         "size": {
-            "width": 208,
-            "length": 586
+            "width": 190,
+            "length": 570
         },
-        "transmission": "UNAVAILABLE"
+        "speed": 0.28,
+        "transmission": "unavailable"
     }
 }

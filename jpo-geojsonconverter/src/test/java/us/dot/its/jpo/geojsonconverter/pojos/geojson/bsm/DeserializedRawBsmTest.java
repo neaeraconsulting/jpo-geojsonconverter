@@ -6,16 +6,16 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.Test;
 
 import us.dot.its.jpo.geojsonconverter.validator.JsonValidatorResult;
-import us.dot.its.jpo.ode.model.OdeBsmData;
+import us.dot.its.jpo.ode.model.OdeMessageFrameData;
 
 public class DeserializedRawBsmTest {
     @Test
     public void testGettersSetters() {
         DeserializedRawBsm object = new DeserializedRawBsm();
-            
-        OdeBsmData bsmData = new OdeBsmData();
-        object.setOdeBsmData(bsmData);
-        OdeBsmData dataResponse = object.getOdeBsmData();
+
+        OdeMessageFrameData bsmData = new OdeMessageFrameData();
+        object.setOdeBsmMessageFrameData(bsmData);
+        OdeMessageFrameData dataResponse = object.getOdeBsmMessageFrameData();
         assertEquals(dataResponse, bsmData);
 
         JsonValidatorResult validation = new JsonValidatorResult();
@@ -28,12 +28,12 @@ public class DeserializedRawBsmTest {
     public void testEquals() {
         DeserializedRawBsm object = new DeserializedRawBsm();
         DeserializedRawBsm otherObject = new DeserializedRawBsm();
-        OdeBsmData bsmData = new OdeBsmData();
-        object.setOdeBsmData(bsmData);
+        OdeMessageFrameData bsmData = new OdeMessageFrameData();
+        object.setOdeBsmMessageFrameData(bsmData);
 
         boolean equals = object.equals(object);
         assertEquals(true, equals);
-        
+
         boolean otherEquals = object.equals(otherObject);
         assertEquals(false, otherEquals);
 
