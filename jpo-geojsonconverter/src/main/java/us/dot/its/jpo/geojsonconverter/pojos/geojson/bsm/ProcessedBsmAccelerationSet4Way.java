@@ -14,6 +14,17 @@ import lombok.extern.slf4j.Slf4j;
 import us.dot.its.jpo.geojsonconverter.DateJsonMapper;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.psm.PsmProperties;
 
+/**
+ * Represents a processed BSM (Basic Safety Message) J2735 AccelerationSet4Way.
+ * <p>
+ * accelLat - meters per second squared (m/s^2)
+ * <p>
+ * accelLong - meters per second squared (m/s^2)
+ * <p>
+ * accelVert - Gs (vertical acceleration)
+ * <p>
+ * accelYaw - degrees per second (yaw rate)
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -24,12 +35,9 @@ import us.dot.its.jpo.geojsonconverter.pojos.geojson.psm.PsmProperties;
 public class ProcessedBsmAccelerationSet4Way {
     private static Logger logger = LoggerFactory.getLogger(PsmProperties.class);
 
-    // Acceleration latitude and longitude in m/s^2
     private Double accelLat;
     private Double accelLong;
-    // Vertical acceleration in Gs
     private Double accelVert;
-    // Yaw rate in degrees per second
     private Double accelYaw;
 
     @Override

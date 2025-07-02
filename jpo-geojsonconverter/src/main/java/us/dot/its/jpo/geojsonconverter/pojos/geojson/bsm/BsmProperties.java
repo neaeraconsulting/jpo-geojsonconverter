@@ -23,6 +23,47 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Represents a processed BSM (Basic Safety Message) J2735 PositionalAccuracy.
+ * <p>
+ * schemaVersion - origin OdeBsmJson message's schema version
+ * <p>
+ * messageType - BSM
+ * <p>
+ * odeReceivedAt - The time the origin OdeBsmJson message was received by the ODE, in UTC
+ * <p>
+ * originIp - The IP address the origin OdeBsmJson message was received from
+ * <p>
+ * logName - The log file name the origin OdeBsmJson message was consumed from
+ * <p>
+ * asn1 - The ASN.1 encoded string of the origin J2735 BSM message
+ * <p>
+ * validationMessages - List of validation messages based on the OdeBsmJson schema
+ * <p>
+ * timeStamp - The time the origin BSM messages was generated, in UTC
+ * <p>
+ * accelSet - ProcessedBsmAccelerationSet4Way
+ * <p>
+ * accuracy - ProcessedBsmPositionalAccuracy
+ * <p>
+ * angle - Degrees
+ * <p>
+ * brakes - BrakeSystemStatus
+ * <p>
+ * heading - Degrees
+ * <p>
+ * id - The unique identifier for the vehicle/OBU the BSM was generated from at the time.
+ * <p>
+ * msgCnt - The message count of the BSM
+ * <p>
+ * secMark - Milliseconds within a minute
+ * <p>
+ * size - VehicleSize (Width and height in cm)
+ * <p>
+ * speed - Speed in meters per second (m/s)
+ * <p>
+ * transmission - TransmissionState enum
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -49,14 +90,14 @@ public class BsmProperties {
     // Payload properties
     private ProcessedBsmAccelerationSet4Way accelSet;
     private ProcessedBsmPositionalAccuracy accuracy;
-    private Double angle; // Degrees
+    private Double angle;
     private BrakeSystemStatus brakes;
-    private Double heading; // Degrees
+    private Double heading;
     private String id;
     private Long msgCnt;
     private Long secMark;
-    private VehicleSize size; // Width and height in cm
-    private Double speed; // meters per second (m/s)
+    private VehicleSize size;
+    private Double speed;
     private TransmissionState transmission;
 
     @Override

@@ -14,6 +14,15 @@ import lombok.extern.slf4j.Slf4j;
 import us.dot.its.jpo.geojsonconverter.DateJsonMapper;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.psm.PsmProperties;
 
+/**
+ * Represents a processed BSM (Basic Safety Message) J2735 PositionalAccuracy.
+ * <p>
+ * semiMajor - meters (m)
+ * <p>
+ * semiMinor - meters (m)
+ * <p>
+ * orientation - Degrees relative to true north
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -24,10 +33,8 @@ import us.dot.its.jpo.geojsonconverter.pojos.geojson.psm.PsmProperties;
 public class ProcessedBsmPositionalAccuracy {
     private static Logger logger = LoggerFactory.getLogger(PsmProperties.class);
 
-    // semiMajor and semiMinor in meters
     private Double semiMajor;
     private Double semiMinor;
-    // Degrees relative to true north
     private Double orientation;
 
     @Override
