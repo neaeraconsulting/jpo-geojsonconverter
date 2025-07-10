@@ -9,24 +9,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import us.dot.its.jpo.asn.j2735.r2024.SPAT.AdvisorySpeedList;
+import us.dot.its.jpo.asn.j2735.r2024.SPAT.MovementPhaseState;
 import us.dot.its.jpo.geojsonconverter.DateJsonMapper;
-import us.dot.its.jpo.ode.plugin.j2735.J2735AdvisorySpeedList;
-import us.dot.its.jpo.ode.plugin.j2735.J2735MovementPhaseState;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class MovementEvent {
-    private static Logger logger = LoggerFactory.getLogger(MovementEvent.class);
+public class ProcessedMovementEvent {
+    private static Logger logger = LoggerFactory.getLogger(ProcessedMovementEvent.class);
 
-    private J2735MovementPhaseState eventState;
+    private MovementPhaseState eventState;
     private TimingChangeDetails timing;
-    private J2735AdvisorySpeedList speeds;
+    private AdvisorySpeedList speeds;
 
-    public J2735MovementPhaseState getEventState() {
+    public MovementPhaseState getEventState() {
         return eventState;
     }
 
-    public void setEventState(J2735MovementPhaseState eventState) {
+    public void setEventState(MovementPhaseState eventState) {
         this.eventState = eventState;
     }
 
@@ -38,11 +37,11 @@ public class MovementEvent {
         this.timing = timing;
     }
 
-    public J2735AdvisorySpeedList getSpeeds() {
+    public AdvisorySpeedList getSpeeds() {
         return speeds;
     }
 
-    public void setSpeeds(J2735AdvisorySpeedList speeds) {
+    public void setSpeeds(AdvisorySpeedList speeds) {
         this.speeds = speeds;
     }
 
@@ -50,11 +49,12 @@ public class MovementEvent {
     public boolean equals(Object o) {
         if (o == this)
             return true;
-        if (!(o instanceof MovementEvent)) {
+        if (!(o instanceof ProcessedMovementEvent)) {
             return false;
         }
-        MovementEvent movementEvent = (MovementEvent) o;
-        return Objects.equals(eventState, movementEvent.eventState) && Objects.equals(timing, movementEvent.timing) && speeds == movementEvent.speeds;
+        ProcessedMovementEvent movementEvent = (ProcessedMovementEvent) o;
+        return Objects.equals(eventState, movementEvent.eventState) && Objects.equals(timing, movementEvent.timing)
+                && speeds == movementEvent.speeds;
     }
 
     @Override

@@ -62,16 +62,16 @@ public class SpatTopology {
                 });
 
         // Convert ODE SPaT to GeoJSON
-        // KStream<RsuIntersectionKey, ProcessedSpat> processedJsonSpatStream =
-        // validatedOdeSpatStream.transform(() -> new SpatProcessedJsonConverter() // change this converter to
-        // // something else NOT GEOJSON
-        // );
+        KStream<RsuIntersectionKey, ProcessedSpat> processedJsonSpatStream =
+                validatedOdeSpatStream.transform(() -> new SpatProcessedJsonConverter() // change this converter to
+                // something else NOT GEOJSON
+                );
 
-        // processedJsonSpatStream.to(
-        // // Push the joined GeoJSON stream back out to the SPaT GeoJSON topic
-        // spatProcessedJsonTopic, Produced.with(JsonSerdes.RsuIntersectionKey(), JsonSerdes.ProcessedSpat(),
-        // new IntersectionIdPartitioner<RsuIntersectionKey, ProcessedSpat>()) // Partition by RSU ID
-        // );
+        processedJsonSpatStream.to(
+                // Push the joined GeoJSON stream back out to the SPaT GeoJSON topic
+                spatProcessedJsonTopic, Produced.with(JsonSerdes.RsuIntersectionKey(), JsonSerdes.ProcessedSpat(),
+                        new IntersectionIdPartitioner<RsuIntersectionKey, ProcessedSpat>()) // Partition by RSU ID
+        );
 
         return builder.build();
     }

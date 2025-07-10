@@ -1,20 +1,22 @@
 package us.dot.its.jpo.geojsonconverter.pojos.spat;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import us.dot.its.jpo.geojsonconverter.DateJsonMapper;
-import us.dot.its.jpo.geojsonconverter.pojos.ProcessedValidationMessage;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import us.dot.its.jpo.asn.j2735.r2024.Common.DescriptiveName;
+import us.dot.its.jpo.asn.j2735.r2024.Common.IntersectionID;
+import us.dot.its.jpo.asn.j2735.r2024.Common.IntersectionReferenceID;
+import us.dot.its.jpo.asn.j2735.r2024.Common.LaneID;
+import us.dot.its.jpo.asn.j2735.r2024.Common.RoadRegulatorID;
+import us.dot.its.jpo.asn.j2735.r2024.SPAT.IntersectionStatusObject;
+import us.dot.its.jpo.geojsonconverter.DateJsonMapper;
+import us.dot.its.jpo.geojsonconverter.pojos.ProcessedValidationMessage;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ProcessedSpat {
@@ -33,8 +35,8 @@ public class ProcessedSpat {
     private Integer revision;
     private IntersectionStatusObject status;
     private ZonedDateTime utcTimeStamp;
-    private List<Integer> enabledLanes = new ArrayList<>();
-    private List<MovementState> states = null;
+    private List<LaneID> enabledLanes = new ArrayList<>();
+    private List<ProcessedMovementState> states = null;
 
     public int getSchemaVersion() {
         return schemaVersion;
@@ -84,12 +86,30 @@ public class ProcessedSpat {
         this.region = region;
     }
 
+    public void setRegion(RoadRegulatorID region) {
+        if (region != null) {
+            setRegion((int) region.getValue());
+        } else {
+            // Use -1 to indicate region is missing
+            setRegion(-1);
+        }
+    }
+
     public Integer getIntersectionId() {
         return intersectionId;
     }
 
     public void setIntersectionId(Integer intersectionId) {
         this.intersectionId = intersectionId;
+    }
+
+    public void setIntersectionId(IntersectionID intersectionId) {
+        if (intersectionId != null) {
+            setIntersectionId((int) intersectionId.getValue());
+        } else {
+            // Use -1 to indicate intersection id is missing
+            setIntersectionId(-1);
+        }
     }
 
     public boolean getCti4501Conformant() {
@@ -132,20 +152,32 @@ public class ProcessedSpat {
         this.utcTimeStamp = utcTimeStamp;
     }
 
-    public List<Integer> getEnabledLanes() {
+    public List<LaneID> getEnabledLanes() {
         return enabledLanes;
     }
 
-    public void setEnabledLanes(List<Integer> enabledLanes) {
+    public void setEnabledLanes(List<LaneID> enabledLanes) {
         this.enabledLanes = enabledLanes;
     }
 
-    public List<MovementState> getStates() {
+    public List<ProcessedMovementState> getStates() {
         return states;
     }
 
-    public void setStates(List<MovementState> states) {
+    public void setStates(List<ProcessedMovementState> states) {
         this.states = states;
+    }
+
+    /**
+     * Sets both intersection ID and region with null checks
+     * 
+     * @param referenceID IntersectionReferenceID
+     */
+    public void setIntersectionReferenceID(IntersectionReferenceID referenceID) {
+        if (referenceID != null) {
+            setIntersectionId(referenceID.getId());
+            setRegion(referenceID.getRegion());
+        }
     }
 
     @Override
@@ -156,12 +188,22 @@ public class ProcessedSpat {
             return false;
         }
         ProcessedSpat processedSpat = (ProcessedSpat) o;
-        return Objects.equals(messageType, processedSpat.messageType) && Objects.equals(odeReceivedAt, processedSpat.odeReceivedAt) && Objects.equals(originIp, processedSpat.originIp) && Objects.equals(name, processedSpat.name) && region == processedSpat.region && intersectionId == processedSpat.intersectionId && cti4501Conformant == processedSpat.cti4501Conformant && Objects.equals(validationMessages, processedSpat.validationMessages) && revision == processedSpat.revision && Objects.equals(status, processedSpat.status) && Objects.equals(utcTimeStamp, processedSpat.utcTimeStamp) && Objects.equals(enabledLanes, processedSpat.enabledLanes) && Objects.equals(states, processedSpat.states);
+        return Objects.equals(messageType, processedSpat.messageType)
+                && Objects.equals(odeReceivedAt, processedSpat.odeReceivedAt)
+                && Objects.equals(originIp, processedSpat.originIp) && Objects.equals(name, processedSpat.name)
+                && region == processedSpat.region && intersectionId == processedSpat.intersectionId
+                && cti4501Conformant == processedSpat.cti4501Conformant
+                && Objects.equals(validationMessages, processedSpat.validationMessages)
+                && revision == processedSpat.revision && Objects.equals(status, processedSpat.status)
+                && Objects.equals(utcTimeStamp, processedSpat.utcTimeStamp)
+                && Objects.equals(enabledLanes, processedSpat.enabledLanes)
+                && Objects.equals(states, processedSpat.states);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(messageType, odeReceivedAt, originIp, name, region, intersectionId, cti4501Conformant, validationMessages, revision, status, utcTimeStamp, enabledLanes, states);
+        return Objects.hash(messageType, odeReceivedAt, originIp, name, region, intersectionId, cti4501Conformant,
+                validationMessages, revision, status, utcTimeStamp, enabledLanes, states);
     }
 
     @Override

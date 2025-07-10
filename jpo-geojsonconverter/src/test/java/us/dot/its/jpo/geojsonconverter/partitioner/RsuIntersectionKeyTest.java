@@ -16,16 +16,16 @@ public class RsuIntersectionKeyTest {
     final static String ipAddress = "127.0.0.1";
     final static int intersectionId = 10001;
     final static int region = 10;
-    
+
     @Test
-    public void testEquality() {        
-        
+    public void testEquality() {
+
         var key = new RsuIntersectionKey();
         key.setRsuId(ipAddress);
         var intersectionRegion = new J2735IntersectionReferenceID();
         intersectionRegion.setId(intersectionId);
         intersectionRegion.setRegion(region);
-        key.setIntersectionReferenceID(intersectionRegion);
+        // key.setIntersectionReferenceID(intersectionRegion);
 
         var keyValue = new RsuIntersectionKey(ipAddress, intersectionId, region);
         var keyRef = key;

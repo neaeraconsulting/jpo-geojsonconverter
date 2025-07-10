@@ -13,12 +13,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class MovementState {
-    private static Logger logger = LoggerFactory.getLogger(MovementState.class);
+public class ProcessedMovementState {
+    private static Logger logger = LoggerFactory.getLogger(ProcessedMovementState.class);
 
     private String movementName;
     private Integer signalGroup;
-    private List<MovementEvent> stateTimeSpeed = null;
+    private List<ProcessedMovementEvent> stateTimeSpeed = null;
 
     public String getMovementName() {
         return movementName;
@@ -36,11 +36,11 @@ public class MovementState {
         this.signalGroup = signalGroup;
     }
 
-    public List<MovementEvent> getStateTimeSpeed() {
+    public List<ProcessedMovementEvent> getStateTimeSpeed() {
         return stateTimeSpeed;
     }
 
-    public void setStateTimeSpeed(List<MovementEvent> stateTimeSpeed) {
+    public void setStateTimeSpeed(List<ProcessedMovementEvent> stateTimeSpeed) {
         this.stateTimeSpeed = stateTimeSpeed;
     }
 
@@ -48,11 +48,12 @@ public class MovementState {
     public boolean equals(Object o) {
         if (o == this)
             return true;
-        if (!(o instanceof MovementState)) {
+        if (!(o instanceof ProcessedMovementState)) {
             return false;
         }
-        MovementState movementState = (MovementState) o;
-        return Objects.equals(movementName, movementState.movementName) && signalGroup == movementState.signalGroup && Objects.equals(stateTimeSpeed, movementState.stateTimeSpeed);
+        ProcessedMovementState movementState = (ProcessedMovementState) o;
+        return Objects.equals(movementName, movementState.movementName) && signalGroup == movementState.signalGroup
+                && Objects.equals(stateTimeSpeed, movementState.stateTimeSpeed);
     }
 
     @Override
