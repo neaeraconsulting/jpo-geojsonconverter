@@ -1,0 +1,37 @@
+package us.dot.its.jpo.geojsonconverter.pojos.rtcm;
+
+
+import com.fasterxml.jackson.databind.JsonNode;
+import lombok.Data;
+
+/**
+ * A decoded RTCM message.  This class corresponds to the JSON format
+ * produced by the
+ * <a href="https://gpsd.gitlab.io/gpsd/gpsdecode.html">gpsdecode</a> tool.
+ */
+@Data
+public class DecodedRTCMmessage {
+
+    /**
+     * The message type extracted from the decoded message.
+     */
+    private int type;
+
+    /**
+     * The station ID extracted from the decoded message.
+     */
+    private int stationId;
+
+    /**
+     * The JSON description produced by decoding the message with the
+     * <a href="https://gpsd.gitlab.io/gpsd/gpsdecode.html">gpsdecode</a> tool.
+     * Contents vary depending on message type.
+     */
+    private JsonNode decodedMessage;
+
+    /**
+     * The original raw RTCM message, hex encoded.
+     */
+    private String hex;
+
+}
