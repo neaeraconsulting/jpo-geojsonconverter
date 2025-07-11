@@ -3,22 +3,32 @@ package us.dot.its.jpo.geojsonconverter.converter.rtcm;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.File;
 import java.io.IOException;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HexFormat;
 
 /**
- * Call the native gpsdecode command line tool to decode RTCMs
+ * Call the native gpsdecode command line tool to decode RTCMs.
+ * <p>Requires gpsd-client to be installed on Linux.  Will not work on Windows.</p>
  */
 @Slf4j
 public class RTCMDecoder {
 
     private static final HexFormat hexFormat = HexFormat.of();
 
+    private static final String EXECUTABLE = "/usr/bin/gpsdecode";
+
     public static String decodeRtcm(String hex)  {
+        File executable = new File(EXECUTABLE);
+        if (!executable.exists()) {
+            log.warn("Executable {} does not exist.",
+                    EXECUTABLE);
+            return "{}";
+        }
         byte[] bytes = hexFormat.parseHex(hex);
-        var pb = new ProcessBuilder("/usr/bin/gpsdecode");
+        var pb = new ProcessBuilder(EXECUTABLE);
 
         String json = null;
         Process process = null;

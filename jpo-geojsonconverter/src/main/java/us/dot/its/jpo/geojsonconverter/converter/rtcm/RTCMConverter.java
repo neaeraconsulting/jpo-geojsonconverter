@@ -1,11 +1,15 @@
 package us.dot.its.jpo.geojsonconverter.converter.rtcm;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SystemUtils;
 import us.dot.its.jpo.asn.j2735.r2024.Common.*;
 import us.dot.its.jpo.asn.j2735.r2024.RTCMcorrections.RTCMcorrections;
 import us.dot.its.jpo.asn.j2735.r2024.RTCMcorrections.RTCMcorrectionsMessageFrame;
+import us.dot.its.jpo.geojsonconverter.DateJsonMapper;
 import us.dot.its.jpo.geojsonconverter.pojos.rtcm.DecodedRTCMmessage;
 import us.dot.its.jpo.geojsonconverter.pojos.rtcm.ProcessedRTCM;
 
@@ -83,15 +87,25 @@ public class RTCMConverter {
         for (RTCMmessage message : messageList) {
             var decodedMessage = new DecodedRTCMmessage();
             decodedMessage.setHex(message.getValue());
+            decodedMessages.add(decodedMessage);
 
             // Decoder is only available on linux, skip detailed decoding to allow testing on Windows
-            if (SystemUtils.IS_OS_LINUX) {
-                String json = RTCMDecoder.decodeRtcm(decodedMessage.getHex());
-            } else {
-                log.warn("The gpsdecode decoder tool won't run on OS: {}.  You only get raw hex.", SystemUtils.OS_NAME);
+            if (SystemUtils.IS_OS_WINDOWS) {
+                log.warn("The gpsdecode decoder tool won't run on Windows. Only raw hex for you.");
+                continue;
             }
 
-            decodedMessages.add(decodedMessage);
+            String json = RTCMDecoder.decodeRtcm(decodedMessage.getHex());
+            ObjectMapper mapper = DateJsonMapper.getInstance();
+            try {
+                JsonNode node = mapper.readValue(json, JsonNode.class);
+                decodedMessage.setDecodedMessage(node);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+
+
+
         }
         processed.setMessages(decodedMessages);
     }
