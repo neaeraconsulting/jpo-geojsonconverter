@@ -1,33 +1,112 @@
 package us.dot.its.jpo.geojsonconverter.converter.rtcm;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.SystemUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import us.dot.its.jpo.geojsonconverter.DateJsonMapper;
+import us.dot.its.jpo.geojsonconverter.GeoJsonConverterProperties;
 
 import java.io.File;
 import java.io.IOException;
 
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.HexFormat;
 
 /**
- * Call the native gpsdecode command line tool to decode RTCMs.
- * <p>Requires gpsd-client to be installed on Linux.  Will not work on Windows.</p>
+ * Methods for decoding the RTCM payloads
  */
+@Component
 @Slf4j
 public class RTCMDecoder {
+
+    private final boolean fullDecode;
+
+    public RTCMDecoder(@Value("${rtcm.full.decode}") boolean fullDecode) {
+        this.fullDecode = fullDecode;
+    }
 
     private static final HexFormat hexFormat = HexFormat.of();
 
     private static final String EXECUTABLE = "/usr/bin/gpsdecode";
 
-    public static String decodeRtcm(String hex)  {
-        File executable = new File(EXECUTABLE);
-        if (!executable.exists()) {
-            log.warn("Executable {} does not exist.",
-                    EXECUTABLE);
-            return "{}";
-        }
+    public JsonNode decodeRtcm(String hex) {
         byte[] bytes = hexFormat.parseHex(hex);
+
+        if (!fullDecode) {
+            return partialDecode(bytes);
+        }
+
+        File executable = new File(EXECUTABLE);
+        if (!SystemUtils.IS_OS_WINDOWS || executable.exists()) {
+            return fullDecode(bytes);
+        } else {
+            log.warn("Executable {} does not exist, or running on Windows. Partially decoding.", EXECUTABLE);
+            return partialDecode(bytes);
+        }
+
+    }
+
+    /**
+     * Partially decode the RTCM message.  Used when gpsdecode library is not available.
+     * Ref. gpsd/driver_rtcm.c
+     * @param bytes byte array
+     * @return JSON formatted partially decoded message.
+     */
+    public static JsonNode partialDecode(byte[] bytes) {
+        ObjectMapper mapper = DateJsonMapper.getInstance();
+        ObjectNode node = mapper.createObjectNode();
+
+        // Need first 6 bytes to get preamble, length, type, station id.
+        if (bytes.length < 6) {
+            log.error("Not enough bytes to decode RTCM.");
+            return node;
+        }
+
+        // Preamble: 8 bits
+        int preamble = unsigned(bytes[0]);
+        if (preamble != 0xD3) {
+            log.error(String.format("Invalid RTCM preamble: %02X, should be %20X", preamble, 0xD3));
+            return node;
+        }
+        node.put("class", "RTCM3");
+
+        // Next 6 bits should be zero
+        int zeroBits = unsigned(bytes[1]) >>> 3;
+        if (zeroBits != 0) {
+            log.error(String.format("Invalid zero bits: %X", zeroBits));
+            return node;
+        }
+
+        // Length: 10 bits
+        int length = ((unsigned(bytes[1]) & 0x03) << 8) | unsigned(bytes[2]);
+        node.put("length", length);
+
+        //  Type: 12 bits
+        int type = (unsigned(bytes[3]) << 4) | (unsigned(bytes[4]) >>> 4);
+        node.put("type", type);
+
+        // Station ID: 12 bits
+        // Get station ID for types known or guessed to have them per driver_rtcm3.c
+        if (type <= 1013 || type == 1029 || type == 1033 || (type >= 1071 && type <= 1230)) {
+            int stationId = ((unsigned(bytes[4]) & 0x0F) << 8) | unsigned(bytes[5]);
+            node.put("station_id", stationId);
+        }
+
+        return node;
+    }
+
+    /**
+     * Call the native gpsdecode command line tool to fully decode RTCMs.
+     * <p>Full decode requires gpsd-client to be installed on Linux.  Will not work on Windows.</p>
+     */
+    public static JsonNode fullDecode(byte[] bytes) {
         var pb = new ProcessBuilder(EXECUTABLE);
 
         String json = null;
@@ -53,7 +132,18 @@ public class RTCMDecoder {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        return json;
+        ObjectMapper mapper = DateJsonMapper.getInstance();
+        try {
+            return mapper.readValue(json, JsonNode.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+
+    private static int unsigned(byte b) {
+        return b & 0xFF;
     }
 
 }

@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SystemUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import us.dot.its.jpo.asn.j2735.r2024.Common.*;
 import us.dot.its.jpo.asn.j2735.r2024.RTCMcorrections.RTCMcorrections;
 import us.dot.its.jpo.asn.j2735.r2024.RTCMcorrections.RTCMcorrectionsMessageFrame;
@@ -13,15 +15,22 @@ import us.dot.its.jpo.geojsonconverter.DateJsonMapper;
 import us.dot.its.jpo.geojsonconverter.pojos.rtcm.DecodedRTCMmessage;
 import us.dot.its.jpo.geojsonconverter.pojos.rtcm.ProcessedRTCM;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static us.dot.its.jpo.geojsonconverter.converter.rtcm.RtcmFieldConversions.*;
 
+@Component
 @Slf4j
 public class RTCMConverter {
 
-    public static ProcessedRTCM processRTCM(final RTCMcorrectionsMessageFrame rtcmFrame) {
+    private final RTCMDecoder decoder;
+
+    @Autowired
+    public RTCMConverter(RTCMDecoder decoder) {
+        this.decoder = decoder;
+    }
+
+    public ProcessedRTCM processRTCM(final RTCMcorrectionsMessageFrame rtcmFrame) {
         var processed = new ProcessedRTCM();
 
         if (rtcmFrame == null) {
@@ -56,7 +65,7 @@ public class RTCMConverter {
         return processed;
     }
 
-    private static void processFullPosition(ProcessedRTCM processed, FullPositionVector anchor) {
+    private void processFullPosition(ProcessedRTCM processed, FullPositionVector anchor) {
         DDateTime utcTime = anchor.getUtcTime();
         if (utcTime != null) {
             processed.setUtcTime(convertDDateTime(utcTime));
@@ -82,31 +91,25 @@ public class RTCMConverter {
         }
     }
 
-    private static void decodeMessages(ProcessedRTCM processed, RTCMmessageList messageList) {
+    private void decodeMessages(ProcessedRTCM processed, RTCMmessageList messageList) {
         List<DecodedRTCMmessage> decodedMessages = new ArrayList<>();
+        Set<Integer> types = new LinkedHashSet<>();
         for (RTCMmessage message : messageList) {
             var decodedMessage = new DecodedRTCMmessage();
             decodedMessage.setHex(message.getValue());
             decodedMessages.add(decodedMessage);
+            JsonNode node = decoder.decodeRtcm(decodedMessage.getHex());
+            decodedMessage.setDecodedMessage(node);
 
-            // Decoder is only available on linux, skip detailed decoding to allow testing on Windows
-            if (SystemUtils.IS_OS_WINDOWS) {
-                log.warn("The gpsdecode decoder tool won't run on Windows. Only raw hex for you.");
-                continue;
+            if (node.has("type")) {
+                types.add(node.get("type").asInt());
             }
 
-            String json = RTCMDecoder.decodeRtcm(decodedMessage.getHex());
-            ObjectMapper mapper = DateJsonMapper.getInstance();
-            try {
-                JsonNode node = mapper.readValue(json, JsonNode.class);
-                decodedMessage.setDecodedMessage(node);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
+            if (node.has("station_id")) {
+                processed.setStationId(node.get("station_id").asInt());
             }
-
-
-
         }
+        processed.setMessageTypes(types);
         processed.setMessages(decodedMessages);
     }
 

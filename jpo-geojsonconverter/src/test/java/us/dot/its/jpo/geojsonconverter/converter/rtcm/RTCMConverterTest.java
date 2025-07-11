@@ -19,8 +19,10 @@ public class RTCMConverterTest {
 
     @Test
     public void testProcessRtcm() throws JsonProcessingException {
+        RTCMDecoder decoder = new RTCMDecoder(false);
+        RTCMConverter converter = new RTCMConverter(decoder);
         RTCMcorrectionsMessageFrame messageFrame = mapper.readValue(RTCM, RTCMcorrectionsMessageFrame.class);
-        ProcessedRTCM processedRtcm = RTCMConverter.processRTCM(messageFrame);
+        ProcessedRTCM processedRtcm = converter.processRTCM(messageFrame);
         assertThat(processedRtcm, notNullValue());
         assertThat(processedRtcm.getMsgCnt(), equalTo(82));
         assertThat(processedRtcm.getRev(), equalTo("rtcmRev3"));

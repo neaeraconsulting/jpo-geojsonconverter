@@ -13,14 +13,9 @@ import lombok.Data;
 public class DecodedRTCMmessage {
 
     /**
-     * The message type extracted from the decoded message.
+     * The original raw RTCM message, hex encoded.
      */
-    private int type;
-
-    /**
-     * The station ID extracted from the decoded message.
-     */
-    private int stationId;
+    private String hex;
 
     /**
      * The JSON description produced by decoding the message with the
@@ -28,10 +23,5 @@ public class DecodedRTCMmessage {
      * Contents vary depending on message type.
      */
     private JsonNode decodedMessage;
-
-    /**
-     * The original raw RTCM message, hex encoded.
-     */
-    private String hex;
 
 }

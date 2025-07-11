@@ -1,6 +1,7 @@
 package us.dot.its.jpo.geojsonconverter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,11 +16,18 @@ import us.dot.its.jpo.geojsonconverter.pojos.rtcm.ProcessedRTCM;
 @RestController
 public class TestController {
 
+    private final RTCMDecoder decoder;
+    private final RTCMConverter converter;
+
+    public TestController(RTCMDecoder decoder, RTCMConverter converter) {
+        this.decoder = decoder;
+        this.converter = converter;
+    }
 
 
     @PostMapping(value = "/decode", consumes = "text/plain", produces = "application/json")
-    String decode(@RequestBody String hex) {
-        return RTCMDecoder.decodeRtcm(hex);
+    JsonNode decode(@RequestBody String hex) {
+        return decoder.decodeRtcm(hex);
     }
 
     @PostMapping(value = "/rtcm", consumes = "application/json", produces = "application/json")
@@ -31,7 +39,7 @@ public class TestController {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-        return RTCMConverter.processRTCM(messageFrame);
+        return converter.processRTCM(messageFrame);
     }
 
 }

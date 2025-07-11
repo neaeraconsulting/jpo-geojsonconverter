@@ -45,3 +45,8 @@ kafka.topics:
 spring.jackson.serialization.write-dates-as-timestamps: false
 
 kafka.linger_ms: 50
+
+# Whether to fully decode RTCM payloads
+# true = fully decode using the native gpsdecode tool
+# false = partial decode: message type and station id only
+rtcm.full.decode: true

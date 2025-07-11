@@ -6,6 +6,7 @@ import us.dot.its.jpo.asn.j2735.r2024.RTCMcorrections.RTCMcorrectionsMessageFram
 import us.dot.its.jpo.geojsonconverter.pojos.ProcessedValidationMessage;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * A processed J2735 {@link RTCMcorrectionsMessageFrame}.
@@ -73,6 +74,20 @@ public class ProcessedRTCM {
      * Elevation in meters.
      */
     private Double elevation;
+
+    /* ------------------------------------------------------------------------
+       Key fields from the decoded message
+     *-----------------------------------------------------------------------*/
+
+    /**
+     * RTCM message types included
+     */
+    private Set<Integer> messageTypes;
+
+    /**
+     * Station ID.
+     */
+    private Integer stationId;
 
     private List<DecodedRTCMmessage> messages;
     private List<ProcessedValidationMessage> validationMessages;
