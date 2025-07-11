@@ -40,6 +40,7 @@ public class RTCMDecoder {
         byte[] bytes = hexFormat.parseHex(hex);
 
         if (!fullDecode) {
+            log.debug("Full decode is disabled by config setting");
             return partialDecode(bytes);
         }
 
@@ -47,7 +48,8 @@ public class RTCMDecoder {
         if (!SystemUtils.IS_OS_WINDOWS || executable.exists()) {
             return fullDecode(bytes);
         } else {
-            log.warn("Executable {} does not exist, or running on Windows. Partially decoding.", EXECUTABLE);
+            log.warn("Executable {} does not exist, or running on Windows. Partially decoding. " +
+                    "Install gpsdecode, or configure rtcm.full.decode=false to suppress this warning", EXECUTABLE);
             return partialDecode(bytes);
         }
 
