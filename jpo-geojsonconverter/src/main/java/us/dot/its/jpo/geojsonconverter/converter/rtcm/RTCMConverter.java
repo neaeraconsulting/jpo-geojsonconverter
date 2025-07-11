@@ -2,6 +2,7 @@ package us.dot.its.jpo.geojsonconverter.converter.rtcm;
 
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.SystemUtils;
 import us.dot.its.jpo.asn.j2735.r2024.Common.*;
 import us.dot.its.jpo.asn.j2735.r2024.RTCMcorrections.RTCMcorrections;
 import us.dot.its.jpo.asn.j2735.r2024.RTCMcorrections.RTCMcorrectionsMessageFrame;
@@ -82,7 +83,17 @@ public class RTCMConverter {
         for (RTCMmessage message : messageList) {
             var decodedMessage = new DecodedRTCMmessage();
             decodedMessage.setHex(message.getValue());
+
+            // Decoder is only available on linux, skip detailed decoding to allow testing on Windows
+            if (SystemUtils.IS_OS_LINUX) {
+                String json = RTCMDecoder.decodeRtcm(decodedMessage.getHex());
+            } else {
+                log.warn("The gpsdecode decoder tool won't run on OS: {}.  You only get raw hex.", SystemUtils.OS_NAME);
+            }
+
+            decodedMessages.add(decodedMessage);
         }
+        processed.setMessages(decodedMessages);
     }
 
 

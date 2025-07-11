@@ -1,10 +1,12 @@
+server.port: 8188
+
 #General Properties
 groupId: '@project.groupId@'
 artifactId: '@project.artifactId@'
 version: '@project.version@'
 
 # Don't run the Spring Boot web server
-spring.main.web-application-type: none
+spring.main.web-application-type: servlet
 
 # Unused feature
 spring.groovy.template.check-template-location: false

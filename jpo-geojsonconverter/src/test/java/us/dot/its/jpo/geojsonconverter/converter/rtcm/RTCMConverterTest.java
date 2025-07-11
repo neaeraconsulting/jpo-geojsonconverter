@@ -2,6 +2,7 @@ package us.dot.its.jpo.geojsonconverter.converter.rtcm;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import us.dot.its.jpo.asn.j2735.r2024.RTCMcorrections.RTCMcorrections;
 import us.dot.its.jpo.asn.j2735.r2024.RTCMcorrections.RTCMcorrectionsMessageFrame;
@@ -11,6 +12,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 
+@Slf4j
 public class RTCMConverterTest {
 
     private final static ObjectMapper mapper = new ObjectMapper();
@@ -22,7 +24,7 @@ public class RTCMConverterTest {
         assertThat(processedRtcm, notNullValue());
         assertThat(processedRtcm.getMsgCnt(), equalTo(82));
         assertThat(processedRtcm.getRev(), equalTo("rtcmRev3"));
-
+        log.info(mapper.writeValueAsString(processedRtcm));
     }
 
     public static final String RTCM = """
