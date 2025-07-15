@@ -8,6 +8,7 @@ import us.dot.its.jpo.asn.j2735.r2024.SPAT.SPAT;
 import us.dot.its.jpo.geojsonconverter.partitioner.RsuIntersectionKey;
 import us.dot.its.jpo.geojsonconverter.pojos.ProcessedValidationMessage;
 import us.dot.its.jpo.geojsonconverter.pojos.spat.DeserializedRawSpat;
+import us.dot.its.jpo.geojsonconverter.pojos.spat.ProcessedIntersectionStatusObject;
 import us.dot.its.jpo.geojsonconverter.pojos.spat.ProcessedMovementEvent;
 import us.dot.its.jpo.geojsonconverter.pojos.spat.ProcessedMovementState;
 import us.dot.its.jpo.geojsonconverter.pojos.spat.ProcessedSpat;
@@ -126,7 +127,7 @@ public class SpatProcessedJsonConverter
         processedSpat.setValidationMessages(processedSpatValidationMessages);
         processedSpat.setRevision(
                 intersectionState.getRevision() != null ? (int) intersectionState.getRevision().getValue() : null);
-        processedSpat.setStatus(intersectionState.getStatus());
+        processedSpat.setStatus(new ProcessedIntersectionStatusObject(intersectionState.getStatus()));
         processedSpat.setEnabledLanes(
                 intersectionState.getEnabledLanes() != null ? intersectionState.getEnabledLanes() : null);
 

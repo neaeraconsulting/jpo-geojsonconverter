@@ -1,8 +1,12 @@
 
 package us.dot.its.jpo.geojsonconverter.pojos.spat;
 
-import java.util.Objects;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,54 +17,18 @@ import us.dot.its.jpo.asn.j2735.r2024.SPAT.AdvisorySpeedList;
 import us.dot.its.jpo.asn.j2735.r2024.SPAT.MovementPhaseState;
 import us.dot.its.jpo.geojsonconverter.DateJsonMapper;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
+@Slf4j
 public class ProcessedMovementEvent {
     private static Logger logger = LoggerFactory.getLogger(ProcessedMovementEvent.class);
 
     private MovementPhaseState eventState;
     private TimingChangeDetails timing;
     private AdvisorySpeedList speeds;
-
-    public MovementPhaseState getEventState() {
-        return eventState;
-    }
-
-    public void setEventState(MovementPhaseState eventState) {
-        this.eventState = eventState;
-    }
-
-    public TimingChangeDetails getTiming() {
-        return timing;
-    }
-
-    public void setTiming(TimingChangeDetails timing) {
-        this.timing = timing;
-    }
-
-    public AdvisorySpeedList getSpeeds() {
-        return speeds;
-    }
-
-    public void setSpeeds(AdvisorySpeedList speeds) {
-        this.speeds = speeds;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == this)
-            return true;
-        if (!(o instanceof ProcessedMovementEvent)) {
-            return false;
-        }
-        ProcessedMovementEvent movementEvent = (ProcessedMovementEvent) o;
-        return Objects.equals(eventState, movementEvent.eventState) && Objects.equals(timing, movementEvent.timing)
-                && speeds == movementEvent.speeds;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(eventState, timing, speeds);
-    }
 
     @Override
     public String toString() {

@@ -15,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import us.dot.its.jpo.asn.j2735.r2024.Common.IntersectionReferenceID;
 import us.dot.its.jpo.asn.j2735.r2024.Common.LaneID;
-import us.dot.its.jpo.asn.j2735.r2024.SPAT.IntersectionStatusObject;
 import us.dot.its.jpo.geojsonconverter.DateJsonMapper;
 import us.dot.its.jpo.geojsonconverter.pojos.ProcessedValidationMessage;
 
@@ -75,7 +74,7 @@ public class ProcessedSpat {
     private Integer intersectionId;
     private boolean cti4501Conformant;
     private Integer revision;
-    private IntersectionStatusObject status;
+    private ProcessedIntersectionStatusObject status;
     private ZonedDateTime utcTimeStamp;
     private List<LaneID> enabledLanes = new ArrayList<>();
     private List<ProcessedMovementState> states = null;

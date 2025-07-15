@@ -1,114 +1,115 @@
-// package us.dot.its.jpo.geojsonconverter.pojos.spat;
+package us.dot.its.jpo.geojsonconverter.pojos.spat;
 
-// import static org.junit.Assert.assertNotNull;
-// import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-// import java.time.ZonedDateTime;
-// import java.util.ArrayList;
-// import java.util.List;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
-// import org.junit.Test;
+import org.junit.Test;
 
-// import us.dot.its.jpo.geojsonconverter.pojos.ProcessedValidationMessage;
+import us.dot.its.jpo.asn.j2735.r2024.Common.LaneID;
+import us.dot.its.jpo.geojsonconverter.pojos.ProcessedValidationMessage;
 
-// public class ProcessedSpatTest {
-// @Test
-// public void testGettersSetters() {
-// ProcessedSpat object = new ProcessedSpat();
+public class ProcessedSpatTest {
+    @Test
+    public void testGettersSetters() {
+        ProcessedSpat object = new ProcessedSpat();
 
-// object.setSchemaVersion(1);
-// int versionResponse = object.getSchemaVersion();
-// assertEquals(versionResponse, 1);
+        object.setSchemaVersion(1);
+        int versionResponse = object.getSchemaVersion();
+        assertEquals(versionResponse, 1);
 
-// object.setMessageType("type");
-// String typeResponse = object.getMessageType();
-// assertEquals(typeResponse, "type");
+        object.setMessageType("type");
+        String typeResponse = object.getMessageType();
+        assertEquals(typeResponse, "type");
 
-// object.setOdeReceivedAt("receivedAt");
-// String oderaResponse = object.getOdeReceivedAt();
-// assertEquals(oderaResponse, "receivedAt");
+        object.setOdeReceivedAt("receivedAt");
+        String oderaResponse = object.getOdeReceivedAt();
+        assertEquals(oderaResponse, "receivedAt");
 
-// object.setOriginIp("ip");
-// String ipResponse = object.getOriginIp();
-// assertEquals(ipResponse, "ip");
+        object.setOriginIp("ip");
+        String ipResponse = object.getOriginIp();
+        assertEquals(ipResponse, "ip");
 
-// object.setName("name");
-// String nameResponse = object.getName();
-// assertEquals(nameResponse, "name");
+        object.setName("name");
+        String nameResponse = object.getName();
+        assertEquals(nameResponse, "name");
 
-// object.setRegion(1);
-// Integer regionResponse = object.getRegion();
-// assertEquals(regionResponse, 1);
+        object.setRegion(1);
+        Integer regionResponse = object.getRegion();
+        assertEquals(regionResponse, 1);
 
-// object.setIntersectionId(1);
-// Integer intersectionResponse = object.getIntersectionId();
-// assertEquals(intersectionResponse, 1);
+        object.setIntersectionId(1);
+        Integer intersectionResponse = object.getIntersectionId();
+        assertEquals(intersectionResponse, 1);
 
-// object.setCti4501Conformant(true);
-// Boolean ctiResponse = object.getCti4501Conformant();
-// assertEquals(ctiResponse, true);
+        object.setCti4501Conformant(true);
+        Boolean ctiResponse = object.isCti4501Conformant();
+        assertEquals(ctiResponse, true);
 
-// List<ProcessedValidationMessage> validationMessages = new ArrayList<ProcessedValidationMessage>();
-// object.setValidationMessages(validationMessages);
-// List<ProcessedValidationMessage> vmResponse = object.getValidationMessages();
-// assertEquals(vmResponse, validationMessages);
+        List<ProcessedValidationMessage> validationMessages = new ArrayList<ProcessedValidationMessage>();
+        object.setValidationMessages(validationMessages);
+        List<ProcessedValidationMessage> vmResponse = object.getValidationMessages();
+        assertEquals(vmResponse, validationMessages);
 
-// object.setRevision(1);
-// Integer revisionResponse = object.getRevision();
-// assertEquals(revisionResponse, 1);
+        object.setRevision(1);
+        Integer revisionResponse = object.getRevision();
+        assertEquals(revisionResponse, 1);
 
-// // IntersectionStatusObject statusObject = new IntersectionStatusObject();
-// // object.setStatus(statusObject);
-// // IntersectionStatusObject statusResponse = object.getStatus();
-// // assertEquals(statusResponse, statusObject);
+        ProcessedIntersectionStatusObject statusObject = new ProcessedIntersectionStatusObject();
+        object.setStatus(statusObject);
+        ProcessedIntersectionStatusObject statusResponse = object.getStatus();
+        assertEquals(statusResponse, statusObject);
 
-// ZonedDateTime dateTime = ZonedDateTime.now();
-// object.setUtcTimeStamp(dateTime);
-// ZonedDateTime tsResponse = object.getUtcTimeStamp();
-// assertEquals(tsResponse, dateTime);
+        ZonedDateTime dateTime = ZonedDateTime.now();
+        object.setUtcTimeStamp(dateTime);
+        ZonedDateTime tsResponse = object.getUtcTimeStamp();
+        assertEquals(tsResponse, dateTime);
 
-// // List<Integer> enabledLanes = new ArrayList<Integer>();
-// // object.setEnabledLanes(enabledLanes);
-// // List<Integer> laneResponse = object.getEnabledLanes();
-// // assertEquals(laneResponse, enabledLanes);
+        List<LaneID> enabledLanes = new ArrayList<LaneID>();
+        object.setEnabledLanes(enabledLanes);
+        List<LaneID> laneResponse = object.getEnabledLanes();
+        assertEquals(laneResponse, enabledLanes);
 
-// List<ProcessedMovementState> states = new ArrayList<ProcessedMovementState>();
-// object.setStates(states);
-// List<ProcessedMovementState> stateResponse = object.getStates();
-// assertEquals(stateResponse, states);
-// }
+        List<ProcessedMovementState> states = new ArrayList<ProcessedMovementState>();
+        object.setStates(states);
+        List<ProcessedMovementState> stateResponse = object.getStates();
+        assertEquals(stateResponse, states);
+    }
 
-// @Test
-// public void testEquals() {
-// ProcessedSpat object = new ProcessedSpat();
-// ProcessedSpat otherObject = new ProcessedSpat();
-// otherObject.setCti4501Conformant(true);
+    @Test
+    public void testEquals() {
+        ProcessedSpat object = new ProcessedSpat();
+        ProcessedSpat otherObject = new ProcessedSpat();
+        otherObject.setCti4501Conformant(true);
 
-// boolean equals = object.equals(object);
-// assertEquals(true, equals);
+        boolean equals = object.equals(object);
+        assertEquals(true, equals);
 
-// boolean otherEquals = object.equals(otherObject);
-// assertEquals(false, otherEquals);
+        boolean otherEquals = object.equals(otherObject);
+        assertEquals(false, otherEquals);
 
-// String string = "string";
-// boolean notEquals = otherObject.equals(string);
-// assertEquals(false, notEquals);
-// }
+        String string = "string";
+        boolean notEquals = otherObject.equals(string);
+        assertEquals(false, notEquals);
+    }
 
 
-// @Test
-// public void testHashCode() {
-// ProcessedSpat object = new ProcessedSpat();
+    @Test
+    public void testHashCode() {
+        ProcessedSpat object = new ProcessedSpat();
 
-// Integer hash = object.hashCode();
-// assertNotNull(hash);
-// }
+        Integer hash = object.hashCode();
+        assertNotNull(hash);
+    }
 
-// @Test
-// public void testToString() {
-// ProcessedSpat object = new ProcessedSpat();
+    @Test
+    public void testToString() {
+        ProcessedSpat object = new ProcessedSpat();
 
-// String string = object.toString();
-// assertNotNull(string);
-// }
-// }
+        String string = object.toString();
+        assertNotNull(string);
+    }
+}

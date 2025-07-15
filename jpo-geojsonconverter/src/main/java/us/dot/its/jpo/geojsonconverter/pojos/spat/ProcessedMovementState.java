@@ -1,8 +1,13 @@
 package us.dot.its.jpo.geojsonconverter.pojos.spat;
 
 import java.util.List;
-import java.util.Objects;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,54 +17,18 @@ import us.dot.its.jpo.geojsonconverter.DateJsonMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
+@Slf4j
 public class ProcessedMovementState {
     private static Logger logger = LoggerFactory.getLogger(ProcessedMovementState.class);
 
     private String movementName;
     private Integer signalGroup;
     private List<ProcessedMovementEvent> stateTimeSpeed = null;
-
-    public String getMovementName() {
-        return movementName;
-    }
-
-    public void setMovementName(String movementName) {
-        this.movementName = movementName;
-    }
-
-    public Integer getSignalGroup() {
-        return signalGroup;
-    }
-
-    public void setSignalGroup(Integer signalGroup) {
-        this.signalGroup = signalGroup;
-    }
-
-    public List<ProcessedMovementEvent> getStateTimeSpeed() {
-        return stateTimeSpeed;
-    }
-
-    public void setStateTimeSpeed(List<ProcessedMovementEvent> stateTimeSpeed) {
-        this.stateTimeSpeed = stateTimeSpeed;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == this)
-            return true;
-        if (!(o instanceof ProcessedMovementState)) {
-            return false;
-        }
-        ProcessedMovementState movementState = (ProcessedMovementState) o;
-        return Objects.equals(movementName, movementState.movementName) && signalGroup == movementState.signalGroup
-                && Objects.equals(stateTimeSpeed, movementState.stateTimeSpeed);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(movementName, signalGroup, stateTimeSpeed);
-    }
 
     @Override
     public String toString() {
