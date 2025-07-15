@@ -67,62 +67,130 @@ Example ProcessedSpat message:
 
 ```json
 {
-  "messageType": "SPAT",
-  "odeReceivedAt": "2023-06-20T06:18:20.577365Z",
-  "originIp": "10.0.0.2",
-  "intersectionId": 12108,
-  "cti4501Conformant": false,
-  "validationMessages": [
-    {
-      "message": "$.metadata.receivedMessageDetails.locationData: is missing but it is required",
-      "jsonPath": "$.metadata.receivedMessageDetails",
-      "schemaPath": "#/$defs/OdeSpatMetadata/properties/receivedMessageDetails/required"
-    }
-  ],
-  "revision": 0,
-  "status": {
-    "manualControlIsEnabled": false,
-    "stopTimeIsActivated": false,
-    "failureFlash": false,
-    "preemptIsActive": false,
-    "signalPriorityIsActive": false,
-    "fixedTimeOperation": false,
-    "trafficDependentOperation": false,
-    "standbyOperation": false,
-    "failureMode": false,
-    "off": false,
-    "recentMAPmessageUpdate": false,
-    "recentChangeInMAPassignedLanesIDsUsed": false,
-    "noValidMAPisAvailableAtThisTime": false,
-    "noValidSPATisAvailableAtThisTime": false
-  },
-  "utcTimeStamp": "2023-06-20T06:18:17.679Z",
-  "states": [
-    {
-      "signalGroup": 1,
-      "stateTimeSpeed": [
-        {
-          "eventState": "STOP_AND_REMAIN",
-          "timing": {
-            "minEndTime": "2023-06-20T06:18:17.6Z",
-            "maxEndTime": "2023-06-20T06:18:17.6Z"
-          }
-        }
-      ]
-    },
-    {
-      "signalGroup": 2,
-      "stateTimeSpeed": [
-        {
-          "eventState": "PROTECTED_MOVEMENT_ALLOWED",
-          "timing": {
-            "minEndTime": "2023-06-20T06:18:21.6Z",
-            "maxEndTime": "2023-06-20T06:18:37.6Z"
-          }
-        }
-      ]
-    }
-  ]
+	"schemaVersion": 2,
+	"messageType": "SPAT",
+	"odeReceivedAt": "2025-07-15T11:36:27.358Z",
+	"originIp": "172.18.0.1",
+	"asn1": "0381004003807C00134700081132000000E437070010434257925790010232119A11CE800C10D095E495E400808684AF24AF20050434257925790030232119A11CE801C10D095E495E401008684AF24AF200",
+	"validationMessages": [],
+	"intersectionId": 8804,
+	"cti4501Conformant": true,
+	"revision": 0,
+	"status": {
+		"manualControlIsEnabled": false,
+		"stopTimeIsActivated": false,
+		"failureFlash": false,
+		"preemptIsActive": false,
+		"signalPriorityIsActive": false,
+		"fixedTimeOperation": false,
+		"trafficDependentOperation": false,
+		"standbyOperation": false,
+		"failureMode": false,
+		"off": false,
+		"recentMAPmessageUpdate": false,
+		"recentChangeInMAPassignedLanesIDsUsed": false,
+		"noValidMAPisAvailableAtThisTime": false,
+		"noValidSPATisAvailableAtThisTime": false
+	},
+	"utcTimeStamp": "2025-07-15T11:36:58.423Z",
+	"states": [
+		{
+			"signalGroup": 1,
+			"stateTimeSpeed": [
+				{
+					"eventState": "stop-And-Remain",
+					"timing": {
+						"minEndTime": "2025-07-15T11:31:58.6Z",
+						"maxEndTime": "2025-07-15T11:31:58.6Z"
+					}
+				}
+			]
+		},
+		{
+			"signalGroup": 2,
+			"stateTimeSpeed": [
+				{
+					"eventState": "protected-Movement-Allowed",
+					"timing": {
+						"minEndTime": "2025-07-15T11:30:02.4Z",
+						"maxEndTime": "2025-07-15T11:30:23.4Z"
+					}
+				}
+			]
+		},
+		{
+			"signalGroup": 3,
+			"stateTimeSpeed": [
+				{
+					"eventState": "stop-And-Remain",
+					"timing": {
+						"minEndTime": "2025-07-15T11:31:58.6Z",
+						"maxEndTime": "2025-07-15T11:31:58.6Z"
+					}
+				}
+			]
+		},
+		{
+			"signalGroup": 4,
+			"stateTimeSpeed": [
+				{
+					"eventState": "stop-And-Remain",
+					"timing": {
+						"minEndTime": "2025-07-15T11:31:58.6Z",
+						"maxEndTime": "2025-07-15T11:31:58.6Z"
+					}
+				}
+			]
+		},
+		{
+			"signalGroup": 5,
+			"stateTimeSpeed": [
+				{
+					"eventState": "stop-And-Remain",
+					"timing": {
+						"minEndTime": "2025-07-15T11:31:58.6Z",
+						"maxEndTime": "2025-07-15T11:31:58.6Z"
+					}
+				}
+			]
+		},
+		{
+			"signalGroup": 6,
+			"stateTimeSpeed": [
+				{
+					"eventState": "protected-Movement-Allowed",
+					"timing": {
+						"minEndTime": "2025-07-15T11:30:02.4Z",
+						"maxEndTime": "2025-07-15T11:30:23.4Z"
+					}
+				}
+			]
+		},
+		{
+			"signalGroup": 7,
+			"stateTimeSpeed": [
+				{
+					"eventState": "stop-And-Remain",
+					"timing": {
+						"minEndTime": "2025-07-15T11:31:58.6Z",
+						"maxEndTime": "2025-07-15T11:31:58.6Z"
+					}
+				}
+			]
+		},
+		{
+			"signalGroup": 8,
+			"stateTimeSpeed": [
+				{
+					"eventState": "stop-And-Remain",
+					"timing": {
+						"minEndTime": "2025-07-15T11:31:58.6Z",
+						"maxEndTime": "2025-07-15T11:31:58.6Z"
+					}
+				}
+			]
+		}
+	]
 }
 ```
 
@@ -144,56 +212,57 @@ When an OdeBsmJson message is processed through the jpo-geojsonconverter, a Proc
 
 ```json
 {
-    "type": "Feature",
-    "geometry": {
-        "type": "Point",
-        "coordinates": [
-            -105.0342901,
-            40.5671913
-        ]
-    },
-    "properties": {
-        "schemaVersion": 8,
-        "messageType": "BSM",
-        "odeReceivedAt": "2024-08-12T12:32:03.811Z",
-        "originIp": "8.8.8.8",
-        "validationMessages": [],
-        "timeStamp": "2024-08-12T12:32:04.3034091Z",
-        "accelSet": {
-            "accelLat": 2001,
-            "accelLong": 0,
-            "accelVert": -127,
-            "accelYaw": 0
-        },
-        "accuracy": {
-            "semiMajor": 5,
-            "semiMinor": 2,
-            "orientation": 0
-        },
-        "brakes": {
-            "wheelBrakes": {
-                "leftFront": false,
-                "rightFront": false,
-                "unavailable": true,
-                "leftRear": false,
-                "rightRear": false
-            },
-            "traction": "unavailable",
-            "abs": "unavailable",
-            "scs": "unavailable",
-            "brakeBoost": "unavailable",
-            "auxBrakes": "unavailable"
-        },
-        "heading": 359.4,
-        "id": "12345678",
-        "msgCnt": 25,
-        "secMark": 2800,
-        "size": {
-            "width": 208,
-            "length": 586
-        },
-        "transmission": "UNAVAILABLE"
-    }
+	"type": "Feature",
+	"geometry": {
+		"type": "Point",
+		"coordinates": [
+			-105.0317754,
+			40.5659938
+		]
+	},
+	"properties": {
+		"schemaVersion": 2,
+		"messageType": "BSM",
+		"odeReceivedAt": "2025-07-15T12:25:38.620Z",
+		"timeStamp": "2025-07-15T12:25:25.399Z",
+		"originIp": "172.18.0.1",
+		"asn1": "001480B8494C4C950CD8CDE6E9651116579F22A424DD78FFFFF00761E4FD7EB7D07F7FFF80005F11D1020214C1C0FFC7C016AFF4017A0FF65403B0FD204C20FFCCC04F8FE40C420FFE6404CEFE60E9A10133408FCFDE1438103AB4138F00E1EEC1048EC160103E237410445C171104E26BC103DC4154305C2C84103B1C1C8F0A82F42103F34262D1123198103DAC25FB12034CE10381C259F12038CA103574251B10E3B2210324C23AD0F23D8EFFFE0000209340D10000004264BF00",
+		"validationMessages": [],
+		"accelSet": {
+			"accelLat": 0.0,
+			"accelLong": 0.27,
+			"accelVert": 0.0,
+			"accelYaw": 0.0
+		},
+		"accuracy": {
+			"semiMajor": 9.3,
+			"semiMinor": 12.05
+		},
+		"brakes": {
+			"wheelBrakes": {
+				"unavailable": true,
+				"leftFront": false,
+				"leftRear": false,
+				"rightFront": false,
+				"rightRear": false
+			},
+			"traction": "unavailable",
+			"abs": "unavailable",
+			"scs": "unavailable",
+			"brakeBoost": "unavailable",
+			"auxBrakes": "unavailable"
+		},
+		"heading": 313.25,
+		"id": "31325433",
+		"msgCnt": 37,
+		"secMark": 25399,
+		"size": {
+			"width": 190,
+			"length": 570
+		},
+		"speed": 0.28,
+		"transmission": "unavailable"
+	}
 }
 ```
 
