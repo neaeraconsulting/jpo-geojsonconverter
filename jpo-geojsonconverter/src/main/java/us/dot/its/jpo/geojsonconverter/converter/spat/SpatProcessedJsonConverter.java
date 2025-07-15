@@ -103,6 +103,7 @@ public class SpatProcessedJsonConverter
         ProcessedSpat processedSpat = new ProcessedSpat();
         processedSpat.setOdeReceivedAt(metadata.getOdeReceivedAt()); // ISO 8601: 2022-11-11T16:36:10.529530Z
         processedSpat.setOriginIp(metadata.getOriginIp());
+        processedSpat.setAsn1(metadata.getAsn1());
         processedSpat.setName(intersectionState.getName() != null ? intersectionState.getName().getValue() : null);
         processedSpat.setIntersectionReferenceID(intersectionState.getId());
         processedSpat.setCti4501Conformant(validationMessages.isValid());

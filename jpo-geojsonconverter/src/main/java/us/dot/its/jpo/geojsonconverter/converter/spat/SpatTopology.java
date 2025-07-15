@@ -30,12 +30,9 @@ public class SpatTopology {
         StreamsBuilder builder = new StreamsBuilder();
 
         // Stream for raw SPAT messages
-        KStream<Void, Bytes> rawOdeSpatStream = builder.stream(spatOdeJsonTopic, Consumed.with(Serdes.Void(), // Raw
-                                                                                                              // topic
-                                                                                                              // has no
-                                                                                                              // key
-                Serdes.Bytes() // Raw JSON bytes
-        ));
+        // Raw topic has no key and the values are raw JSON bytes
+        KStream<Void, Bytes> rawOdeSpatStream =
+                builder.stream(spatOdeJsonTopic, Consumed.with(Serdes.Void(), Serdes.Bytes()));
 
         // Validate the JSON and write validation errors to the log at warn level
         // Passes the raw JSON along unchanged, even if there are validation errors.
@@ -61,17 +58,14 @@ public class SpatTopology {
                     return deserializedRawSpat;
                 });
 
-        // Convert ODE SPaT to GeoJSON
+        // Convert ODE SPaT to ProcessedSpat which is not GeoJSON
         KStream<RsuIntersectionKey, ProcessedSpat> processedJsonSpatStream =
-                validatedOdeSpatStream.transform(() -> new SpatProcessedJsonConverter() // change this converter to
-                // something else NOT GEOJSON
-                );
+                validatedOdeSpatStream.transform(() -> new SpatProcessedJsonConverter());
 
         processedJsonSpatStream.to(
-                // Push the joined GeoJSON stream back out to the SPaT GeoJSON topic
+                // Push the ProcessedSpat to the output topic partioned by RsuIntersectionKey
                 spatProcessedJsonTopic, Produced.with(JsonSerdes.RsuIntersectionKey(), JsonSerdes.ProcessedSpat(),
-                        new IntersectionIdPartitioner<RsuIntersectionKey, ProcessedSpat>()) // Partition by RSU ID
-        );
+                        new IntersectionIdPartitioner<RsuIntersectionKey, ProcessedSpat>()));
 
         return builder.build();
     }

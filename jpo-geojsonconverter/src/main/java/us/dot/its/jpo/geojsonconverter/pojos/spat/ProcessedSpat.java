@@ -1,23 +1,65 @@
 package us.dot.its.jpo.geojsonconverter.pojos.spat;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import us.dot.its.jpo.asn.j2735.r2024.Common.IntersectionID;
 import us.dot.its.jpo.asn.j2735.r2024.Common.IntersectionReferenceID;
 import us.dot.its.jpo.asn.j2735.r2024.Common.LaneID;
-import us.dot.its.jpo.asn.j2735.r2024.Common.RoadRegulatorID;
 import us.dot.its.jpo.asn.j2735.r2024.SPAT.IntersectionStatusObject;
 import us.dot.its.jpo.geojsonconverter.DateJsonMapper;
 import us.dot.its.jpo.geojsonconverter.pojos.ProcessedValidationMessage;
 
+/**
+ * Represents a processed SPaT (Signal Phase and Timing) message.
+ * <p>
+ * schemaVersion - The jpo-geojsonconverter schema version for ProcessedSpat
+ * <p>
+ * messageType - SPAT
+ * <p>
+ * odeReceivedAt - The time the origin OdeSpatJson message was received by the ODE, in UTC
+ * <p>
+ * originIp - The IP address the origin OdeSpatJson message was received from
+ * <p>
+ * asn1 - The ASN.1 encoded string of the origin J2735 SPAT message
+ * <p>
+ * validationMessages - List of validation messages based on the OdeSpatJson schema
+ * <p>
+ * name - The intersection name defined in the SPaT message.
+ * <p>
+ * region - The region ID associated with the intersection. This may be null when intersection ID is present.
+ * <p>
+ * intersectionId - The intersection ID associated with the intersection. This may be null when region ID is present.
+ * <p>
+ * cti4501Conformant - Represents whether the SPaT message conforms to the CTI 4501 standard.
+ * <p>
+ * revision - The current revision of the SPaT message.
+ * <p>
+ * status - A bitstring represeting the status of the intersection.
+ * <p>
+ * utcTimeStamp - The timestamp of the SPaT message in UTC calculated from the SPaT message relative to the
+ * odeReceivedAt.
+ * <p>
+ * enabledLanes - List of enabled lanes in the intersection.
+ * <p>
+ * states - All states for each signal group in the intersection including phase timestamps based on the calculated
+ * utcTimeStamp.
+ */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
+@Slf4j
 public class ProcessedSpat {
     private static Logger logger = LoggerFactory.getLogger(ProcessedSpat.class);
 
@@ -26,128 +68,17 @@ public class ProcessedSpat {
     private String messageType = "SPAT";
     private String odeReceivedAt;
     private String originIp;
+    private String asn1;
+    private List<ProcessedValidationMessage> validationMessages = null;
     private String name;
     private Integer region;
     private Integer intersectionId;
     private boolean cti4501Conformant;
-    private List<ProcessedValidationMessage> validationMessages = null;
     private Integer revision;
     private IntersectionStatusObject status;
     private ZonedDateTime utcTimeStamp;
     private List<LaneID> enabledLanes = new ArrayList<>();
     private List<ProcessedMovementState> states = null;
-
-    public int getSchemaVersion() {
-        return schemaVersion;
-    }
-
-    public void setSchemaVersion(int schemaVersion) {
-        this.schemaVersion = schemaVersion;
-    }
-
-    public String getMessageType() {
-        return messageType;
-    }
-
-    public void setMessageType(String messageType) {
-        this.messageType = messageType;
-    }
-
-    public String getOdeReceivedAt() {
-        return odeReceivedAt;
-    }
-
-    public void setOdeReceivedAt(String odeReceivedAt) {
-        this.odeReceivedAt = odeReceivedAt;
-    }
-
-    public String getOriginIp() {
-        return originIp;
-    }
-
-    public void setOriginIp(String originIp) {
-        this.originIp = originIp;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Integer getRegion() {
-        return region;
-    }
-
-    public void setRegion(Integer region) {
-        this.region = region;
-    }
-
-    public Integer getIntersectionId() {
-        return intersectionId;
-    }
-
-    public void setIntersectionId(Integer intersectionId) {
-        this.intersectionId = intersectionId;
-    }
-
-    public boolean getCti4501Conformant() {
-        return cti4501Conformant;
-    }
-
-    public void setCti4501Conformant(boolean cti4501Conformant) {
-        this.cti4501Conformant = cti4501Conformant;
-    }
-
-    public List<ProcessedValidationMessage> getValidationMessages() {
-        return validationMessages;
-    }
-
-    public void setValidationMessages(List<ProcessedValidationMessage> validationMessages) {
-        this.validationMessages = validationMessages;
-    }
-
-    public Integer getRevision() {
-        return revision;
-    }
-
-    public void setRevision(Integer revision) {
-        this.revision = revision;
-    }
-
-    public IntersectionStatusObject getStatus() {
-        return status;
-    }
-
-    public void setStatus(IntersectionStatusObject status) {
-        this.status = status;
-    }
-
-    public ZonedDateTime getUtcTimeStamp() {
-        return utcTimeStamp;
-    }
-
-    public void setUtcTimeStamp(ZonedDateTime utcTimeStamp) {
-        this.utcTimeStamp = utcTimeStamp;
-    }
-
-    public List<LaneID> getEnabledLanes() {
-        return enabledLanes;
-    }
-
-    public void setEnabledLanes(List<LaneID> enabledLanes) {
-        this.enabledLanes = enabledLanes;
-    }
-
-    public List<ProcessedMovementState> getStates() {
-        return states;
-    }
-
-    public void setStates(List<ProcessedMovementState> states) {
-        this.states = states;
-    }
 
     /**
      * Sets both intersection ID and region with null checks
@@ -163,32 +94,6 @@ public class ProcessedSpat {
                 setRegion((int) referenceID.getRegion().getValue());
             }
         }
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == this)
-            return true;
-        if (!(o instanceof ProcessedSpat)) {
-            return false;
-        }
-        ProcessedSpat processedSpat = (ProcessedSpat) o;
-        return Objects.equals(messageType, processedSpat.messageType)
-                && Objects.equals(odeReceivedAt, processedSpat.odeReceivedAt)
-                && Objects.equals(originIp, processedSpat.originIp) && Objects.equals(name, processedSpat.name)
-                && region == processedSpat.region && intersectionId == processedSpat.intersectionId
-                && cti4501Conformant == processedSpat.cti4501Conformant
-                && Objects.equals(validationMessages, processedSpat.validationMessages)
-                && revision == processedSpat.revision && Objects.equals(status, processedSpat.status)
-                && Objects.equals(utcTimeStamp, processedSpat.utcTimeStamp)
-                && Objects.equals(enabledLanes, processedSpat.enabledLanes)
-                && Objects.equals(states, processedSpat.states);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(messageType, odeReceivedAt, originIp, name, region, intersectionId, cti4501Conformant,
-                validationMessages, revision, status, utcTimeStamp, enabledLanes, states);
     }
 
     @Override

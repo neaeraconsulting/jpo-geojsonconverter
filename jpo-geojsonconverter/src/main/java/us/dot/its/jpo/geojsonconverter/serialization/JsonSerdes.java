@@ -36,7 +36,16 @@ public class JsonSerdes {
     }
 
     public static Serde<ProcessedSpat> ProcessedSpat() {
-        return Serdes.serdeFrom(new JsonSerializer<ProcessedSpat>(), new JsonDeserializer<>(ProcessedSpat.class));
+        return Serdes.serdeFrom(new JsonSerializer<ProcessedSpat>(),
+                new OdeCustomJsonDeserializer<>(ProcessedSpat.class));
+    }
+
+    public static Serde<ProcessedBsm<Point>> ProcessedBsm() {
+        return Serdes.serdeFrom(new JsonSerializer<ProcessedBsm<Point>>(), new ProcessedBsmDeserializer<>(Point.class));
+    }
+
+    public static Serde<ProcessedPsm<Point>> ProcessedPsm() {
+        return Serdes.serdeFrom(new JsonSerializer<ProcessedPsm<Point>>(), new ProcessedPsmDeserializer<>(Point.class));
     }
 
     public static Serde<RsuIntersectionKey> RsuIntersectionKey() {
@@ -44,16 +53,8 @@ public class JsonSerdes {
                 new JsonDeserializer<>(RsuIntersectionKey.class));
     }
 
-    public static Serde<ProcessedBsm<Point>> ProcessedBsm() {
-        return Serdes.serdeFrom(new JsonSerializer<ProcessedBsm<Point>>(), new ProcessedBsmDeserializer<>(Point.class));
-    }
-
     public static Serde<RsuLogKey> RsuLogKey() {
         return Serdes.serdeFrom(new JsonSerializer<RsuLogKey>(), new JsonDeserializer<>(RsuLogKey.class));
-    }
-
-    public static Serde<ProcessedPsm<Point>> ProcessedPsm() {
-        return Serdes.serdeFrom(new JsonSerializer<ProcessedPsm<Point>>(), new ProcessedPsmDeserializer<>(Point.class));
     }
 
     public static Serde<RsuPsmIdKey> RsuTypeIdKey() {
