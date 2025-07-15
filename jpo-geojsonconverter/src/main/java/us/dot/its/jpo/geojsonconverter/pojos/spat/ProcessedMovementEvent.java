@@ -17,6 +17,15 @@ import us.dot.its.jpo.asn.j2735.r2024.SPAT.AdvisorySpeedList;
 import us.dot.its.jpo.asn.j2735.r2024.SPAT.MovementPhaseState;
 import us.dot.its.jpo.geojsonconverter.DateJsonMapper;
 
+/**
+ * Contains information regarding the dynamic flow of traffic in relation to a signal group.
+ * <p>
+ * eventState - The signal group's phase state.
+ * <p>
+ * timing - The collection of timing details for the signal group.
+ * <p>
+ * speeds - A list of advisory speeds for the signal group.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
