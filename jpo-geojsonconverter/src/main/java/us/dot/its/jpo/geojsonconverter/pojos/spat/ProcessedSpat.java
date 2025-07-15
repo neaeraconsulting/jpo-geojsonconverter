@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import us.dot.its.jpo.asn.j2735.r2024.Common.DescriptiveName;
 import us.dot.its.jpo.asn.j2735.r2024.Common.IntersectionID;
 import us.dot.its.jpo.asn.j2735.r2024.Common.IntersectionReferenceID;
 import us.dot.its.jpo.asn.j2735.r2024.Common.LaneID;
@@ -86,30 +85,12 @@ public class ProcessedSpat {
         this.region = region;
     }
 
-    public void setRegion(RoadRegulatorID region) {
-        if (region != null) {
-            setRegion((int) region.getValue());
-        } else {
-            // Use -1 to indicate region is missing
-            setRegion(-1);
-        }
-    }
-
     public Integer getIntersectionId() {
         return intersectionId;
     }
 
     public void setIntersectionId(Integer intersectionId) {
         this.intersectionId = intersectionId;
-    }
-
-    public void setIntersectionId(IntersectionID intersectionId) {
-        if (intersectionId != null) {
-            setIntersectionId((int) intersectionId.getValue());
-        } else {
-            // Use -1 to indicate intersection id is missing
-            setIntersectionId(-1);
-        }
     }
 
     public boolean getCti4501Conformant() {
@@ -175,8 +156,12 @@ public class ProcessedSpat {
      */
     public void setIntersectionReferenceID(IntersectionReferenceID referenceID) {
         if (referenceID != null) {
-            setIntersectionId(referenceID.getId());
-            setRegion(referenceID.getRegion());
+            if (referenceID.getId() != null) {
+                setIntersectionId((int) referenceID.getId().getValue());
+            }
+            if (referenceID.getRegion() != null) {
+                setRegion((int) referenceID.getRegion().getValue());
+            }
         }
     }
 

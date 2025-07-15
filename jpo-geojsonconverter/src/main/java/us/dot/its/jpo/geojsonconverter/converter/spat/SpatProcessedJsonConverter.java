@@ -4,6 +4,7 @@ import us.dot.its.jpo.asn.j2735.r2024.SPAT.IntersectionState;
 import us.dot.its.jpo.asn.j2735.r2024.SPAT.SPATMessageFrame;
 import us.dot.its.jpo.asn.j2735.r2024.SPAT.MovementEvent;
 import us.dot.its.jpo.asn.j2735.r2024.SPAT.MovementState;
+import us.dot.its.jpo.asn.j2735.r2024.SPAT.SPAT;
 import us.dot.its.jpo.geojsonconverter.partitioner.RsuIntersectionKey;
 import us.dot.its.jpo.geojsonconverter.pojos.ProcessedValidationMessage;
 import us.dot.its.jpo.geojsonconverter.pojos.spat.DeserializedRawSpat;
@@ -58,17 +59,16 @@ public class SpatProcessedJsonConverter
 
                 rawValue.setPayload(rawSpat.getOdeSpatMessageFrameData().getPayload());
                 SPATMessageFrame spatMessageFrame = (SPATMessageFrame) rawValue.getPayload().getData();
-                IntersectionState intersectionState = spatMessageFrame.getValue().getIntersections().get(0);
 
                 ProcessedSpat processedSpat =
-                        createProcessedSpat(intersectionState, spatMetadata, rawSpat.getValidatorResults());
+                        createProcessedSpat(spatMessageFrame.getValue(), spatMetadata, rawSpat.getValidatorResults());
 
                 // Set the schema version
                 processedSpat.setSchemaVersion(ProcessedSchemaVersions.PROCESSED_SPAT_SCHEMA_VERSION);
 
                 var key = new RsuIntersectionKey();
                 key.setRsuId(spatMetadata.getOriginIp());
-                key.setIntersectionReferenceID(intersectionState.getId());
+                key.setIntersectionReferenceID(spatMessageFrame.getValue().getIntersections().get(0).getId());
                 return KeyValue.pair(key, processedSpat);
             } else {
                 ProcessedSpat processedSpat =
@@ -94,13 +94,16 @@ public class SpatProcessedJsonConverter
         // Nothing to do here
     }
 
-    public ProcessedSpat createProcessedSpat(IntersectionState intersectionState, OdeMessageFrameMetadata metadata,
+    public ProcessedSpat createProcessedSpat(SPAT spat, OdeMessageFrameMetadata metadata,
             JsonValidatorResult validationMessages) {
+        // Create an IntersectionState from the SPAT for easier readability
+        IntersectionState intersectionState = spat.getIntersections().get(0);
+
+        // Build the ProcessedSpat object representing the intersection state
         ProcessedSpat processedSpat = new ProcessedSpat();
         processedSpat.setOdeReceivedAt(metadata.getOdeReceivedAt()); // ISO 8601: 2022-11-11T16:36:10.529530Z
         processedSpat.setOriginIp(metadata.getOriginIp());
         processedSpat.setName(intersectionState.getName() != null ? intersectionState.getName().getValue() : null);
-        // Set region and intersection ID from the IntersectionReferenceID if available
         processedSpat.setIntersectionReferenceID(intersectionState.getId());
         processedSpat.setCti4501Conformant(validationMessages.isValid());
 
@@ -120,25 +123,35 @@ public class SpatProcessedJsonConverter
             processedSpatValidationMessages.add(object);
         }
         processedSpat.setValidationMessages(processedSpatValidationMessages);
-        processedSpat.setRevision((int) intersectionState.getRevision().getValue());
+        processedSpat.setRevision(
+                intersectionState.getRevision() != null ? (int) intersectionState.getRevision().getValue() : null);
         processedSpat.setStatus(intersectionState.getStatus());
-
-        // Set UTC timestamp from the SPaT message if avaialable (Optional in J2735)
-        ZonedDateTime utcTimestamp = null;
-        if (intersectionState.getMoy() != null && intersectionState.getTimeStamp() != null) {
-            utcTimestamp = generateUTCTimestamp((int) intersectionState.getMoy().getValue(),
-                    (int) intersectionState.getTimeStamp().getValue(), metadata.getOdeReceivedAt());
-            processedSpat.setUtcTimeStamp(utcTimestamp);
-        }
         processedSpat.setEnabledLanes(
                 intersectionState.getEnabledLanes() != null ? intersectionState.getEnabledLanes() : null);
+
+        // Retrieve all relevant timestamp-based fields to calculate the UTC timestamp
+        Integer spatMoy = spat.getTimeStamp() != null ? (int) spat.getTimeStamp().getValue() : null;
+        Integer intersectionMoy =
+                intersectionState.getMoy() != null ? (int) intersectionState.getMoy().getValue() : null;
+        Integer intersectionDSecond =
+                intersectionState.getTimeStamp() != null ? (int) intersectionState.getTimeStamp().getValue() : null;
+
+        // Generate the UTC timestamp based on the moy that isn't null and let the function handle the rest
+        // If both are null or intersectionDSecond is null, the function will still use the ODE received timestamp to
+        // fill in the blanks
+        ZonedDateTime utcTimestamp = intersectionMoy != null
+                ? generateUTCTimestamp(intersectionMoy, intersectionDSecond, metadata.getOdeReceivedAt())
+                : generateUTCTimestamp(spatMoy, intersectionDSecond, metadata.getOdeReceivedAt());
+        processedSpat.setUtcTimeStamp(utcTimestamp);
 
         List<ProcessedMovementState> processedMovementStateList = new ArrayList<ProcessedMovementState>();
         for (MovementState signalGroupState : intersectionState.getStates()) {
             ProcessedMovementState processedMovementState = new ProcessedMovementState();
             processedMovementState.setMovementName(
                     signalGroupState.getMovementName() != null ? signalGroupState.getMovementName().getValue() : null);
-            processedMovementState.setSignalGroup((int) signalGroupState.getSignalGroup().getValue());
+            processedMovementState.setSignalGroup(
+                    signalGroupState.getSignalGroup() != null ? (int) signalGroupState.getSignalGroup().getValue()
+                            : null);
 
             List<ProcessedMovementEvent> processedMovementEventList = new ArrayList<ProcessedMovementEvent>();
             if (signalGroupState.getState_time_speed() != null) {
@@ -146,23 +159,34 @@ public class SpatProcessedJsonConverter
                     ProcessedMovementEvent processedMovementEvent = new ProcessedMovementEvent();
                     processedMovementEvent.setEventState(incomingMovementEvent.getEventState());
 
-                    if (utcTimestamp != null) {
-                        TimingChangeDetails spatTimingDetails = new TimingChangeDetails();
-                        spatTimingDetails.setStartTime(generateOffsetUTCTimestamp(utcTimestamp,
-                                (int) incomingMovementEvent.getTiming().getStartTime().getValue()));
-                        spatTimingDetails.setMinEndTime(generateOffsetUTCTimestamp(utcTimestamp,
-                                (int) incomingMovementEvent.getTiming().getMinEndTime().getValue()));
-                        spatTimingDetails.setMaxEndTime(generateOffsetUTCTimestamp(utcTimestamp,
-                                (int) incomingMovementEvent.getTiming().getMaxEndTime().getValue()));
-                        spatTimingDetails.setLikelyTime(generateOffsetUTCTimestamp(utcTimestamp,
-                                (int) incomingMovementEvent.getTiming().getLikelyTime().getValue()));
-                        spatTimingDetails
-                                .setConfidence((int) incomingMovementEvent.getTiming().getConfidence().getValue());
+                    // Calculate the UTC timestamps for the movement event states and account for null values
+                    TimingChangeDetails spatTimingDetails = new TimingChangeDetails();
+                    Integer startTime = incomingMovementEvent.getTiming().getStartTime() != null
+                            ? (int) incomingMovementEvent.getTiming().getStartTime().getValue()
+                            : null;
+                    Integer minEndTime = incomingMovementEvent.getTiming().getMinEndTime() != null
+                            ? (int) incomingMovementEvent.getTiming().getMinEndTime().getValue()
+                            : null;
+                    Integer maxEndTime = incomingMovementEvent.getTiming().getMaxEndTime() != null
+                            ? (int) incomingMovementEvent.getTiming().getMaxEndTime().getValue()
+                            : null;
+                    Integer likelyTime = incomingMovementEvent.getTiming().getLikelyTime() != null
+                            ? (int) incomingMovementEvent.getTiming().getLikelyTime().getValue()
+                            : null;
+                    Integer nextTime = incomingMovementEvent.getTiming().getNextTime() != null
+                            ? (int) incomingMovementEvent.getTiming().getNextTime().getValue()
+                            : null;
+                    spatTimingDetails.setStartTime(generateOffsetUTCTimestamp(utcTimestamp, startTime));
+                    spatTimingDetails.setMinEndTime(generateOffsetUTCTimestamp(utcTimestamp, minEndTime));
+                    spatTimingDetails.setMaxEndTime(generateOffsetUTCTimestamp(utcTimestamp, maxEndTime));
+                    spatTimingDetails.setLikelyTime(generateOffsetUTCTimestamp(utcTimestamp, likelyTime));
+                    spatTimingDetails.setNextTime(generateOffsetUTCTimestamp(utcTimestamp, nextTime));
+                    spatTimingDetails.setConfidence(incomingMovementEvent.getTiming().getConfidence() != null
+                            ? (int) incomingMovementEvent.getTiming().getConfidence().getValue()
+                            : null);
+                    processedMovementEvent.setTiming(spatTimingDetails);
 
-                        spatTimingDetails.setNextTime(generateOffsetUTCTimestamp(utcTimestamp,
-                                (int) incomingMovementEvent.getTiming().getNextTime().getValue()));
-                        processedMovementEvent.setTiming(spatTimingDetails);
-                    }
+                    // Set the speeds if they exist, otherwise set to null
                     processedMovementEvent.setSpeeds(
                             incomingMovementEvent.getSpeeds() != null ? incomingMovementEvent.getSpeeds() : null);
 

@@ -1,67 +1,20 @@
 package us.dot.its.jpo.geojsonconverter.pojos.spat;
 
-import java.util.Objects;
-
 import us.dot.its.jpo.geojsonconverter.validator.JsonValidatorResult;
 import us.dot.its.jpo.ode.model.OdeMessageFrameData;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class DeserializedRawSpat {
 
     OdeMessageFrameData odeSpatMessageFrameData;
     JsonValidatorResult validatorResults;
     Boolean validationFailure = false;
     String failedMessage = null;
-
-    public OdeMessageFrameData getOdeSpatMessageFrameData() {
-        return this.odeSpatMessageFrameData;
-    }
-
-    public void setOdeSpatMessageFrameData(OdeMessageFrameData odeSpatMessageFrameData) {
-        this.odeSpatMessageFrameData = odeSpatMessageFrameData;
-    }
-
-    public JsonValidatorResult getValidatorResults() {
-        return this.validatorResults;
-    }
-
-    public void setValidatorResults(JsonValidatorResult validatorResults) {
-        this.validatorResults = validatorResults;
-    }
-
-    public Boolean getValidationFailure() {
-        return this.validationFailure;
-    }
-
-    public void setValidationFailure(Boolean validationFailure) {
-        this.validationFailure = validationFailure;
-    }
-
-    public String getFailedMessage() {
-        return this.failedMessage;
-    }
-
-    public void setFailedMessage(String failedMessage) {
-        this.failedMessage = failedMessage;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == this)
-            return true;
-        if (!(o instanceof DeserializedRawSpat)) {
-            return false;
-        }
-        DeserializedRawSpat deserializedRawSpat = (DeserializedRawSpat) o;
-        return Objects.equals(odeSpatMessageFrameData, deserializedRawSpat.odeSpatMessageFrameData)
-                && Objects.equals(validatorResults, deserializedRawSpat.validatorResults)
-                && Objects.equals(validationFailure, deserializedRawSpat.validationFailure)
-                && Objects.equals(failedMessage, deserializedRawSpat.failedMessage);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(odeSpatMessageFrameData, validatorResults, validationFailure, failedMessage);
-    }
 
     @Override
     public String toString() {
