@@ -69,12 +69,25 @@ Example ProcessedSpat message:
 {
 	"schemaVersion": 2,
 	"messageType": "SPAT",
-	"odeReceivedAt": "2025-07-15T11:36:27.358Z",
+	"odeReceivedAt": "2025-07-16T22:55:40.636Z",
 	"originIp": "172.18.0.1",
 	"asn1": "0381004003807C00134700081132000000E437070010434257925790010232119A11CE800C10D095E495E400808684AF24AF20050434257925790030232119A11CE801C10D095E495E401008684AF24AF200",
-	"validationMessages": [],
+	"validationMessages": [
+		{
+			"message": "CTI-4501 conformance issue: the SPAT 'timeStamp' DE_MinuteOfTheYear is missing"
+		},
+		{
+			"message": "CTI-4501 conformance issue: the intersections 'id.region' DE_RoadRegulatorID is missing"
+		},
+		{
+			"message": "CTI-4501 conformance issue: the state-time-speed 'timing.startTime' DE_TimeMark is missing"
+		},
+		{
+			"message": "CTI-4501 conformance issue: the state-time-speed 'timing.nextTime' DE_TimeMark is missing"
+		}
+	],
 	"intersectionId": 8804,
-	"cti4501Conformant": true,
+	"cti4501Conformant": false,
 	"revision": 0,
 	"status": {
 		"manualControlIsEnabled": false,
@@ -92,7 +105,7 @@ Example ProcessedSpat message:
 		"noValidMAPisAvailableAtThisTime": false,
 		"noValidSPATisAvailableAtThisTime": false
 	},
-	"utcTimeStamp": "2025-07-15T11:36:58.423Z",
+	"utcTimeStamp": "2025-07-16T22:55:58.423Z",
 	"states": [
 		{
 			"signalGroup": 1,
@@ -100,8 +113,8 @@ Example ProcessedSpat message:
 				{
 					"eventState": "stop-And-Remain",
 					"timing": {
-						"minEndTime": "2025-07-15T11:31:58.6Z",
-						"maxEndTime": "2025-07-15T11:31:58.6Z"
+						"minEndTime": "2025-07-16T22:31:58.6Z",
+						"maxEndTime": "2025-07-16T22:31:58.6Z"
 					}
 				}
 			]
@@ -112,8 +125,8 @@ Example ProcessedSpat message:
 				{
 					"eventState": "protected-Movement-Allowed",
 					"timing": {
-						"minEndTime": "2025-07-15T11:30:02.4Z",
-						"maxEndTime": "2025-07-15T11:30:23.4Z"
+						"minEndTime": "2025-07-16T22:30:02.4Z",
+						"maxEndTime": "2025-07-16T22:30:23.4Z"
 					}
 				}
 			]
@@ -124,8 +137,8 @@ Example ProcessedSpat message:
 				{
 					"eventState": "stop-And-Remain",
 					"timing": {
-						"minEndTime": "2025-07-15T11:31:58.6Z",
-						"maxEndTime": "2025-07-15T11:31:58.6Z"
+						"minEndTime": "2025-07-16T22:31:58.6Z",
+						"maxEndTime": "2025-07-16T22:31:58.6Z"
 					}
 				}
 			]
@@ -136,8 +149,8 @@ Example ProcessedSpat message:
 				{
 					"eventState": "stop-And-Remain",
 					"timing": {
-						"minEndTime": "2025-07-15T11:31:58.6Z",
-						"maxEndTime": "2025-07-15T11:31:58.6Z"
+						"minEndTime": "2025-07-16T22:31:58.6Z",
+						"maxEndTime": "2025-07-16T22:31:58.6Z"
 					}
 				}
 			]
@@ -148,8 +161,8 @@ Example ProcessedSpat message:
 				{
 					"eventState": "stop-And-Remain",
 					"timing": {
-						"minEndTime": "2025-07-15T11:31:58.6Z",
-						"maxEndTime": "2025-07-15T11:31:58.6Z"
+						"minEndTime": "2025-07-16T22:31:58.6Z",
+						"maxEndTime": "2025-07-16T22:31:58.6Z"
 					}
 				}
 			]
@@ -160,8 +173,8 @@ Example ProcessedSpat message:
 				{
 					"eventState": "protected-Movement-Allowed",
 					"timing": {
-						"minEndTime": "2025-07-15T11:30:02.4Z",
-						"maxEndTime": "2025-07-15T11:30:23.4Z"
+						"minEndTime": "2025-07-16T22:30:02.4Z",
+						"maxEndTime": "2025-07-16T22:30:23.4Z"
 					}
 				}
 			]
@@ -172,8 +185,8 @@ Example ProcessedSpat message:
 				{
 					"eventState": "stop-And-Remain",
 					"timing": {
-						"minEndTime": "2025-07-15T11:31:58.6Z",
-						"maxEndTime": "2025-07-15T11:31:58.6Z"
+						"minEndTime": "2025-07-16T22:31:58.6Z",
+						"maxEndTime": "2025-07-16T22:31:58.6Z"
 					}
 				}
 			]
@@ -184,8 +197,8 @@ Example ProcessedSpat message:
 				{
 					"eventState": "stop-And-Remain",
 					"timing": {
-						"minEndTime": "2025-07-15T11:31:58.6Z",
-						"maxEndTime": "2025-07-15T11:31:58.6Z"
+						"minEndTime": "2025-07-16T22:31:58.6Z",
+						"maxEndTime": "2025-07-16T22:31:58.6Z"
 					}
 				}
 			]

@@ -65,9 +65,10 @@ public class SpatTopologyTest {
             assertEquals("172.18.0.1", processedSpatJson.key.getRsuId());
             assertEquals(8804, processedSpatJson.key.getIntersectionId());
             assertNotNull(processedSpatJson.value);
+            assertEquals(false, processedSpatJson.value.isCti4501Conformant());
+            assertEquals(4, processedSpatJson.value.getValidationMessages().size());
             assertEquals(8, processedSpatJson.value.getStates().size());
         }
-
     }
 
     @Test

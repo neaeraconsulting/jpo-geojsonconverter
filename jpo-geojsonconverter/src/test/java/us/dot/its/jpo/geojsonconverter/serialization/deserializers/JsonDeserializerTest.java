@@ -67,10 +67,8 @@ public class JsonDeserializerTest {
 
             ProcessedSpat spat = serializer.deserialize("the_topic", spatBytes);
             assertNotNull(spat);
-            assertEquals(true, spat.isCti4501Conformant());
-            assertEquals("2025-07-15T11:36:58.423Z", spat.getUtcTimeStamp().toString());
-
-            // assertEquals(spatString, spat.toString().replace(" ", ""));
+            assertEquals(false, spat.isCti4501Conformant());
+            assertEquals("2025-07-16T22:55:58.423Z", spat.getUtcTimeStamp().toString());
 
         } catch (Exception e) {
             fail("Unexpected exception: " + e);
