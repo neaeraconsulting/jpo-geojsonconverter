@@ -12,10 +12,13 @@ spring.main.web-application-type: servlet
 spring.groovy.template.check-template-location: false
 
 # JSON Schema resource paths
-schema.bsm: classpath:schemas/bsm.schema.json
-schema.map: classpath:schemas/map.schema.json
-schema.spat: classpath:schemas/spat.schema.json
-schema.psm: classpath:schemas/psm.schema.json
+schema:
+  bsm: classpath:schemas/bsm.schema.json
+  map: classpath:schemas/map.schema.json
+  spat: classpath:schemas/spat.schema.json
+  psm: classpath:schemas/psm.schema.json
+  rtcm: classpath:schemas/rtcm.schema.json
+
 # Geometry JSON output mode (GEOJSON_ONLY or WKT)
 geometry.output.mode: GEOJSON_ONLY
 
