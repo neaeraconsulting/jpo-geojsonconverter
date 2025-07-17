@@ -5,6 +5,8 @@ import us.dot.its.jpo.asn.j2735.r2024.Common.FullPositionVector;
 import us.dot.its.jpo.asn.j2735.r2024.RTCMcorrections.RTCMcorrectionsMessageFrame;
 import us.dot.its.jpo.geojsonconverter.pojos.ProcessedValidationMessage;
 
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -36,6 +38,15 @@ import java.util.Set;
  */
 @Data
 public class ProcessedRTCM {
+
+    /* -----------------------------------------------------------------------
+     * Metadata properties
+     * ---------------------------------------------------------------------*/
+    private int schemaVersion = -1;
+    private String messageType = "RTCM";
+    private ZonedDateTime odeReceivedAt;
+    private String originIp;
+    private String asn1;
 
     /* -----------------------------------------------------------------------
      * CTI 4501 required fields from RTCMcorrections message frame
@@ -91,4 +102,24 @@ public class ProcessedRTCM {
 
     private List<DecodedRTCMmessage> messages;
     private List<ProcessedValidationMessage> validationMessages;
+
+    public void addValidationMessage(ProcessedValidationMessage message) {
+        if (validationMessages == null) {
+            validationMessages = new ArrayList<ProcessedValidationMessage>();
+        }
+        validationMessages.add(message);
+    }
+
+    public void addValidationMessages(List<ProcessedValidationMessage> messages) {
+        if (validationMessages == null) {
+            validationMessages = new ArrayList<>();
+        }
+        validationMessages.addAll(messages);
+    }
+
+    public void addValidationMessage(String message) {
+        var validationMessage = new ProcessedValidationMessage();
+        validationMessage.setMessage(message);
+        validationMessages.add(validationMessage);
+    }
 }

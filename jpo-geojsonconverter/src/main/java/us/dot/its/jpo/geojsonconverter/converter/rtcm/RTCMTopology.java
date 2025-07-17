@@ -26,7 +26,8 @@ public class RTCMTopology {
 
     public static Topology build(final String rtcmOdeJsonTopic,
                                  final String rtcmProcessedJsonTopic,
-                                 RTCMJsonValidator rtcmJsonValidator) {
+                                 RTCMJsonValidator rtcmJsonValidator,
+                                 RTCMConverter rtcmConverter) {
         var builder = new StreamsBuilder();
 
         // Stream in raw RTCMcorrections
@@ -61,7 +62,7 @@ public class RTCMTopology {
 
         // Convert to ProcessedRTCM
         KStream<RsuStationIdKey, ProcessedRTCM> processedRTCMStream =
-                validatedOdeRTCMStream.transform(RTCMTransformer::new);
+                validatedOdeRTCMStream.transform(() -> new RTCMTransformer(rtcmConverter));
 
         processedRTCMStream.to(rtcmProcessedJsonTopic,
                 Produced.with(
