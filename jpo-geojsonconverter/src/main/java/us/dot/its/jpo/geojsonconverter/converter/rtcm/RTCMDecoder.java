@@ -57,7 +57,7 @@ public class RTCMDecoder {
 
     /**
      * Partially decode the RTCM message.  Used when gpsdecode library is not available.
-     * Ref. gpsd/driver_rtcm.c
+     * Ref. <a href="https://gitlab.com/gpsd/gpsd/-/blob/master/drivers/driver_rtcm3.c">gpsd/driver_rtcm.c</a>
      * @param bytes byte array
      * @return JSON formatted partially decoded message.
      */
@@ -80,7 +80,7 @@ public class RTCMDecoder {
         node.put("class", "RTCM3");
 
         // Next 6 bits should be zero
-        int zeroBits = unsigned(bytes[1]) >>> 3;
+        int zeroBits = unsigned(bytes[1]) >>> 2;
         if (zeroBits != 0) {
             log.error(String.format("Invalid zero bits: %X", zeroBits));
             return node;
@@ -95,7 +95,7 @@ public class RTCMDecoder {
         node.put("type", type);
 
         // Station ID: 12 bits
-        // Get station ID for types known or guessed to have them per driver_rtcm3.c
+        // Get station ID for types known or guessed to have them per gpsd/driver_rtcm3.c
         if (type <= 1013 || type == 1029 || type == 1033 || (type >= 1071 && type <= 1230)) {
             int stationId = ((unsigned(bytes[4]) & 0x0F) << 8) | unsigned(bytes[5]);
             node.put("station_id", stationId);
