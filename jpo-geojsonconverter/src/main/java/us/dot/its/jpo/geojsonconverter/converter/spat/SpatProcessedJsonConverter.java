@@ -245,7 +245,7 @@ public class SpatProcessedJsonConverter
      * SPAT.intersections[0].states[*].state_time_speed[*].timing.nextTime
      *
      * @param spat The SPAT object to be validated for CTI-4501 conformance.
-     * @return {@code true} if the SPAT object is CTI-4501 conformant; {@code false} otherwise.
+     * @return a list of validation messages describing CTI-4501 conformance issues, or an empty list if conformant.
      */
     public List<ProcessedValidationMessage> checkIfCti4501Conformant(SPAT spat) {
         List<ProcessedValidationMessage> validationMessages = new ArrayList<>();

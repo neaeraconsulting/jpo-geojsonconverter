@@ -7,7 +7,7 @@ package us.dot.its.jpo.geojsonconverter.utils;
  */
 public class ProcessedSchemaVersions {
     public static final int PROCESSED_BSM_SCHEMA_VERSION = 2;
-    public static final int PROCESSED_MAP_SCHEMA_VERSION = 1;
+    public static final int PROCESSED_MAP_SCHEMA_VERSION = 2;
     public static final int PROCESSED_SPAT_SCHEMA_VERSION = 2;
     public static final int PROCESSED_PSM_SCHEMA_VERSION = 1;
 }
