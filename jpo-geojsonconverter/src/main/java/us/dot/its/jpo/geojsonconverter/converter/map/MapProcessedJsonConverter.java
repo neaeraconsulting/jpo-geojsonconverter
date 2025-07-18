@@ -1,401 +1,409 @@
-// package us.dot.its.jpo.geojsonconverter.converter.map;
+package us.dot.its.jpo.geojsonconverter.converter.map;
 
-// import us.dot.its.jpo.geojsonconverter.partitioner.RsuIntersectionKey;
-// import us.dot.its.jpo.geojsonconverter.pojos.ProcessedValidationMessage;
-// import us.dot.its.jpo.geojsonconverter.pojos.geojson.LineString;
-// import us.dot.its.jpo.geojsonconverter.pojos.geojson.connectinglanes.*;
-// import us.dot.its.jpo.geojsonconverter.pojos.geojson.map.*;
-// import us.dot.its.jpo.geojsonconverter.validator.JsonValidatorResult;
-// import us.dot.its.jpo.ode.model.*;
-// import us.dot.its.jpo.ode.plugin.j2735.*;
+import us.dot.its.jpo.asn.j2735.r2024.Common.Position3D;
+import us.dot.its.jpo.asn.j2735.r2024.MapData.IntersectionGeometry;
+import us.dot.its.jpo.asn.j2735.r2024.MapData.MapDataMessageFrame;
+import us.dot.its.jpo.geojsonconverter.partitioner.RsuIntersectionKey;
+import us.dot.its.jpo.geojsonconverter.pojos.ProcessedValidationMessage;
+import us.dot.its.jpo.geojsonconverter.pojos.geojson.LineString;
+import us.dot.its.jpo.geojsonconverter.pojos.geojson.connectinglanes.*;
+import us.dot.its.jpo.geojsonconverter.pojos.geojson.map.*;
+import us.dot.its.jpo.geojsonconverter.validator.JsonValidatorResult;
+import us.dot.its.jpo.ode.model.*;
+import us.dot.its.jpo.ode.plugin.j2735.*;
 
-// import java.util.ArrayList;
-// import java.util.Arrays;
-// import java.util.HashMap;
-// import java.util.List;
-// import java.math.BigDecimal;
-// import java.math.RoundingMode;
-// import java.time.Instant;
-// import java.time.ZoneId;
-// import java.time.ZoneOffset;
-// import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
-// import org.apache.commons.lang3.exception.ExceptionUtils;
-// import org.apache.kafka.streams.KeyValue;
-// import org.apache.kafka.streams.kstream.Transformer;
-// import org.apache.kafka.streams.processor.ProcessorContext;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.kafka.streams.KeyValue;
+import org.apache.kafka.streams.kstream.Transformer;
+import org.apache.kafka.streams.processor.ProcessorContext;
 
-// import org.slf4j.Logger;
-// import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-// import com.networknt.schema.ValidationMessage;
+import com.networknt.schema.ValidationMessage;
 
-// public class MapProcessedJsonConverter implements Transformer<Void, DeserializedRawMap, KeyValue<RsuIntersectionKey,
-// ProcessedMap<LineString>>> {
-// private static final Logger logger = LoggerFactory.getLogger(MapProcessedJsonConverter.class);
+public class MapProcessedJsonConverter
+        implements Transformer<Void, DeserializedRawMap, KeyValue<RsuIntersectionKey, ProcessedMap<LineString>>> {
+    private static final Logger logger = LoggerFactory.getLogger(MapProcessedJsonConverter.class);
 
-// @Override
-// public void init(ProcessorContext arg0) {}
+    @Override
+    public void init(ProcessorContext arg0) {}
 
-// /**
-// * Transform an ODE MAP POJO to MAP GeoJSON POJO.
-// *
-// * @param rawKey - Void type because ODE topics have no specified key
-// * @param rawValue - The raw POJO
-// * @return A key value pair: the key an {@link RsuIntersectionKey} containing the RSU IP address and Intersection ID
-// * and the value is the GeoJSON FeatureCollection POJO
-// */
-// @Override
-// public KeyValue<RsuIntersectionKey, ProcessedMap<LineString>> transform(Void rawKey, DeserializedRawMap rawValue) {
-// try {
-// if (!rawValue.getValidationFailure()){
-// OdeMapMetadata mapMetadata = (OdeMapMetadata)rawValue.getOdeMapOdeMapData().getMetadata();
-// OdeMapPayload mapPayload = (OdeMapPayload)rawValue.getOdeMapOdeMapData().getPayload();
-// J2735IntersectionGeometry intersection = mapPayload.getMap().getIntersections().getIntersections().get(0);
+    /**
+     * Transform an ODE MAP POJO to MAP GeoJSON POJO.
+     *
+     * @param rawKey - Void type because ODE topics have no specified key
+     * @param rawValue - The raw POJO
+     * @return A key value pair: the key an {@link RsuIntersectionKey} containing the RSU IP address and Intersection ID
+     *         and the value is the GeoJSON FeatureCollection POJO
+     */
+    @Override
+    public KeyValue<RsuIntersectionKey, ProcessedMap<LineString>> transform(Void rawKey, DeserializedRawMap rawMap) {
+        try {
+            if (!rawMap.getValidationFailure()) {
+                OdeMessageFrameData rawValue = new OdeMessageFrameData();
+                rawValue.setMetadata(rawMap.getOdeMapMessageFrameData().getMetadata());
+                OdeMessageFrameMetadata mapMetadata = rawValue.getMetadata();
 
-// MapSharedProperties sharedProps = createProperties(mapPayload, mapMetadata, intersection,
-// rawValue.getValidatorResults());
+                rawValue.setPayload(rawMap.getOdeMapMessageFrameData().getPayload());
+                MapDataMessageFrame mapMessageFrame = (MapDataMessageFrame) rawValue.getPayload().getData();
+                IntersectionGeometry intersection = mapMessageFrame.getValue().getIntersections().get(0);
 
-// // Set the schema version
-// sharedProps.setSchemaVersion(1);
+                MapSharedProperties sharedProps =
+                        createProperties(mapMessageFrame, mapMetadata, intersection, rawMap.getValidatorResults());
 
-// MapFeatureCollection<LineString> mapFeatureCollection = createFeatureCollection(intersection);
-// ConnectingLanesFeatureCollection<LineString> connectingLanesFeatureCollection =
-// createConnectingLanesFeatureCollection(mapMetadata, intersection);
+                // Set the schema version
+                sharedProps.setSchemaVersion(1);
 
-// ProcessedMap<LineString> processedMapObject = new ProcessedMap<LineString>();
-// processedMapObject.setMapFeatureCollection(mapFeatureCollection);
-// processedMapObject.setConnectingLanesFeatureCollection(connectingLanesFeatureCollection);
-// processedMapObject.setProperties(sharedProps);
+                MapFeatureCollection<LineString> mapFeatureCollection = createFeatureCollection(intersection);
+                ConnectingLanesFeatureCollection<LineString> connectingLanesFeatureCollection =
+                        createConnectingLanesFeatureCollection(mapMetadata, intersection);
 
-// var key = new RsuIntersectionKey();
-// key.setRsuId(mapMetadata.getOriginIp());
-// key.setIntersectionReferenceID(intersection.getId());
+                ProcessedMap<LineString> processedMapObject = new ProcessedMap<LineString>();
+                processedMapObject.setMapFeatureCollection(mapFeatureCollection);
+                processedMapObject.setConnectingLanesFeatureCollection(connectingLanesFeatureCollection);
+                processedMapObject.setProperties(sharedProps);
 
-// logger.debug("Successfully created MAP GeoJSON for {}", key);
-// return KeyValue.pair(key, processedMapObject);
-// } else {
-// ProcessedMap<LineString> processedMapObject = createFailureProcessedMap(rawValue.getValidatorResults(),
-// rawValue.getFailedMessage());
+                var key = new RsuIntersectionKey();
+                key.setRsuId(mapMetadata.getOriginIp());
+                key.setIntersectionReferenceID(intersection.getId());
 
-// var key = new RsuIntersectionKey();
-// key.setRsuId("ERROR");
+                logger.debug("Successfully created MAP GeoJSON for {}", key);
+                return KeyValue.pair(key, processedMapObject);
+            } else {
+                ProcessedMap<LineString> processedMapObject =
+                        createFailureProcessedMap(rawValue.getValidatorResults(), rawValue.getFailedMessage());
 
-// return KeyValue.pair(key, processedMapObject);
-// }
-// } catch (Exception e) {
-// String errMsg = String.format("Exception converting ODE MAP to GeoJSON! Message: %s", e.getMessage());
-// logger.error(errMsg, e);
-// // KafkaStreams knows to remove null responses before allowing further steps from occurring
-// var key = new RsuIntersectionKey();
-// key.setRsuId("ERROR");
-// return KeyValue.pair(key, null);
-// }
-// }
+                var key = new RsuIntersectionKey();
+                key.setRsuId("ERROR");
 
-// @Override
-// public void close() {
-// // Nothing to do here
-// }
+                return KeyValue.pair(key, processedMapObject);
+            }
+        } catch (Exception e) {
+            String errMsg = String.format("Exception converting ODE MAP to GeoJSON! Message: %s", e.getMessage());
+            logger.error(errMsg, e);
+            // KafkaStreams knows to remove null responses before allowing further steps from occurring
+            var key = new RsuIntersectionKey();
+            key.setRsuId("ERROR");
+            return KeyValue.pair(key, null);
+        }
+    }
 
-// public MapSharedProperties createProperties(OdeMapPayload mapPayload, OdeMapMetadata metadata,
-// J2735IntersectionGeometry intersection, JsonValidatorResult validationMessages) {
-// // Save for geometry calculations
-// OdePosition3D refPoint = intersection.getRefPoint();
+    @Override
+    public void close() {
+        // Nothing to do here
+    }
 
-// String odeTimestamp = metadata.getOdeReceivedAt();
-// ZonedDateTime odeDate = Instant.parse(odeTimestamp).atZone(ZoneId.of("UTC"));
+    public MapSharedProperties createProperties(MapDataMessageFrame mapMessageFrame, OdeMessageFrameMetadata metadata,
+            IntersectionGeometry intersection, JsonValidatorResult validationMessages) {
+        // Save for geometry calculations
+        Position3D refPoint = intersection.getRefPoint();
 
-// // Creating Validation Messages object
-// List<ProcessedValidationMessage> processedSpatValidationMessages = new ArrayList<ProcessedValidationMessage>();
-// for (Exception exception : validationMessages.getExceptions()){
-// ProcessedValidationMessage object = new ProcessedValidationMessage();
-// object.setMessage(exception.getMessage());
-// object.setException(Arrays.toString(exception.getStackTrace()));
-// processedSpatValidationMessages.add(object);
-// }
-// for (ValidationMessage vm : validationMessages.getValidationMessages()){
-// ProcessedValidationMessage object = new ProcessedValidationMessage();
-// object.setMessage(vm.getMessage());
-// object.setSchemaPath(vm.getSchemaPath());
-// object.setJsonPath(vm.getPath());
+        String odeTimestamp = metadata.getOdeReceivedAt();
+        ZonedDateTime odeDate = Instant.parse(odeTimestamp).atZone(ZoneId.of("UTC"));
 
-// processedSpatValidationMessages.add(object);
-// }
-// MapSharedProperties sharedProps = new MapSharedProperties();
+        // Creating Validation Messages object
+        List<ProcessedValidationMessage> processedSpatValidationMessages = new ArrayList<ProcessedValidationMessage>();
+        for (Exception exception : validationMessages.getExceptions()) {
+            ProcessedValidationMessage object = new ProcessedValidationMessage();
+            object.setMessage(exception.getMessage());
+            object.setException(Arrays.toString(exception.getStackTrace()));
+            processedSpatValidationMessages.add(object);
+        }
+        for (ValidationMessage vm : validationMessages.getValidationMessages()) {
+            ProcessedValidationMessage object = new ProcessedValidationMessage();
+            object.setMessage(vm.getMessage());
+            object.setSchemaPath(vm.getSchemaPath());
+            object.setJsonPath(vm.getPath());
 
-// sharedProps.setOriginIp(metadata.getOriginIp());
-// sharedProps.setOdeReceivedAt(odeDate);
-// sharedProps.setIntersectionName(intersection.getName());
-// sharedProps.setRegion(intersection.getId().getRegion());
-// sharedProps.setIntersectionId(intersection.getId().getId());
-// sharedProps.setMsgIssueRevision(mapPayload.getMap().getMsgIssueRevision());
-// sharedProps.setRevision(intersection.getRevision());
-// sharedProps.setRefPoint(refPoint);
-// sharedProps.setLaneWidth(intersection.getLaneWidth());
-// sharedProps.setSpeedLimits(intersection.getSpeedLimits() != null ? intersection.getSpeedLimits().getSpeedLimits() :
-// null);
-// sharedProps.setMapSource(metadata.getMapSource());
-// sharedProps.setTimeStamp(generateUTCTimestamp(mapPayload.getMap().getTimeStamp(), odeDate));
-// // Setting validation fields
-// sharedProps.setValidationMessages(processedSpatValidationMessages);
-// sharedProps.setCti4501Conformant(validationMessages.isValid());
+            processedSpatValidationMessages.add(object);
+        }
+        // TODO: Perform CTI-4501 validation
+        MapSharedProperties sharedProps = new MapSharedProperties();
 
-// return sharedProps;
-// }
+        sharedProps.setOriginIp(metadata.getOriginIp());
+        sharedProps.setOdeReceivedAt(odeDate);
+        sharedProps.setIntersectionName(intersection.getName() != null ? intersection.getName().getValue() : null);
+        sharedProps.setRegion(intersection.getId().getRegion());
+        sharedProps.setIntersectionId(intersection.getId().getId());
+        sharedProps.setMsgIssueRevision(mapMessageFrame.getValue().getMsgIssueRevision() != null
+                ? (int) mapMessageFrame.getValue().getMsgIssueRevision().getValue()
+                : null);
+        sharedProps.setRevision(intersection.getRevision());
+        sharedProps.setRefPoint(refPoint);
+        sharedProps.setLaneWidth(intersection.getLaneWidth());
+        sharedProps.setSpeedLimits(
+                intersection.getSpeedLimits() != null ? intersection.getSpeedLimits().getSpeedLimits() : null);
+        sharedProps.setMapSource(metadata.getMapSource());
+        sharedProps.setTimeStamp(generateUTCTimestamp(mapPayload.getMap().getTimeStamp(), odeDate));
+        // Setting validation fields
+        sharedProps.setValidationMessages(processedSpatValidationMessages);
+        sharedProps.setCti4501Conformant(validationMessages.isValid());
 
-// @SuppressWarnings("unchecked")
-// public MapFeatureCollection<LineString> createFeatureCollection(J2735IntersectionGeometry intersection) {
-// // Save for geometry calculations
-// OdePosition3D refPoint = intersection.getRefPoint();
+        return sharedProps;
+    }
 
-// List<MapFeature<LineString>> mapFeatures = new ArrayList<>();
-// for (J2735GenericLane lane : intersection.getLaneSet().getLaneSet()) {
-// // Create MAP properties
-// MapProperties mapProps = new MapProperties();
-// if (lane.getNodeList().getNodes() != null) {
-// mapProps.setNodes(nodeConversionList(Arrays.asList(lane.getNodeList().getNodes())));
-// }
-// mapProps.setLaneId(lane.getLaneID());
-// mapProps.setLaneName(lane.getName());
-// mapProps.setLaneType(lane.getLaneAttributes().getLaneType());
-// mapProps.setSharedWith(lane.getLaneAttributes().getShareWith());
-// mapProps.setIngressPath(lane.getLaneAttributes().getDirectionalUse().get("ingressPath"));
-// mapProps.setEgressPath(lane.getLaneAttributes().getDirectionalUse().get("egressPath"));
-// mapProps.setIngressApproach(lane.getIngressApproach() != null ? lane.getIngressApproach() : 0);
-// mapProps.setEgressApproach(lane.getEgressApproach() != null ? lane.getEgressApproach() : 0);
+    @SuppressWarnings("unchecked")
+    public MapFeatureCollection<LineString> createFeatureCollection(J2735IntersectionGeometry intersection) {
+        // Save for geometry calculations
+        OdePosition3D refPoint = intersection.getRefPoint();
 
-// mapProps.setManeuvers(lane.getManeuvers());
-// mapProps.setConnectsTo(lane.getConnectsTo() != null? lane.getConnectsTo().getConnectsTo() : null);
+        List<MapFeature<LineString>> mapFeatures = new ArrayList<>();
+        for (J2735GenericLane lane : intersection.getLaneSet().getLaneSet()) {
+            // Create MAP properties
+            MapProperties mapProps = new MapProperties();
+            if (lane.getNodeList().getNodes() != null) {
+                mapProps.setNodes(nodeConversionList(Arrays.asList(lane.getNodeList().getNodes())));
+            }
+            mapProps.setLaneId(lane.getLaneID());
+            mapProps.setLaneName(lane.getName());
+            mapProps.setLaneType(lane.getLaneAttributes().getLaneType());
+            mapProps.setSharedWith(lane.getLaneAttributes().getShareWith());
+            mapProps.setIngressPath(lane.getLaneAttributes().getDirectionalUse().get("ingressPath"));
+            mapProps.setEgressPath(lane.getLaneAttributes().getDirectionalUse().get("egressPath"));
+            mapProps.setIngressApproach(lane.getIngressApproach() != null ? lane.getIngressApproach() : 0);
+            mapProps.setEgressApproach(lane.getEgressApproach() != null ? lane.getEgressApproach() : 0);
 
-// // Create MAP geometry
-// LineString geometry = createGeometry(lane, refPoint);
+            mapProps.setManeuvers(lane.getManeuvers());
+            mapProps.setConnectsTo(lane.getConnectsTo() != null ? lane.getConnectsTo().getConnectsTo() : null);
 
-// // Create MAP feature and add it to the feature list
-// mapFeatures.add(new MapFeature<LineString>(mapProps.getLaneId(), geometry, mapProps));
-// }
+            // Create MAP geometry
+            LineString geometry = createGeometry(lane, refPoint);
 
-// return new MapFeatureCollection<LineString>(mapFeatures.toArray(new MapFeature[0]));
-// }
+            // Create MAP feature and add it to the feature list
+            mapFeatures.add(new MapFeature<LineString>(mapProps.getLaneId(), geometry, mapProps));
+        }
 
-// @SuppressWarnings("unchecked")
-// public ConnectingLanesFeatureCollection<LineString> createConnectingLanesFeatureCollection(OdeMapMetadata metadata,
-// J2735IntersectionGeometry intersection) {
-// // Save for geometry calculations
-// OdePosition3D refPoint = intersection.getRefPoint();
+        return new MapFeatureCollection<LineString>(mapFeatures.toArray(new MapFeature[0]));
+    }
 
-// HashMap<Integer, double[]> lanePoints = new HashMap<Integer, double[]>();
-// for (J2735GenericLane lane : intersection.getLaneSet().getLaneSet()) {
-// if (!lanePoints.containsKey(lane.getLaneID())){
-// LineString laneGeometry = createGeometry(lane, refPoint);
-// double coordinate[] = {laneGeometry.getCoordinates()[0][0],laneGeometry.getCoordinates()[0][1]};
-// lanePoints.put(lane.getLaneID(), coordinate);
-// }
-// }
+    @SuppressWarnings("unchecked")
+    public ConnectingLanesFeatureCollection<LineString> createConnectingLanesFeatureCollection(OdeMapMetadata metadata,
+            J2735IntersectionGeometry intersection) {
+        // Save for geometry calculations
+        OdePosition3D refPoint = intersection.getRefPoint();
 
-// List<ConnectingLanesFeature<LineString>> lanesFeatures = new ArrayList<>();
-// for (J2735GenericLane lane : intersection.getLaneSet().getLaneSet()) {
-// if (lane.getLaneAttributes().getDirectionalUse().get("ingressPath") == true){
-// double[] laneCoordinates = lanePoints.get(lane.getLaneID()); //first poiunt
-// if (lane.getConnectsTo() == null)
-// continue;
+        HashMap<Integer, double[]> lanePoints = new HashMap<Integer, double[]>();
+        for (J2735GenericLane lane : intersection.getLaneSet().getLaneSet()) {
+            if (!lanePoints.containsKey(lane.getLaneID())) {
+                LineString laneGeometry = createGeometry(lane, refPoint);
+                double coordinate[] = {laneGeometry.getCoordinates()[0][0], laneGeometry.getCoordinates()[0][1]};
+                lanePoints.put(lane.getLaneID(), coordinate);
+            }
+        }
 
-// for (J2735Connection connection : lane.getConnectsTo().getConnectsTo()){
-// ConnectingLanesProperties laneProps = new ConnectingLanesProperties();
-// laneProps.setIngressLaneId(lane.getLaneID());
-// laneProps.setEgressLaneId(connection.getConnectingLane().getLane());
-// laneProps.setSignalGroupId(connection.getSignalGroup());
+        List<ConnectingLanesFeature<LineString>> lanesFeatures = new ArrayList<>();
+        for (J2735GenericLane lane : intersection.getLaneSet().getLaneSet()) {
+            if (lane.getLaneAttributes().getDirectionalUse().get("ingressPath") == true) {
+                double[] laneCoordinates = lanePoints.get(lane.getLaneID()); // first poiunt
+                if (lane.getConnectsTo() == null)
+                    continue;
 
-// // Point
-// double[] connectionCoordinates = lanePoints.get(connection.getConnectingLane().getLane()); // last point
-// double[][] coordinates = new double[][] {laneCoordinates, connectionCoordinates};
-// LineString geometry = new LineString(coordinates);
+                for (J2735Connection connection : lane.getConnectsTo().getConnectsTo()) {
+                    ConnectingLanesProperties laneProps = new ConnectingLanesProperties();
+                    laneProps.setIngressLaneId(lane.getLaneID());
+                    laneProps.setEgressLaneId(connection.getConnectingLane().getLane());
+                    laneProps.setSignalGroupId(connection.getSignalGroup());
 
-// String id = String.format("%s-%s", laneProps.getIngressLaneId(), laneProps.getEgressLaneId());
-// lanesFeatures.add(new ConnectingLanesFeature<LineString>(id, geometry, laneProps));
-// }
-// }
-// }
+                    // Point
+                    double[] connectionCoordinates = lanePoints.get(connection.getConnectingLane().getLane()); // last
+                                                                                                               // point
+                    double[][] coordinates = new double[][] {laneCoordinates, connectionCoordinates};
+                    LineString geometry = new LineString(coordinates);
 
-// return new ConnectingLanesFeatureCollection<LineString>(lanesFeatures.toArray(new ConnectingLanesFeature[0]));
-// }
+                    String id = String.format("%s-%s", laneProps.getIngressLaneId(), laneProps.getEgressLaneId());
+                    lanesFeatures.add(new ConnectingLanesFeature<LineString>(id, geometry, laneProps));
+                }
+            }
+        }
 
-// public LineString createGeometry(J2735GenericLane lane, OdePosition3D refPoint) {
-// // Calculate coordinates from reference point
-// BigDecimal anchorLat = new BigDecimal(refPoint.getLatitude().toString());
-// BigDecimal anchorLong = new BigDecimal(refPoint.getLongitude().toString());
-// List<List<Double>> coordinatesList = new ArrayList<>();
-// for (int x = 0; x < lane.getNodeList().getNodes().length; x++) {
-// J2735NodeOffsetPointXY nodeOffset = lane.getNodeList().getNodes()[x].getDelta();
+        return new ConnectingLanesFeatureCollection<LineString>(lanesFeatures.toArray(new ConnectingLanesFeature[0]));
+    }
 
-// if (nodeOffset.getNodeLatLon() != null) {
-// J2735NodeLLmD64b nodeLatLong = nodeOffset.getNodeLatLon();
-// // Complete absolute lat-long representation per J2735
-// // Lat-Long values expressed in standard SAE 1/10 of a microdegree
-// BigDecimal lat = nodeLatLong.getLat().divide(new BigDecimal("10000000"));
-// BigDecimal lon = nodeLatLong.getLon().divide(new BigDecimal("10000000"));
+    public LineString createGeometry(J2735GenericLane lane, OdePosition3D refPoint) {
+        // Calculate coordinates from reference point
+        BigDecimal anchorLat = new BigDecimal(refPoint.getLatitude().toString());
+        BigDecimal anchorLong = new BigDecimal(refPoint.getLongitude().toString());
+        List<List<Double>> coordinatesList = new ArrayList<>();
+        for (int x = 0; x < lane.getNodeList().getNodes().length; x++) {
+            J2735NodeOffsetPointXY nodeOffset = lane.getNodeList().getNodes()[x].getDelta();
 
-// List<Double> coordinate = new ArrayList<>();
-// coordinate.add(lon.doubleValue());
-// coordinate.add(lat.doubleValue());
-// coordinatesList.add(coordinate);
+            if (nodeOffset.getNodeLatLon() != null) {
+                J2735NodeLLmD64b nodeLatLong = nodeOffset.getNodeLatLon();
+                // Complete absolute lat-long representation per J2735
+                // Lat-Long values expressed in standard SAE 1/10 of a microdegree
+                BigDecimal lat = nodeLatLong.getLat().divide(new BigDecimal("10000000"));
+                BigDecimal lon = nodeLatLong.getLon().divide(new BigDecimal("10000000"));
 
-// // Reset the anchor point for following offset nodes
-// // J2735 is not clear if only one of these nodelatlon types is allowed in the lane path nodes
-// anchorLat = new BigDecimal(lat.toString());
-// anchorLong = new BigDecimal(lon.toString());
-// }
-// else {
-// // Get the NodeXY object or skip node if entirely null
-// J2735Node_XY nodexy = null;
-// if (nodeOffset.getNodeXY1() != null)
-// nodexy = nodeOffset.getNodeXY1();
-// else if (nodeOffset.getNodeXY2() != null)
-// nodexy = nodeOffset.getNodeXY2();
-// else if (nodeOffset.getNodeXY3() != null)
-// nodexy = nodeOffset.getNodeXY3();
-// else if (nodeOffset.getNodeXY4() != null)
-// nodexy = nodeOffset.getNodeXY4();
-// else if (nodeOffset.getNodeXY5() != null)
-// nodexy = nodeOffset.getNodeXY5();
-// else if (nodeOffset.getNodeXY6() != null)
-// nodexy = nodeOffset.getNodeXY6();
-// else
-// continue;
+                List<Double> coordinate = new ArrayList<>();
+                coordinate.add(lon.doubleValue());
+                coordinate.add(lat.doubleValue());
+                coordinatesList.add(coordinate);
 
-// // Calculate offset lon,lat values
-// // Equations may become less accurate the further N/S the coordinate is
-// double offsetX = nodexy.getX().doubleValue();
-// double offsetY = nodexy.getY().doubleValue();
+                // Reset the anchor point for following offset nodes
+                // J2735 is not clear if only one of these nodelatlon types is allowed in the lane path nodes
+                anchorLat = new BigDecimal(lat.toString());
+                anchorLong = new BigDecimal(lon.toString());
+            } else {
+                // Get the NodeXY object or skip node if entirely null
+                J2735Node_XY nodexy = null;
+                if (nodeOffset.getNodeXY1() != null)
+                    nodexy = nodeOffset.getNodeXY1();
+                else if (nodeOffset.getNodeXY2() != null)
+                    nodexy = nodeOffset.getNodeXY2();
+                else if (nodeOffset.getNodeXY3() != null)
+                    nodexy = nodeOffset.getNodeXY3();
+                else if (nodeOffset.getNodeXY4() != null)
+                    nodexy = nodeOffset.getNodeXY4();
+                else if (nodeOffset.getNodeXY5() != null)
+                    nodexy = nodeOffset.getNodeXY5();
+                else if (nodeOffset.getNodeXY6() != null)
+                    nodexy = nodeOffset.getNodeXY6();
+                else
+                    continue;
 
-// // (offsetX * 0.01) / (math.cos((Math.PI / 180.0) * anchorLat) * 111111.0)
-// // Step 1. (offsetX * 0.01)
-// // Step 2. (math.cos((Math.PI/180.0) * anchorLat) * 111111.0)
-// // Step 3. Step 1 / Step 2
-// double offsetX_step1 = offsetX * 0.01;
-// double offsetX_step2 = Math.cos(((double)(Math.PI / 180.0)) * anchorLat.doubleValue()) * 111111.0;
-// double offsetXDegrees = offsetX_step1 / offsetX_step2;
+                // Calculate offset lon,lat values
+                // Equations may become less accurate the further N/S the coordinate is
+                double offsetX = nodexy.getX().doubleValue();
+                double offsetY = nodexy.getY().doubleValue();
 
-// // (offsetY * 0.01) / 111111.0
-// double offsetYDegrees = (offsetY * 0.01) / 111111.0;
+                // (offsetX * 0.01) / (math.cos((Math.PI / 180.0) * anchorLat) * 111111.0)
+                // Step 1. (offsetX * 0.01)
+                // Step 2. (math.cos((Math.PI/180.0) * anchorLat) * 111111.0)
+                // Step 3. Step 1 / Step 2
+                double offsetX_step1 = offsetX * 0.01;
+                double offsetX_step2 = Math.cos(((double) (Math.PI / 180.0)) * anchorLat.doubleValue()) * 111111.0;
+                double offsetXDegrees = offsetX_step1 / offsetX_step2;
 
-// // return (reference_point[0] + dx_deg, reference_point[1] + dy_deg)
-// BigDecimal offsetLong = new BigDecimal(String.valueOf(anchorLong.doubleValue() + offsetXDegrees));
-// BigDecimal offsetLat = new BigDecimal(String.valueOf(anchorLat.doubleValue() + offsetYDegrees));
-// offsetLong = offsetLong.setScale(7, RoundingMode.HALF_UP);
-// offsetLat = offsetLat.setScale(7, RoundingMode.HALF_UP);
+                // (offsetY * 0.01) / 111111.0
+                double offsetYDegrees = (offsetY * 0.01) / 111111.0;
 
-// List<Double> coordinate = new ArrayList<>();
-// coordinate.add(offsetLong.doubleValue());
-// coordinate.add(offsetLat.doubleValue());
-// coordinatesList.add(coordinate);
+                // return (reference_point[0] + dx_deg, reference_point[1] + dy_deg)
+                BigDecimal offsetLong = new BigDecimal(String.valueOf(anchorLong.doubleValue() + offsetXDegrees));
+                BigDecimal offsetLat = new BigDecimal(String.valueOf(anchorLat.doubleValue() + offsetYDegrees));
+                offsetLong = offsetLong.setScale(7, RoundingMode.HALF_UP);
+                offsetLat = offsetLat.setScale(7, RoundingMode.HALF_UP);
 
-// // Reset the anchor point for following offset nodes
-// anchorLat = new BigDecimal(offsetLat.toString());
-// anchorLong = new BigDecimal(offsetLong.toString());
-// }
-// }
+                List<Double> coordinate = new ArrayList<>();
+                coordinate.add(offsetLong.doubleValue());
+                coordinate.add(offsetLat.doubleValue());
+                coordinatesList.add(coordinate);
 
-// double[][] coordinatesArray = coordinatesList.stream()
-// .map(l -> l.stream().mapToDouble(Double::doubleValue).toArray())
-// .toArray(double[][]::new);
+                // Reset the anchor point for following offset nodes
+                anchorLat = new BigDecimal(offsetLat.toString());
+                anchorLong = new BigDecimal(offsetLong.toString());
+            }
+        }
 
-// return new LineString(coordinatesArray);
-// }
+        double[][] coordinatesArray = coordinatesList.stream()
+                .map(l -> l.stream().mapToDouble(Double::doubleValue).toArray()).toArray(double[][]::new);
 
-// public ProcessedMap<LineString> createFailureProcessedMap(JsonValidatorResult validatorResult, String message) {
-// ProcessedMap<LineString> processedMapObject = new ProcessedMap<LineString>();
+        return new LineString(coordinatesArray);
+    }
 
-// MapSharedProperties processedMapProps = new MapSharedProperties();
-// ProcessedValidationMessage object = new ProcessedValidationMessage();
-// List<ProcessedValidationMessage> processedMapValidationMessages = new ArrayList<ProcessedValidationMessage>();
+    public ProcessedMap<LineString> createFailureProcessedMap(JsonValidatorResult validatorResult, String message) {
+        ProcessedMap<LineString> processedMapObject = new ProcessedMap<LineString>();
 
-// ZonedDateTime utcDateTime = ZonedDateTime.now(ZoneOffset.UTC);
+        MapSharedProperties processedMapProps = new MapSharedProperties();
+        ProcessedValidationMessage object = new ProcessedValidationMessage();
+        List<ProcessedValidationMessage> processedMapValidationMessages = new ArrayList<ProcessedValidationMessage>();
 
-// object.setMessage(message);
-// object.setException(ExceptionUtils.getStackTrace(validatorResult.getExceptions().get(0)));
+        ZonedDateTime utcDateTime = ZonedDateTime.now(ZoneOffset.UTC);
 
-// processedMapValidationMessages.add(object);
-// processedMapProps.setValidationMessages(processedMapValidationMessages);
-// processedMapProps.setTimeStamp(utcDateTime);
+        object.setMessage(message);
+        object.setException(ExceptionUtils.getStackTrace(validatorResult.getExceptions().get(0)));
 
-// processedMapObject.setProperties(processedMapProps);
+        processedMapValidationMessages.add(object);
+        processedMapProps.setValidationMessages(processedMapValidationMessages);
+        processedMapProps.setTimeStamp(utcDateTime);
 
-// return processedMapObject;
-// }
+        processedMapObject.setProperties(processedMapProps);
 
-// public ZonedDateTime generateUTCTimestamp(Integer moy, ZonedDateTime odeDate){ //2022-10-31T15:40:26.687292Z
-// ZonedDateTime date = null;
-// try {
-// int year = odeDate.getYear();
-// String dateString;
-// long minutes;
-// if (moy != null){
-// minutes = moy; // minutes from beginning of year
-// dateString = String.format("%d-01-01T00:00:00.00Z", year);
-// date = Instant.parse(dateString).atZone(ZoneId.of("UTC"));
-// date = date.plusMinutes(minutes);
-// } else {
-// date = odeDate;
-// }
+        return processedMapObject;
+    }
 
-// } catch (Exception e) {
-// String errMsg = String.format("Failed to generateUTCTimestamp - SpatProcessedJsonConverter. Message: %s",
-// e.getMessage());
-// logger.error(errMsg, e);
-// }
+    public ZonedDateTime generateUTCTimestamp(Integer moy, ZonedDateTime odeDate) { // 2022-10-31T15:40:26.687292Z
+        ZonedDateTime date = null;
+        try {
+            int year = odeDate.getYear();
+            String dateString;
+            long minutes;
+            if (moy != null) {
+                minutes = moy; // minutes from beginning of year
+                dateString = String.format("%d-01-01T00:00:00.00Z", year);
+                date = Instant.parse(dateString).atZone(ZoneId.of("UTC"));
+                date = date.plusMinutes(minutes);
+            } else {
+                date = odeDate;
+            }
 
-// return date;
-// }
+        } catch (Exception e) {
+            String errMsg = String.format("Failed to generateUTCTimestamp - SpatProcessedJsonConverter. Message: %s",
+                    e.getMessage());
+            logger.error(errMsg, e);
+        }
 
-// public List<MapNode> nodeConversionList(List<J2735NodeXY> nodeXYs){ //2022-10-31T15:40:26.687292Z
-// List<MapNode> mapNodes = new ArrayList<MapNode>();
-// try{
-// for (J2735NodeXY nodeXy : nodeXYs){
-// MapNode mapNode = new MapNode();
-// mapNode.setDWidth(nodeXy.getAttributes() != null ? nodeXy.getAttributes().getdWidth() : null);
-// mapNode.setDElevation(nodeXy.getAttributes() != null ? nodeXy.getAttributes().getdElevation() : null);
+        return date;
+    }
 
-// Integer offsetX = null;
-// Integer offsetY = null;
-// J2735Node_XY nodexy = null;
-// J2735NodeLLmD64b nodeLatLong = null;
+    public List<MapNode> nodeConversionList(List<J2735NodeXY> nodeXYs) { // 2022-10-31T15:40:26.687292Z
+        List<MapNode> mapNodes = new ArrayList<MapNode>();
+        try {
+            for (J2735NodeXY nodeXy : nodeXYs) {
+                MapNode mapNode = new MapNode();
+                mapNode.setDWidth(nodeXy.getAttributes() != null ? nodeXy.getAttributes().getdWidth() : null);
+                mapNode.setDElevation(nodeXy.getAttributes() != null ? nodeXy.getAttributes().getdElevation() : null);
 
-// J2735NodeOffsetPointXY nodeOffset = nodeXy.getDelta();
-// if (nodeOffset.getNodeXY1() != null)
-// nodexy = nodeOffset.getNodeXY1();
-// else if (nodeOffset.getNodeXY2() != null)
-// nodexy = nodeOffset.getNodeXY2();
-// else if (nodeOffset.getNodeXY3() != null)
-// nodexy = nodeOffset.getNodeXY3();
-// else if (nodeOffset.getNodeXY4() != null)
-// nodexy = nodeOffset.getNodeXY4();
-// else if (nodeOffset.getNodeXY5() != null)
-// nodexy = nodeOffset.getNodeXY5();
-// else if (nodeOffset.getNodeXY6() != null)
-// nodexy = nodeOffset.getNodeXY6();
-// else if (nodeOffset.getNodeLatLon() != null)
-// nodeLatLong = nodeOffset.getNodeLatLon();
-// else
-// continue;
-// if (nodexy != null) {
-// offsetX = nodexy.getX().intValue();
-// offsetY = nodexy.getY().intValue();
-// }
-// else if (nodeLatLong != null) {
-// offsetX = nodeLatLong.getLon().divide(new BigDecimal("10000000")).intValue();
-// offsetY = nodeLatLong.getLat().divide(new BigDecimal("10000000")).intValue();
-// }
-// Integer[] delta = {offsetX,offsetY};
-// mapNode.setDelta(delta);
-// mapNodes.add(mapNode);
-// }
-// } catch (Exception e) {
-// String errMsg = String.format("Failed to nodeConversionList - SpatProcessedJsonConverter. Message: %s",
-// e.getMessage());
-// logger.error(errMsg, e);
-// }
-// return mapNodes;
-// }
+                Integer offsetX = null;
+                Integer offsetY = null;
+                J2735Node_XY nodexy = null;
+                J2735NodeLLmD64b nodeLatLong = null;
 
-// }
+                J2735NodeOffsetPointXY nodeOffset = nodeXy.getDelta();
+                if (nodeOffset.getNodeXY1() != null)
+                    nodexy = nodeOffset.getNodeXY1();
+                else if (nodeOffset.getNodeXY2() != null)
+                    nodexy = nodeOffset.getNodeXY2();
+                else if (nodeOffset.getNodeXY3() != null)
+                    nodexy = nodeOffset.getNodeXY3();
+                else if (nodeOffset.getNodeXY4() != null)
+                    nodexy = nodeOffset.getNodeXY4();
+                else if (nodeOffset.getNodeXY5() != null)
+                    nodexy = nodeOffset.getNodeXY5();
+                else if (nodeOffset.getNodeXY6() != null)
+                    nodexy = nodeOffset.getNodeXY6();
+                else if (nodeOffset.getNodeLatLon() != null)
+                    nodeLatLong = nodeOffset.getNodeLatLon();
+                else
+                    continue;
+                if (nodexy != null) {
+                    offsetX = nodexy.getX().intValue();
+                    offsetY = nodexy.getY().intValue();
+                } else if (nodeLatLong != null) {
+                    offsetX = nodeLatLong.getLon().divide(new BigDecimal("10000000")).intValue();
+                    offsetY = nodeLatLong.getLat().divide(new BigDecimal("10000000")).intValue();
+                }
+                Integer[] delta = {offsetX, offsetY};
+                mapNode.setDelta(delta);
+                mapNodes.add(mapNode);
+            }
+        } catch (Exception e) {
+            String errMsg = String.format("Failed to nodeConversionList - SpatProcessedJsonConverter. Message: %s",
+                    e.getMessage());
+            logger.error(errMsg, e);
+        }
+        return mapNodes;
+    }
+
+}
