@@ -2,21 +2,20 @@ package us.dot.its.jpo.geojsonconverter.serialization.deserializers;
 
 import java.io.IOException;
 
-import us.dot.its.jpo.geojsonconverter.DateJsonMapper;
-
 import org.apache.kafka.common.serialization.Deserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import us.dot.its.jpo.asn.runtime.serialization.OdeCustomJsonMapper;
+import us.dot.its.jpo.geojsonconverter.DateJsonMapper;
 
-public class JsonDeserializer<T> implements Deserializer<T> {
-    private static Logger logger = LoggerFactory.getLogger(JsonDeserializer.class);
+public class OdeCustomJsonDeserializer<T> implements Deserializer<T> {
+    private static Logger logger = LoggerFactory.getLogger(OdeCustomJsonDeserializer.class);
 
-    protected final ObjectMapper mapper = DateJsonMapper.getInstance();
+    private final OdeCustomJsonMapper mapper = DateJsonMapper.getOdeInstance();
 
     private Class<T> destinationClass;
 
-    public JsonDeserializer(Class<T> destinationClass) {
+    public OdeCustomJsonDeserializer(Class<T> destinationClass) {
         this.destinationClass = destinationClass;
     }
 

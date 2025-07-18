@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.junit.Test;
 
+import us.dot.its.jpo.asn.j2735.r2024.Common.LaneID;
 import us.dot.its.jpo.geojsonconverter.pojos.ProcessedValidationMessage;
 
 public class ProcessedSpatTest {
@@ -45,7 +46,7 @@ public class ProcessedSpatTest {
         assertEquals(intersectionResponse, 1);
 
         object.setCti4501Conformant(true);
-        Boolean ctiResponse = object.getCti4501Conformant();
+        Boolean ctiResponse = object.isCti4501Conformant();
         assertEquals(ctiResponse, true);
 
         List<ProcessedValidationMessage> validationMessages = new ArrayList<ProcessedValidationMessage>();
@@ -57,9 +58,9 @@ public class ProcessedSpatTest {
         Integer revisionResponse = object.getRevision();
         assertEquals(revisionResponse, 1);
 
-        IntersectionStatusObject statusObject = new IntersectionStatusObject();
+        ProcessedIntersectionStatusObject statusObject = new ProcessedIntersectionStatusObject();
         object.setStatus(statusObject);
-        IntersectionStatusObject statusResponse = object.getStatus();
+        ProcessedIntersectionStatusObject statusResponse = object.getStatus();
         assertEquals(statusResponse, statusObject);
 
         ZonedDateTime dateTime = ZonedDateTime.now();
@@ -67,14 +68,14 @@ public class ProcessedSpatTest {
         ZonedDateTime tsResponse = object.getUtcTimeStamp();
         assertEquals(tsResponse, dateTime);
 
-        List<Integer> enabledLanes = new ArrayList<Integer>();
+        List<LaneID> enabledLanes = new ArrayList<LaneID>();
         object.setEnabledLanes(enabledLanes);
-        List<Integer> laneResponse = object.getEnabledLanes();
+        List<LaneID> laneResponse = object.getEnabledLanes();
         assertEquals(laneResponse, enabledLanes);
 
-        List<MovementState> states = new ArrayList<MovementState>();
+        List<ProcessedMovementState> states = new ArrayList<ProcessedMovementState>();
         object.setStates(states);
-        List<MovementState> stateResponse = object.getStates();
+        List<ProcessedMovementState> stateResponse = object.getStates();
         assertEquals(stateResponse, states);
     }
 
@@ -86,7 +87,7 @@ public class ProcessedSpatTest {
 
         boolean equals = object.equals(object);
         assertEquals(true, equals);
-        
+
         boolean otherEquals = object.equals(otherObject);
         assertEquals(false, otherEquals);
 
@@ -103,7 +104,7 @@ public class ProcessedSpatTest {
         Integer hash = object.hashCode();
         assertNotNull(hash);
     }
-    
+
     @Test
     public void testToString() {
         ProcessedSpat object = new ProcessedSpat();

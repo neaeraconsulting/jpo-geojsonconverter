@@ -8,10 +8,10 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class MovementStateTest {
+public class ProcessedMovementStateTest {
     @Test
     public void testGettersSetters() {
-        MovementState object = new MovementState();
+        ProcessedMovementState object = new ProcessedMovementState();
 
         object.setMovementName("name");
         String nameResponse = object.getMovementName();
@@ -21,21 +21,21 @@ public class MovementStateTest {
         Integer sgResponse = object.getSignalGroup();
         assertEquals(sgResponse, 1);
 
-        List<MovementEvent> movementEvent = new ArrayList<MovementEvent>();
+        List<ProcessedMovementEvent> movementEvent = new ArrayList<ProcessedMovementEvent>();
         object.setStateTimeSpeed(movementEvent);
-        List<MovementEvent> movementResponse = object.getStateTimeSpeed();
+        List<ProcessedMovementEvent> movementResponse = object.getStateTimeSpeed();
         assertEquals(movementResponse, movementEvent);
     }
 
     @Test
     public void testEquals() {
-        MovementState object = new MovementState();
-        MovementState otherObject = new MovementState();
+        ProcessedMovementState object = new ProcessedMovementState();
+        ProcessedMovementState otherObject = new ProcessedMovementState();
         otherObject.setMovementName("name");
 
         boolean equals = object.equals(object);
         assertEquals(true, equals);
-        
+
         boolean otherEquals = object.equals(otherObject);
         assertEquals(false, otherEquals);
 
@@ -47,7 +47,7 @@ public class MovementStateTest {
 
     @Test
     public void testHashCode() {
-        MovementState object = new MovementState();
+        ProcessedMovementState object = new ProcessedMovementState();
 
         Integer hash = object.hashCode();
         assertNotNull(hash);
@@ -55,7 +55,7 @@ public class MovementStateTest {
 
     @Test
     public void testToString() {
-        MovementState object = new MovementState();
+        ProcessedMovementState object = new ProcessedMovementState();
 
         String string = object.toString();
         assertNotNull(string);

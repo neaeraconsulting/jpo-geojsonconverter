@@ -25,6 +25,7 @@ import us.dot.its.jpo.geojsonconverter.pojos.geojson.bsm.DeserializedRawBsm;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.bsm.ProcessedBsm;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.bsm.ProcessedBsmAccelerationSet4Way;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.bsm.ProcessedBsmPositionalAccuracy;
+import us.dot.its.jpo.geojsonconverter.utils.ProcessedSchemaVersions;
 import us.dot.its.jpo.geojsonconverter.validator.JsonValidatorResult;
 
 import us.dot.its.jpo.ode.model.OdeMessageFrameData;
@@ -62,7 +63,7 @@ public class BsmProcessedJsonConverter
                         createProcessedBsm(bsmMetadata, bsmMessageFrame, rawBsm.getValidatorResults());
 
                 // Set the schema version
-                processedBsm.getProperties().setSchemaVersion(bsmMetadata.getSchemaVersion());
+                processedBsm.getProperties().setSchemaVersion(ProcessedSchemaVersions.PROCESSED_BSM_SCHEMA_VERSION);
                 RsuLogKey key = new RsuLogKey();
                 key.setRsuId(bsmMetadata.getOriginIp());
                 key.setLogId(bsmMetadata.getLogFileName());

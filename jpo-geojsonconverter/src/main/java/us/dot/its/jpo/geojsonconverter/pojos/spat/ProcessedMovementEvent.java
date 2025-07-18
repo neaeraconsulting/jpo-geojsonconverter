@@ -1,6 +1,5 @@
-package us.dot.its.jpo.geojsonconverter.pojos.spat;
 
-import java.time.ZonedDateTime;
+package us.dot.its.jpo.geojsonconverter.pojos.spat;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,33 +10,38 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-
-import us.dot.its.jpo.geojsonconverter.DateJsonMapper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import us.dot.its.jpo.asn.j2735.r2024.SPAT.AdvisorySpeedList;
+import us.dot.its.jpo.asn.j2735.r2024.SPAT.MovementPhaseState;
+import us.dot.its.jpo.geojsonconverter.DateJsonMapper;
 
+/**
+ * Contains information regarding the dynamic flow of traffic in relation to a signal group.
+ * <p>
+ * eventState - The signal group's phase state.
+ * <p>
+ * timing - The collection of timing details for the signal group.
+ * <p>
+ * speeds - A list of advisory speeds for the signal group.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Slf4j
-public class TimingChangeDetails {
-    private static Logger logger = LoggerFactory.getLogger(TimingChangeDetails.class);
+public class ProcessedMovementEvent {
+    private static Logger logger = LoggerFactory.getLogger(ProcessedMovementEvent.class);
 
-    private ZonedDateTime startTime;
-    private ZonedDateTime minEndTime;
-    private ZonedDateTime maxEndTime;
-    private ZonedDateTime likelyTime;
-    private Integer confidence;
-    private ZonedDateTime nextTime;
+    private MovementPhaseState eventState;
+    private TimingChangeDetails timing;
+    private AdvisorySpeedList speeds;
 
     @Override
     public String toString() {
         ObjectMapper mapper = DateJsonMapper.getInstance();
-        mapper.registerModule(new JavaTimeModule());
         String testReturn = "";
         try {
             testReturn = (mapper.writeValueAsString(this));
@@ -46,4 +50,5 @@ public class TimingChangeDetails {
         }
         return testReturn;
     }
+
 }

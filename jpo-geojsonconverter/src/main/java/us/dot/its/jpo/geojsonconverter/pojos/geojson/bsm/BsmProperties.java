@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * Represents a processed BSM (Basic Safety Message) J2735 PositionalAccuracy.
  * <p>
- * schemaVersion - origin OdeBsmJson message's schema version
+ * schemaVersion - The jpo-geojsonconverter schema version for ProcessedBsm
  * <p>
  * messageType - BSM
  * <p>

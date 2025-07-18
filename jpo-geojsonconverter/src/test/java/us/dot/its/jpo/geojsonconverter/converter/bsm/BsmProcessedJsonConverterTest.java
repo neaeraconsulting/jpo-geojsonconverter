@@ -72,7 +72,7 @@ public class BsmProcessedJsonConverterTest {
         BsmProperties props = value.getProperties();
         assertNotNull(props);
         assertEquals("31325433", props.getId());
-        assertEquals(9, props.getSchemaVersion());
+        assertEquals(2, props.getSchemaVersion());
         assertEquals("BSM", props.getMessageType());
         assertEquals("2025-06-26T22:30:25.014Z", props.getOdeReceivedAt());
         assertNotNull(props.getTimeStamp());
