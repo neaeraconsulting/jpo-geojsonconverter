@@ -31,6 +31,7 @@ import us.dot.its.jpo.geojsonconverter.pojos.geojson.LineString;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.connectinglanes.*;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.map.*;
 import us.dot.its.jpo.geojsonconverter.utils.ProcessedSchemaVersions;
+import us.dot.its.jpo.geojsonconverter.validator.CTI4501Validator;
 import us.dot.its.jpo.geojsonconverter.validator.JsonValidatorResult;
 import us.dot.its.jpo.ode.model.OdeMessageFrameData;
 import us.dot.its.jpo.ode.model.OdeMessageFrameMetadata;
@@ -132,7 +133,7 @@ public class MapProcessedJsonConverter
 
             processedSpatValidationMessages.add(object);
         }
-        processedSpatValidationMessages.addAll(checkIfCti4501Conformant(mapData));
+        processedSpatValidationMessages.addAll(CTI4501Validator.mapValidation(mapData));
 
         // Build the MapSharedProperties object
         MapSharedProperties sharedProps = new MapSharedProperties();
@@ -156,19 +157,6 @@ public class MapProcessedJsonConverter
         sharedProps.setCti4501Conformant(sharedProps.getValidationMessages().size() == 0);
 
         return sharedProps;
-    }
-
-    /**
-     * Checks if the provided MapData object conforms to the CTI-4501 specification. This method validates the presence
-     * of CTI-4501 required fields in the MapData object and assumes only 1 intersection is defined.
-     *
-     * @param mapData The MapData object to be validated for CTI-4501 conformance.
-     * @return a list of validation messages describing CTI-4501 conformance issues, or an empty list if conformant.
-     */
-    public List<ProcessedValidationMessage> checkIfCti4501Conformant(MapData mapData) {
-        List<ProcessedValidationMessage> validationMessages = new ArrayList<>();
-        // TODO: Add validation logic for CTI-4501 conformance
-        return validationMessages;
     }
 
     @SuppressWarnings("unchecked")
@@ -396,51 +384,36 @@ public class MapProcessedJsonConverter
                             : null);
                 }
 
-                MapNodeXY nodexy = null;
-                Node_LLmD_64b nodeLatLong = null;
+                Integer offsetX = null;
+                Integer offsetY = null;
                 NodeOffsetPointXY nodeOffset = nodeXy.getDelta();
                 if (nodeOffset.getNode_XY1() != null) {
-                    nodexy = new MapNodeXY();
-                    nodexy.setX((int) nodeOffset.getNode_XY1().getX().getValue());
-                    nodexy.setY((int) nodeOffset.getNode_XY1().getY().getValue());
+                    offsetX = (int) nodeOffset.getNode_XY1().getX().getValue();
+                    offsetY = (int) nodeOffset.getNode_XY1().getY().getValue();
                 } else if (nodeOffset.getNode_XY2() != null) {
-                    nodexy = new MapNodeXY();
-                    nodexy.setX((int) nodeOffset.getNode_XY2().getX().getValue());
-                    nodexy.setY((int) nodeOffset.getNode_XY2().getY().getValue());
+                    offsetX = (int) nodeOffset.getNode_XY2().getX().getValue();
+                    offsetY = (int) nodeOffset.getNode_XY2().getY().getValue();
                 } else if (nodeOffset.getNode_XY3() != null) {
-                    nodexy = new MapNodeXY();
-                    nodexy.setX((int) nodeOffset.getNode_XY3().getX().getValue());
-                    nodexy.setY((int) nodeOffset.getNode_XY3().getY().getValue());
+                    offsetX = (int) nodeOffset.getNode_XY3().getX().getValue();
+                    offsetY = (int) nodeOffset.getNode_XY3().getY().getValue();
                 } else if (nodeOffset.getNode_XY4() != null) {
-                    nodexy = new MapNodeXY();
-                    nodexy.setX((int) nodeOffset.getNode_XY4().getX().getValue());
-                    nodexy.setY((int) nodeOffset.getNode_XY4().getY().getValue());
+                    offsetX = (int) nodeOffset.getNode_XY4().getX().getValue();
+                    offsetY = (int) nodeOffset.getNode_XY4().getY().getValue();
                 } else if (nodeOffset.getNode_XY5() != null) {
-                    nodexy = new MapNodeXY();
-                    nodexy.setX((int) nodeOffset.getNode_XY5().getX().getValue());
-                    nodexy.setY((int) nodeOffset.getNode_XY5().getY().getValue());
+                    offsetX = (int) nodeOffset.getNode_XY5().getX().getValue();
+                    offsetY = (int) nodeOffset.getNode_XY5().getY().getValue();
                 } else if (nodeOffset.getNode_XY6() != null) {
-                    nodexy = new MapNodeXY();
-                    nodexy.setX((int) nodeOffset.getNode_XY6().getX().getValue());
-                    nodexy.setY((int) nodeOffset.getNode_XY6().getY().getValue());
+                    offsetX = (int) nodeOffset.getNode_XY6().getX().getValue();
+                    offsetY = (int) nodeOffset.getNode_XY6().getY().getValue();
                 } else if (nodeOffset.getNode_LatLon() != null) {
-                    nodeLatLong = nodeOffset.getNode_LatLon();
+                    offsetX =
+                            MapFieldConversions.convertLong(nodeOffset.getNode_LatLon().getLon().getValue()).intValue();
+                    offsetY =
+                            MapFieldConversions.convertLat(nodeOffset.getNode_LatLon().getLat().getValue()).intValue();
                 } else {
                     continue;
                 }
 
-                // Identify the offset X and Y values
-                // If the nodeXY is null, then the nodeLatLong is used to calculate the
-                // offset X and Y values
-                Integer offsetX = null;
-                Integer offsetY = null;
-                if (nodexy != null) {
-                    offsetX = nodexy.getX();
-                    offsetY = nodexy.getY();
-                } else if (nodeLatLong != null) {
-                    offsetX = MapFieldConversions.convertLong(nodeLatLong.getLon().getValue()).intValue();
-                    offsetY = MapFieldConversions.convertLat(nodeLatLong.getLat().getValue()).intValue();
-                }
                 Integer[] delta = {offsetX, offsetY};
                 mapNode.setDelta(delta);
                 mapNodes.add(mapNode);
