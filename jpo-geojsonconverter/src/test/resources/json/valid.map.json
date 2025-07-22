@@ -8,13 +8,13 @@
 		},
 		"payloadType": "us.dot.its.jpo.ode.model.OdeMessageFramePayload",
 		"serialId": {
-			"streamId": "c00445f9-dac1-4349-94f7-6f884adf6922",
+			"streamId": "36119f73-0745-41e8-a695-cd1ef738711c",
 			"bundleSize": 1,
 			"bundleId": 0,
 			"recordId": 0,
 			"serialNumber": 0
 		},
-		"odeReceivedAt": "2025-07-18T21:04:58.047Z",
+		"odeReceivedAt": "2025-07-21T23:30:04.399Z",
 		"schemaVersion": 9,
 		"maxDurationTime": 0,
 		"recordGeneratedAt": "",

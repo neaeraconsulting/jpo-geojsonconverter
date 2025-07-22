@@ -74,6 +74,8 @@ public class MapTopologyTest {
             assertEquals(27, mapGeoJson.value.getMapFeatureCollection().getFeatures().length);
             assertEquals(2,
                     mapGeoJson.value.getMapFeatureCollection().getFeatures()[0].getProperties().getIngressApproach());
+            assertEquals(false, mapGeoJson.value.getProperties().getCti4501Conformant());
+            assertEquals(5, mapGeoJson.value.getProperties().getValidationMessages().size());
         }
     }
 
@@ -99,10 +101,11 @@ public class MapTopologyTest {
             KeyValue<RsuIntersectionKey, ProcessedMap<String>> mapWKT = mapWKTResults.get(0);
             assertNotNull(mapWKT.key);
             assertEquals("172.18.0.1", mapWKT.key.getRsuId());
-            assertEquals(12107, mapWKT.key.getIntersectionId());
+            assertEquals(12112, mapWKT.key.getIntersectionId());
             assertNotNull(mapWKT.value);
-            assertEquals(31, mapWKT.value.getMapFeatureCollection().getFeatures().length);
-            assertEquals("LINESTRING (-105.0915245 39.6095358, -105.0915252 39.6094981)",
+            assertEquals(27, mapWKT.value.getMapFeatureCollection().getFeatures().length);
+            assertEquals(
+                    "LINESTRING (-105.08731667516962 39.58083233014103, -105.08774523232292 39.581549630858326, -105.08788477758141 39.581774541083234, -105.08809870874727 39.58214795145665, -105.08860236054305 39.58298918229788, -105.08911197406428 39.58384553315423, -105.08961085029375 39.584704764013466)",
                     mapWKT.value.getMapFeatureCollection().getFeatures()[0].getGeometry());
         }
     }

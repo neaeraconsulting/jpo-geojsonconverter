@@ -139,6 +139,7 @@ public class MapProcessedJsonConverter
         MapSharedProperties sharedProps = new MapSharedProperties();
 
         sharedProps.setOriginIp(metadata.getOriginIp());
+        sharedProps.setAsn1(metadata.getAsn1());
         sharedProps.setOdeReceivedAt(odeDate);
         sharedProps.setIntersectionName(intersection.getName() != null ? intersection.getName().getValue() : null);
         sharedProps.setIntersectionReferenceID(intersection.getId());

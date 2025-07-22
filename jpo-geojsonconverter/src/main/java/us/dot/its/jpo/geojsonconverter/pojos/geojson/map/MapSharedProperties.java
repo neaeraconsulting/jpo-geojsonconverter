@@ -32,6 +32,7 @@ public class MapSharedProperties {
     private String messageType = "MAP";
     private ZonedDateTime odeReceivedAt;
     private String originIp;
+    private String asn1;
     private String intersectionName;
     private Integer region;
     private Integer intersectionId;

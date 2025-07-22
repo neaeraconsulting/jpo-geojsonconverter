@@ -3,7 +3,6 @@ package us.dot.its.jpo.geojsonconverter.pojos.spat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import us.dot.its.jpo.asn.j2735.r2024.Common.IntersectionReferenceID;
 import us.dot.its.jpo.asn.j2735.r2024.Common.LaneID;
+import us.dot.its.jpo.asn.runtime.serialization.OdeCustomJsonMapper;
 import us.dot.its.jpo.geojsonconverter.DateJsonMapper;
 import us.dot.its.jpo.geojsonconverter.pojos.ProcessedValidationMessage;
 
@@ -97,7 +97,7 @@ public class ProcessedSpat {
 
     @Override
     public String toString() {
-        ObjectMapper mapper = DateJsonMapper.getInstance();
+        OdeCustomJsonMapper mapper = DateJsonMapper.getOdeInstance();
         String testReturn = "";
         try {
             testReturn = (mapper.writeValueAsString(this));
