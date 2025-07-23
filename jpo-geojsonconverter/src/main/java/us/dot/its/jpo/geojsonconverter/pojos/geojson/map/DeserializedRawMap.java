@@ -5,24 +5,15 @@ import us.dot.its.jpo.ode.model.OdeMessageFrameData;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Slf4j
 public class DeserializedRawMap {
-
     OdeMessageFrameData odeMapMessageFrameData;
     JsonValidatorResult validatorResults;
     boolean validationFailure = false;
     String failedMessage = null;
-
-    @Override
-    public String toString() {
-        return "{" + " odeMapOdeSpat='" + getOdeMapMessageFrameData() + "'" + ", validatorResults='"
-                + getValidatorResults() + "'" + ", validationFailure='" + isValidationFailure() + "'"
-                + ", failedMessage='" + getFailedMessage() + "'" + "}";
-    }
-
-
-
 }
