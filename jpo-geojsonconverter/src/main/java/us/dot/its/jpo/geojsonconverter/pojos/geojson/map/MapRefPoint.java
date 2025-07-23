@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import us.dot.its.jpo.asn.j2735.r2024.Common.Position3D;
 import us.dot.its.jpo.geojsonconverter.DateJsonMapper;
-import us.dot.its.jpo.geojsonconverter.converter.map.MapFieldConversions;
+import us.dot.its.jpo.geojsonconverter.converter.FieldConversions;
 
 @Data
 @NoArgsConstructor
@@ -35,12 +35,12 @@ public class MapRefPoint {
      * @param refPoint the Position3D object containing the reference point data
      */
     public void setFromPosition3D(Position3D refPoint) {
-        this.latitude = refPoint.getLat() != null ? MapFieldConversions.convertLat(refPoint.getLat().getValue()) : null;
+        this.latitude = refPoint.getLat() != null ? FieldConversions.convertLat(refPoint.getLat().getValue()) : null;
         this.longitude =
-                refPoint.getLong_() != null ? MapFieldConversions.convertLong(refPoint.getLong_().getValue()) : null;
-        this.elevation = refPoint.getElevation() != null
-                ? MapFieldConversions.convertElevation(refPoint.getElevation().getValue())
-                : null;
+                refPoint.getLong_() != null ? FieldConversions.convertLong(refPoint.getLong_().getValue()) : null;
+        this.elevation =
+                refPoint.getElevation() != null ? FieldConversions.convertElevation(refPoint.getElevation().getValue())
+                        : null;
     }
 
     @Override

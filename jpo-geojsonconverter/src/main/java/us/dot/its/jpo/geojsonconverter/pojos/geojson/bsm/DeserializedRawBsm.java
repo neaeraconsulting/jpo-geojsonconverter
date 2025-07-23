@@ -13,13 +13,13 @@ public class DeserializedRawBsm {
 
     OdeMessageFrameData odeBsmMessageFrameData;
     JsonValidatorResult validatorResults;
-    Boolean validationFailure = false;
+    boolean validationFailure = false;
     String failedMessage = null;
 
     @Override
     public String toString() {
         return "{" + " odeBsmMessageFrameData='" + getOdeBsmMessageFrameData() + "'" + ", validatorResults='"
-                + getValidatorResults() + "'" + ", validationFailure='" + getValidationFailure() + "'"
+                + getValidatorResults() + "'" + ", validationFailure='" + isValidationFailure() + "'"
                 + ", failedMessage='" + getFailedMessage() + "'" + "}";
     }
 }

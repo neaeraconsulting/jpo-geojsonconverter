@@ -13,13 +13,13 @@ public class DeserializedRawSpat {
 
     OdeMessageFrameData odeSpatMessageFrameData;
     JsonValidatorResult validatorResults;
-    Boolean validationFailure = false;
+    boolean validationFailure = false;
     String failedMessage = null;
 
     @Override
     public String toString() {
         return "{" + " odeSpatOdeSpat='" + getOdeSpatMessageFrameData() + "'" + ", validatorResults='"
-                + getValidatorResults() + "'" + ", validationFailure='" + getValidationFailure() + "'"
+                + getValidatorResults() + "'" + ", validationFailure='" + isValidationFailure() + "'"
                 + ", failedMessage='" + getFailedMessage() + "'" + "}";
     }
 

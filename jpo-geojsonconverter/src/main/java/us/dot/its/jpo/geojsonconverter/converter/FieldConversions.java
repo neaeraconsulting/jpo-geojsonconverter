@@ -1,6 +1,6 @@
-package us.dot.its.jpo.geojsonconverter.converter.bsm;
+package us.dot.its.jpo.geojsonconverter.converter;
 
-public class BsmFieldConversions {
+public class FieldConversions {
     public static Double convertLong(long j2735Long) {
         // Longitude ::= INTEGER (-1799999999..1800000001)
         // -- LSB = 1/10 microdegree
@@ -19,6 +19,21 @@ public class BsmFieldConversions {
         Double returnValue = null;
         if (j2735Lat != 900000001) {
             returnValue = j2735Lat * 1e-7;
+        }
+        return returnValue;
+    }
+
+    /**
+     * Converts a J2735 elevation value to meters. Providing a range of -409.5 to + 6143.9 meters. The value -4096 shall
+     * be used when Unknown is to be sent.
+     *
+     * @param j2735Elev J2735 elevation value.
+     * @return Elevation in meters, or null if unavailable.
+     */
+    public static Double convertElevation(long j2735Elev) {
+        Double returnValue = null;
+        if (j2735Elev != -4096) {
+            returnValue = j2735Elev * 1e-1;
         }
         return returnValue;
     }

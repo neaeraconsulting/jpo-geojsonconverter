@@ -25,6 +25,7 @@ import us.dot.its.jpo.asn.j2735.r2024.MapData.GenericLane;
 import us.dot.its.jpo.asn.j2735.r2024.MapData.IntersectionGeometry;
 import us.dot.its.jpo.asn.j2735.r2024.MapData.MapData;
 import us.dot.its.jpo.asn.j2735.r2024.MapData.MapDataMessageFrame;
+import us.dot.its.jpo.geojsonconverter.converter.FieldConversions;
 import us.dot.its.jpo.geojsonconverter.partitioner.RsuIntersectionKey;
 import us.dot.its.jpo.geojsonconverter.pojos.ProcessedValidationMessage;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.LineString;
@@ -54,7 +55,7 @@ public class MapProcessedJsonConverter
     @Override
     public KeyValue<RsuIntersectionKey, ProcessedMap<LineString>> transform(Void rawKey, DeserializedRawMap rawMap) {
         try {
-            if (!rawMap.getValidationFailure()) {
+            if (!rawMap.isValidationFailure()) {
                 OdeMessageFrameData rawValue = new OdeMessageFrameData();
                 rawValue.setMetadata(rawMap.getOdeMapMessageFrameData().getMetadata());
                 OdeMessageFrameMetadata mapMetadata = rawValue.getMetadata();
@@ -254,8 +255,8 @@ public class MapProcessedJsonConverter
 
             if (nodeOffset.getNode_LatLon() != null) {
                 Node_LLmD_64b nodeLatLong = nodeOffset.getNode_LatLon();
-                Double lat = MapFieldConversions.convertLat(nodeLatLong.getLat().getValue());
-                Double lon = MapFieldConversions.convertLong(nodeLatLong.getLon().getValue());
+                Double lat = FieldConversions.convertLat(nodeLatLong.getLat().getValue());
+                Double lon = FieldConversions.convertLong(nodeLatLong.getLon().getValue());
 
                 List<Double> coordinate = new ArrayList<>();
                 coordinate.add(lon);
@@ -407,10 +408,8 @@ public class MapProcessedJsonConverter
                     offsetX = (int) nodeOffset.getNode_XY6().getX().getValue();
                     offsetY = (int) nodeOffset.getNode_XY6().getY().getValue();
                 } else if (nodeOffset.getNode_LatLon() != null) {
-                    offsetX =
-                            MapFieldConversions.convertLong(nodeOffset.getNode_LatLon().getLon().getValue()).intValue();
-                    offsetY =
-                            MapFieldConversions.convertLat(nodeOffset.getNode_LatLon().getLat().getValue()).intValue();
+                    offsetX = FieldConversions.convertLong(nodeOffset.getNode_LatLon().getLon().getValue()).intValue();
+                    offsetY = FieldConversions.convertLat(nodeOffset.getNode_LatLon().getLat().getValue()).intValue();
                 } else {
                     continue;
                 }

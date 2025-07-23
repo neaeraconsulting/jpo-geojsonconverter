@@ -54,7 +54,7 @@ public class SpatProcessedJsonConverter
     @Override
     public KeyValue<RsuIntersectionKey, ProcessedSpat> transform(Void rawKey, DeserializedRawSpat rawSpat) {
         try {
-            if (!rawSpat.getValidationFailure()) {
+            if (!rawSpat.isValidationFailure()) {
                 OdeMessageFrameData rawValue = new OdeMessageFrameData();
                 rawValue.setMetadata(rawSpat.getOdeSpatMessageFrameData().getMetadata());
                 OdeMessageFrameMetadata spatMetadata = rawValue.getMetadata();

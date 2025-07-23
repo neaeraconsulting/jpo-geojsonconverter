@@ -13,13 +13,13 @@ public class DeserializedRawMap {
 
     OdeMessageFrameData odeMapMessageFrameData;
     JsonValidatorResult validatorResults;
-    Boolean validationFailure = false;
+    boolean validationFailure = false;
     String failedMessage = null;
 
     @Override
     public String toString() {
         return "{" + " odeMapOdeSpat='" + getOdeMapMessageFrameData() + "'" + ", validatorResults='"
-                + getValidatorResults() + "'" + ", validationFailure='" + getValidationFailure() + "'"
+                + getValidatorResults() + "'" + ", validationFailure='" + isValidationFailure() + "'"
                 + ", failedMessage='" + getFailedMessage() + "'" + "}";
     }
 
