@@ -47,7 +47,7 @@ public class MapProcessedJsonConverter
      * Transform an ODE MAP POJO to MAP GeoJSON POJO.
      *
      * @param rawKey - Void type because ODE topics have no specified key
-     * @param rawValue - The raw POJO
+     * @param rawMap - The raw POJO
      * @return A key value pair: the key an {@link RsuIntersectionKey} containing the RSU IP address and Intersection ID
      *         and the value is the GeoJSON FeatureCollection POJO
      */
