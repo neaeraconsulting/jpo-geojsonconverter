@@ -1,21 +1,12 @@
 
 package us.dot.its.jpo.geojsonconverter.pojos.spat;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import us.dot.its.jpo.geojsonconverter.DateJsonMapper;
 import us.dot.its.jpo.asn.j2735.r2024.SPAT.IntersectionStatusObject;
-
 
 @Data
 @NoArgsConstructor
@@ -23,8 +14,6 @@ import us.dot.its.jpo.asn.j2735.r2024.SPAT.IntersectionStatusObject;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Slf4j
 public class ProcessedIntersectionStatusObject {
-    private static Logger logger = LoggerFactory.getLogger(ProcessedIntersectionStatusObject.class);
-
     private Boolean manualControlIsEnabled = false;
     private Boolean stopTimeIsActivated = false;
     private Boolean failureFlash = false;
@@ -65,17 +54,4 @@ public class ProcessedIntersectionStatusObject {
         setNoValidMAPisAvailableAtThisTime(status.get(12));
         setNoValidSPATisAvailableAtThisTime(status.get(13));
     }
-
-    @Override
-    public String toString() {
-        ObjectMapper mapper = DateJsonMapper.getInstance();
-        String testReturn = "";
-        try {
-            testReturn = (mapper.writeValueAsString(this));
-        } catch (JsonProcessingException e) {
-            logger.error(e.getMessage(), e);
-        }
-        return testReturn;
-    }
-
 }

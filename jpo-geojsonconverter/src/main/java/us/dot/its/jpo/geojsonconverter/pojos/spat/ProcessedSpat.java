@@ -10,8 +10,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import us.dot.its.jpo.asn.j2735.r2024.Common.IntersectionReferenceID;
 import us.dot.its.jpo.asn.j2735.r2024.Common.LaneID;
 import us.dot.its.jpo.asn.runtime.serialization.OdeCustomJsonMapper;
@@ -60,8 +58,6 @@ import us.dot.its.jpo.geojsonconverter.pojos.ProcessedValidationMessage;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Slf4j
 public class ProcessedSpat {
-    private static Logger logger = LoggerFactory.getLogger(ProcessedSpat.class);
-
     // Default schemaVersion is -1 for older messages that lack a schemaVersion value
     private int schemaVersion = -1;
     private String messageType = "SPAT";
@@ -102,7 +98,7 @@ public class ProcessedSpat {
         try {
             testReturn = (mapper.writeValueAsString(this));
         } catch (JsonProcessingException e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
         return testReturn;
     }
