@@ -5,10 +5,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import java.time.ZonedDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Generated;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Data
+@Generated
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)

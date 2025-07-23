@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Generated;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
  * stateTimeSpeed - A set of movement data with phase and timing information.
  */
 @Data
+@Generated
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)

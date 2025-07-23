@@ -6,6 +6,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Generated;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import us.dot.its.jpo.asn.j2735.r2024.Common.IntersectionReferenceID;
@@ -14,6 +15,7 @@ import us.dot.its.jpo.geojsonconverter.pojos.ProcessedValidationMessage;
 import us.dot.its.jpo.ode.model.OdeMessageFrameMetadata.Source;
 
 @Data
+@Generated
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)

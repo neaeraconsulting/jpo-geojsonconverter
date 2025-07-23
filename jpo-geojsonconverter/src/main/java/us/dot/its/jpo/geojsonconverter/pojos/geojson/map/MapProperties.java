@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Generated;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import us.dot.its.jpo.asn.j2735.r2024.MapData.AllowedManeuvers;
@@ -13,6 +14,7 @@ import us.dot.its.jpo.asn.j2735.r2024.MapData.LaneSharing;
 import us.dot.its.jpo.asn.j2735.r2024.MapData.LaneTypeAttributes;
 
 @Data
+@Generated
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
