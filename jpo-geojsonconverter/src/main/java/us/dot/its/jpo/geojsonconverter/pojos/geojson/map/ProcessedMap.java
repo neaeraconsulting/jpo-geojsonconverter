@@ -25,4 +25,16 @@ public class ProcessedMap<TGeometry> {
     MapFeatureCollection<TGeometry> mapFeatureCollection;
     ConnectingLanesFeatureCollection<TGeometry> connectingLanesFeatureCollection;
     MapSharedProperties properties;
+
+    @Override
+    public String toString() {
+        OdeCustomJsonMapper mapper = DateJsonMapper.getOdeInstance();
+        String testReturn = "";
+        try {
+            testReturn = (mapper.writeValueAsString(this));
+        } catch (JsonProcessingException e) {
+            log.error(e.getMessage(), e);
+        }
+        return testReturn;
+    }
 }
