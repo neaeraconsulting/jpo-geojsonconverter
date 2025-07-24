@@ -67,6 +67,7 @@ public class JsonSerializerTest {
             OdeCustomJsonMapper mapper = DateJsonMapper.getOdeInstance();
             ProcessedSpat spat = mapper.readValue(spatString, ProcessedSpat.class);
 
+            final String str = mapper.writeValueAsString(spat);
             byte[] bytes = serializer.serialize("the_topic", spat);
             assertNotNull(bytes);
             assertTrue(bytes.length > 0);

@@ -61,9 +61,9 @@ public class JsonDeserializerTest {
 
     @Test
     public void testProcessedSpatDeserializer() {
-        try (JsonDeserializer<ProcessedSpat> serializer = new JsonDeserializer<ProcessedSpat>(ProcessedSpat.class)) {
+        try (OdeCustomJsonDeserializer<ProcessedSpat> serializer =
+                new OdeCustomJsonDeserializer<ProcessedSpat>(ProcessedSpat.class)) {
             byte[] spatBytes = IOUtils.toByteArray(validSpatJsonResource.getInputStream());
-            // String spatString = new String(spatBytes).strip().replace("\n", "").replace("\r", "").replace(" ", "");
 
             ProcessedSpat spat = serializer.deserialize("the_topic", spatBytes);
             assertNotNull(spat);
