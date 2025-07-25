@@ -58,13 +58,13 @@ public class PsmTopology {
         });
 
         // Convert ODE PSM to GeoJSON
-        // KStream<RsuPsmIdKey, ProcessedPsm<Point>> processedJsonPsmStream =
-        // validatedOdePsmStream.transform(() -> new PsmProcessedJsonConverter());
+        KStream<RsuPsmIdKey, ProcessedPsm<Point>> processedJsonPsmStream =
+                validatedOdePsmStream.transform(() -> new PsmProcessedJsonConverter());
 
-        // processedJsonPsmStream.to(
-        // // Push the joined GeoJSON stream back out to the PSM GeoJSON topic
-        // psmProcessedJsonTopic, Produced.with(JsonSerdes.RsuTypeIdKey(), JsonSerdes.ProcessedPsm(),
-        // new RsuPsmIdPartitioner<RsuPsmIdKey, ProcessedPsm<Point>>()));
+        processedJsonPsmStream.to(
+                // Push the joined GeoJSON stream back out to the PSM GeoJSON topic
+                psmProcessedJsonTopic, Produced.with(JsonSerdes.RsuTypeIdKey(), JsonSerdes.ProcessedPsm(),
+                        new RsuPsmIdPartitioner<RsuPsmIdKey, ProcessedPsm<Point>>()));
 
         return builder.build();
     }
