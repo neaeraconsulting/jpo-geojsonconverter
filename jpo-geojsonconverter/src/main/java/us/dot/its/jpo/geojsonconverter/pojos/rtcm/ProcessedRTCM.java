@@ -101,7 +101,7 @@ public class ProcessedRTCM {
     private Integer stationId;
 
     private List<DecodedRTCMmessage> messages;
-    private List<ProcessedValidationMessage> validationMessages;
+    private List<ProcessedValidationMessage> validationMessages = new ArrayList<>();
 
     public void addValidationMessage(ProcessedValidationMessage message) {
         if (validationMessages == null) {
@@ -120,6 +120,6 @@ public class ProcessedRTCM {
     public void addValidationMessage(String message) {
         var validationMessage = new ProcessedValidationMessage();
         validationMessage.setMessage(message);
-        validationMessages.add(validationMessage);
+        addValidationMessage(validationMessage);
     }
 }

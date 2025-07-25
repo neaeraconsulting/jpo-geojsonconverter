@@ -114,17 +114,20 @@ public class RTCMConverter {
      * CTI 4501 v01.01, Sec. 4.3.3.5.1:
      * DF_FullPositionVector shall include utcTime, latitude, longitude, and elevation.
      * It shall not include any other fields.
-     * @param processed
-     * @param anchor
+     * @param processed The ProcessedRTCM
+     * @param anchor The anchorPoint
      */
     private void processFullPosition(ProcessedRTCM processed, FullPositionVector anchor) {
+
+        log.info("FullPositionVector: {}", anchor);
+
         DDateTime utcTime = anchor.getUtcTime();
-        if (utcTime != null) {
-            processed.setUtcTime(convertDDateTime(utcTime));
-        }
-        if (processed.getUtcTime() == null) {
-            processed.addValidationMessage(
-                    "CTI-4501 conformance issue: The anchorPoint (DF_FullPositionVector) 'utcTime' field (DF_DDateTime) is missing.");
+        List<String> utcValidations = new ArrayList<>();
+        Long timestamp = convertDDateTime(utcValidations, utcTime);
+        processed.setUtcTime(timestamp);
+        for (String utcValidation : utcValidations) {
+            processed.addValidationMessage("CTI-4501 conformance issue: anchorPoint (DF_FullPositionVector) " +
+                    "'utcTime' field: " + utcValidation);
         }
 
         Longitude lon = anchor.getLong_();
