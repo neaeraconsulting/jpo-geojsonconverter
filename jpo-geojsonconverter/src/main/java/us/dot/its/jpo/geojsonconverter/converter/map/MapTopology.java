@@ -67,45 +67,41 @@ public class MapTopology {
         });
 
         // Convert ODE MAP to GeoJSON
-        // KStream<RsuIntersectionKey, ProcessedMap<LineString>> processedMapStream =
-        // validatedOdeMapStream.transform(
-        // () -> new MapProcessedJsonConverter()
-        // );
+        KStream<RsuIntersectionKey, ProcessedMap<LineString>> processedMapStream =
+                validatedOdeMapStream.transform(() -> new MapProcessedJsonConverter());
 
-        // // Removes null messages from being posted to output topic.
-        // // Helpful to remove generated messages that caused exceptions.
-        // processedMapStream = processedMapStream.filter((key, value) -> value != null);
+        // Removes null messages from being posted to output topic.
+        // Helpful to remove generated messages that caused exceptions.
+        processedMapStream = processedMapStream.filter((key, value) -> value != null);
 
-        // // Push the GeoJSON stream back out to the MAP GeoJSON topic
-        // processedMapStream.to(
-        // processedMapTopic,
-        // Produced.with(
-        // JsonSerdes.RsuIntersectionKey(), // Key is now an RsuIntersectionKey object
-        // JsonSerdes.ProcessedMapGeoJson(), // Value serializer for MAP GeoJSON
-        // new IntersectionIdPartitioner<RsuIntersectionKey, ProcessedMap<LineString>>()) // Partition by Intersection
-        // ID
-        // );
+        // Push the GeoJSON stream back out to the MAP GeoJSON topic
+        processedMapStream.to(processedMapTopic, Produced.with(JsonSerdes.RsuIntersectionKey(), // Key is now an
+                                                                                                // RsuIntersectionKey
+                                                                                                // object
+                JsonSerdes.ProcessedMapGeoJson(), // Value serializer for MAP GeoJSON
+                new IntersectionIdPartitioner<RsuIntersectionKey, ProcessedMap<LineString>>()) // Partition by
+                                                                                               // Intersection ID
+        );
 
-        // if (gom == GeometryOutputMode.WKT) {
-        // // Convert ProcessedMap GeoJSON to WKT
-        // KStream<RsuIntersectionKey, ProcessedMap<String>> wktProcessedMapStream =
-        // processedMapStream.transform(
-        // () -> new MapProcessedWKTConverter()
-        // );
+        if (gom == GeometryOutputMode.WKT) {
+            // Convert ProcessedMap GeoJSON to WKT
+            KStream<RsuIntersectionKey, ProcessedMap<String>> wktProcessedMapStream =
+                    processedMapStream.transform(() -> new MapProcessedWKTConverter());
 
-        // // Removes null messages from being posted to output topic.
-        // // Helpful to remove generated messages that caused exceptions.
-        // wktProcessedMapStream = wktProcessedMapStream.filter((key, value) -> value != null);
+            // Removes null messages from being posted to output topic.
+            // Helpful to remove generated messages that caused exceptions.
+            wktProcessedMapStream = wktProcessedMapStream.filter((key, value) -> value != null);
 
-        // // Push the WKT stream back out to the MAP WKT topic
-        // wktProcessedMapStream.to(
-        // processedMapWTKTopic,
-        // Produced.with(
-        // JsonSerdes.RsuIntersectionKey(), // Key is still an RsuIntersectionKey object
-        // JsonSerdes.ProcessedMapWKT(), // Value serializer for MAP WKT
-        // new IntersectionIdPartitioner<RsuIntersectionKey, ProcessedMap<String>>()) // Partition by Intersection ID
-        // );
-        // }
+            // Push the WKT stream back out to the MAP WKT topic
+            wktProcessedMapStream.to(processedMapWTKTopic, Produced.with(JsonSerdes.RsuIntersectionKey(), // Key is
+                                                                                                          // still an
+                                                                                                          // RsuIntersectionKey
+                                                                                                          // object
+                    JsonSerdes.ProcessedMapWKT(), // Value serializer for MAP WKT
+                    new IntersectionIdPartitioner<RsuIntersectionKey, ProcessedMap<String>>()) // Partition by
+                                                                                               // Intersection ID
+            );
+        }
 
         return builder.build();
     }

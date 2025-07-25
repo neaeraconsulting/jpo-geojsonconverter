@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import com.networknt.schema.ValidationMessage;
 
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.Point;
+import us.dot.its.jpo.geojsonconverter.converter.FieldConversions;
 import us.dot.its.jpo.geojsonconverter.partitioner.RsuLogKey;
 import us.dot.its.jpo.geojsonconverter.pojos.ProcessedValidationMessage;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.bsm.BsmProperties;
@@ -25,6 +26,7 @@ import us.dot.its.jpo.geojsonconverter.pojos.geojson.bsm.DeserializedRawBsm;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.bsm.ProcessedBsm;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.bsm.ProcessedBsmAccelerationSet4Way;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.bsm.ProcessedBsmPositionalAccuracy;
+import us.dot.its.jpo.geojsonconverter.utils.ProcessedSchemaVersions;
 import us.dot.its.jpo.geojsonconverter.validator.JsonValidatorResult;
 
 import us.dot.its.jpo.ode.model.OdeMessageFrameData;
@@ -49,7 +51,7 @@ public class BsmProcessedJsonConverter
     @Override
     public KeyValue<RsuLogKey, ProcessedBsm<Point>> transform(Void rawKey, DeserializedRawBsm rawBsm) {
         try {
-            if (!rawBsm.getValidationFailure()) {
+            if (!rawBsm.isValidationFailure()) {
                 OdeMessageFrameData rawValue = new OdeMessageFrameData();
                 rawValue.setMetadata(rawBsm.getOdeBsmMessageFrameData().getMetadata());
                 OdeMessageFrameMetadata bsmMetadata = rawValue.getMetadata();
@@ -62,7 +64,7 @@ public class BsmProcessedJsonConverter
                         createProcessedBsm(bsmMetadata, bsmMessageFrame, rawBsm.getValidatorResults());
 
                 // Set the schema version
-                processedBsm.getProperties().setSchemaVersion(bsmMetadata.getSchemaVersion());
+                processedBsm.getProperties().setSchemaVersion(ProcessedSchemaVersions.PROCESSED_BSM_SCHEMA_VERSION);
                 RsuLogKey key = new RsuLogKey();
                 key.setRsuId(bsmMetadata.getOriginIp());
                 key.setLogId(bsmMetadata.getLogFileName());
@@ -150,29 +152,29 @@ public class BsmProcessedJsonConverter
         BSMcoreData coreData = bsmMessageFrame.getValue().getCoreData();
 
         // Create the Geometry Point
-        Double bsmLong = BsmFieldConversions.convertLong(coreData.getLong_().getValue());
-        Double bsmLat = BsmFieldConversions.convertLat(coreData.getLat().getValue());
+        Double bsmLong = FieldConversions.convertLong(coreData.getLong_().getValue());
+        Double bsmLat = FieldConversions.convertLat(coreData.getLat().getValue());
         Point bsmPoint = new Point(bsmLong, bsmLat);
 
         // Create the BSM Properties
         BsmProperties bsmProps = new BsmProperties();
         bsmProps.setAccelSet(new ProcessedBsmAccelerationSet4Way(
-                BsmFieldConversions.convertAccelLatLong(coreData.getAccelSet().getLat().getValue()),
-                BsmFieldConversions.convertAccelLatLong(coreData.getAccelSet().getLong_().getValue()),
-                BsmFieldConversions.convertAccelVert(coreData.getAccelSet().getVert().getValue()),
-                BsmFieldConversions.convertAccelYaw(coreData.getAccelSet().getYaw().getValue())));
+                FieldConversions.convertAccelLatLong(coreData.getAccelSet().getLat().getValue()),
+                FieldConversions.convertAccelLatLong(coreData.getAccelSet().getLong_().getValue()),
+                FieldConversions.convertAccelVert(coreData.getAccelSet().getVert().getValue()),
+                FieldConversions.convertAccelYaw(coreData.getAccelSet().getYaw().getValue())));
         bsmProps.setAccuracy(new ProcessedBsmPositionalAccuracy(
-                BsmFieldConversions.convertSemiMajor(coreData.getAccuracy().getSemiMajor().getValue()),
-                BsmFieldConversions.convertSemiMinor(coreData.getAccuracy().getSemiMinor().getValue()),
-                BsmFieldConversions.convertOrientation(coreData.getAccuracy().getOrientation().getValue())));
-        bsmProps.setAngle(BsmFieldConversions.convertAngle(coreData.getAngle().getValue()));
+                FieldConversions.convertSemiMajor(coreData.getAccuracy().getSemiMajor().getValue()),
+                FieldConversions.convertSemiMinor(coreData.getAccuracy().getSemiMinor().getValue()),
+                FieldConversions.convertOrientation(coreData.getAccuracy().getOrientation().getValue())));
+        bsmProps.setAngle(FieldConversions.convertAngle(coreData.getAngle().getValue()));
         bsmProps.setBrakes(coreData.getBrakes());
-        bsmProps.setHeading(BsmFieldConversions.convertHeading(coreData.getHeading().getValue()));
+        bsmProps.setHeading(FieldConversions.convertHeading(coreData.getHeading().getValue()));
         bsmProps.setId(coreData.getId().getValue());
         bsmProps.setMsgCnt(coreData.getMsgCnt().getValue());
         bsmProps.setSecMark(coreData.getSecMark().getValue());
         bsmProps.setSize(coreData.getSize());
-        bsmProps.setSpeed(BsmFieldConversions.convertSpeed(coreData.getSpeed().getValue()));
+        bsmProps.setSpeed(FieldConversions.convertSpeed(coreData.getSpeed().getValue()));
         bsmProps.setTransmission(coreData.getTransmission());
 
         return new ProcessedBsm<Point>(null, bsmPoint, bsmProps);

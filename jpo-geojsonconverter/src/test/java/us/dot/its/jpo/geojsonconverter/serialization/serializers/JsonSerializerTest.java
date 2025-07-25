@@ -21,7 +21,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import us.dot.its.jpo.asn.runtime.serialization.OdeCustomJsonMapper;
 import us.dot.its.jpo.geojsonconverter.DateJsonMapper;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.LineString;
@@ -65,9 +64,10 @@ public class JsonSerializerTest {
         try (JsonSerializer<ProcessedSpat> serializer = new JsonSerializer<ProcessedSpat>()) {
             BufferedInputStream inputStream = new BufferedInputStream(validSpatJsonResource.getInputStream());
             String spatString = IOUtils.toString(inputStream, "UTF-8");
-            ObjectMapper mapper = DateJsonMapper.getInstance();
+            OdeCustomJsonMapper mapper = DateJsonMapper.getOdeInstance();
             ProcessedSpat spat = mapper.readValue(spatString, ProcessedSpat.class);
 
+            final String str = mapper.writeValueAsString(spat);
             byte[] bytes = serializer.serialize("the_topic", spat);
             assertNotNull(bytes);
             assertTrue(bytes.length > 0);
@@ -82,7 +82,7 @@ public class JsonSerializerTest {
         try (JsonSerializer<ProcessedMap<LineString>> serializer = new JsonSerializer<ProcessedMap<LineString>>()) {
             BufferedInputStream inputStream = new BufferedInputStream(validMapGeoJsonResource.getInputStream());
             String mapString = IOUtils.toString(inputStream, "UTF-8");
-            ObjectMapper mapper = DateJsonMapper.getInstance();
+            OdeCustomJsonMapper mapper = DateJsonMapper.getOdeInstance();
             JavaType javaType = mapper.getTypeFactory().constructParametricType(ProcessedMap.class, LineString.class);
             ProcessedMap<LineString> map = mapper.readValue(mapString, javaType);
 
@@ -100,7 +100,7 @@ public class JsonSerializerTest {
         try (JsonSerializer<ProcessedMap<String>> serializer = new JsonSerializer<ProcessedMap<String>>()) {
             BufferedInputStream inputStream = new BufferedInputStream(validMapWKTJsonResource.getInputStream());
             String mapString = IOUtils.toString(inputStream, "UTF-8");
-            ObjectMapper mapper = DateJsonMapper.getInstance();
+            OdeCustomJsonMapper mapper = DateJsonMapper.getOdeInstance();
             JavaType javaType = mapper.getTypeFactory().constructParametricType(ProcessedMap.class, String.class);
             ProcessedMap<String> map = mapper.readValue(mapString, javaType);
 
