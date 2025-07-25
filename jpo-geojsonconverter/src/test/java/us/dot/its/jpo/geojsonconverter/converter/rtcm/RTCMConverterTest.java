@@ -52,10 +52,12 @@ public class RTCMConverterTest {
         log.info(mapper.writeValueAsString(processedRtcm));
         if (expectCti4501Conformant) {
             assertThat(processedRtcm.getValidationMessages(), hasSize(equalTo(0)));
+            assertThat(processedRtcm.isCti4501Conformant(), equalTo(true));
         } else {
             assertThat(processedRtcm.getValidationMessages(), hasSize(greaterThanOrEqualTo(1)));
             Set<String> messages = processedRtcm.getValidationMessages().stream().map(ProcessedValidationMessage::getMessage).collect(Collectors.toSet());
             assertThat(messages, hasItems(containsString(expectValidationMessageIncludes)));
+            assertThat(processedRtcm.isCti4501Conformant(), equalTo(false));
         }
         if (expectUtcTime != null) {
             assertThat(processedRtcm.getUtcTime(), equalTo(expectUtcTime));

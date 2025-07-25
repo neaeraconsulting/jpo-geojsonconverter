@@ -100,8 +100,15 @@ public class ProcessedRTCM {
      */
     private Integer stationId;
 
-    private List<DecodedRTCMmessage> messages;
+    private List<DecodedRTCMmessage> messages = new ArrayList<>();
+
+
+    /* -----------------------------------------------------------------------
+       Validation
+     ------------------------------------------------------------------------*/
     private List<ProcessedValidationMessage> validationMessages = new ArrayList<>();
+
+    private boolean cti4501Conformant = true;
 
     public void addValidationMessage(ProcessedValidationMessage message) {
         if (validationMessages == null) {

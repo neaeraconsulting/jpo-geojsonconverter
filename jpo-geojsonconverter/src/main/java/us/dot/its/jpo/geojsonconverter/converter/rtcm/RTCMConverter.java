@@ -21,7 +21,7 @@ import static us.dot.its.jpo.geojsonconverter.converter.FieldConversions.*;
 
 
 /**
- * Encapsulate methods for converting, decoding, and validating RTCM messages.
+ * Encapsulate methods for converting, decoding, and validating RTCM MessageFrames.
  */
 @Component
 @Slf4j
@@ -104,6 +104,10 @@ public class RTCMConverter {
             processed.addValidationMessage(
                     "CTI-4501 conformance issue: The RTCMcorrections has regional extensions present which are " +
                             "forbidden by CTI-4501.");
+        }
+
+        if (!processed.getValidationMessages().isEmpty()) {
+            processed.setCti4501Conformant(false);
         }
 
         return processed;
