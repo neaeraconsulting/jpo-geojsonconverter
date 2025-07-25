@@ -64,8 +64,8 @@ public class ProcessedBsmDeserializerTest {
             assertEquals(190L, size.getWidth().getValue());
             assertEquals(570L, size.getLength().getValue());
             assertNotNull(accelSet);
-            assertEquals(0.27D, accelSet.getAccelLat());
-            assertEquals(0D, accelSet.getAccelLong());
+            assertEquals(0D, accelSet.getAccelLat());
+            assertEquals(0.27D, accelSet.getAccelLong());
             assertEquals(0D, accelSet.getAccelVert());
             assertEquals(0D, accelSet.getAccelYaw());
             var accuracy = props.getAccuracy();
