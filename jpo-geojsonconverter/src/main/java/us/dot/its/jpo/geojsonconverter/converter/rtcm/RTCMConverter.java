@@ -17,7 +17,8 @@ import us.dot.its.jpo.geojsonconverter.validator.JsonValidatorResult;
 
 import java.util.*;
 
-import static us.dot.its.jpo.geojsonconverter.converter.rtcm.RtcmFieldConversions.*;
+import static us.dot.its.jpo.geojsonconverter.converter.FieldConversions.*;
+
 
 /**
  * Encapsulate methods for converting, decoding, and validating RTCM messages.
@@ -102,39 +103,94 @@ public class RTCMConverter {
         if (regionalSeq != null && !regionalSeq.isEmpty()) {
             processed.addValidationMessage(
                     "CTI-4501 conformance issue: The RTCMcorrections has regional extensions present which are " +
-                            "forbiddenb by CTI-4501.");
+                            "forbidden by CTI-4501.");
         }
 
         return processed;
     }
 
 
-
-
+    /**
+     * CTI 4501 v01.01, Sec. 4.3.3.5.1:
+     * DF_FullPositionVector shall include utcTime, latitude, longitude, and elevation.
+     * It shall not include any other fields.
+     * @param processed
+     * @param anchor
+     */
     private void processFullPosition(ProcessedRTCM processed, FullPositionVector anchor) {
         DDateTime utcTime = anchor.getUtcTime();
         if (utcTime != null) {
             processed.setUtcTime(convertDDateTime(utcTime));
-        } else {
-            log.error("utcTime is null");
+        }
+        if (processed.getUtcTime() == null) {
+            processed.addValidationMessage(
+                    "CTI-4501 conformance issue: The anchorPoint (DF_FullPositionVector) 'utcTime' field (DF_DDateTime) is missing.");
         }
 
         Longitude lon = anchor.getLong_();
         if (lon != null) {
             processed.setLongitude(convertLong(lon.getValue()));
-        } else {
-            log.error("long_ is null");
+        }
+        if (processed.getLongitude() == null){
+            processed.addValidationMessage(
+                    "CTI-4501 conformance issue: The anchorPoint (DF_FullPositionVector) 'long' field (DE_Longitude) is missing.");
         }
 
         Latitude lat = anchor.getLat();
         if (lat != null) {
             processed.setLatitude(convertLat(lat.getValue()));
         }
+        if (processed.getLatitude() == null){
+            processed.addValidationMessage(
+                    "CTI-4501 conformance issue: The anchorPoint (DF_FullPositionVector) 'lat' field (DE_Latitude) is missing.");
+        }
 
         Elevation elevation = anchor.getElevation();
         if (elevation != null) {
             processed.setElevation(convertElevation(elevation.getValue()));
         }
+        if (processed.getElevation() == null) {
+            processed.addValidationMessage(
+                    "CTI-4501 conformance issue: The anchorPoint (DF_FullPositionVector) 'elevation' field (DE_Elevation) is missing.");
+        }
+
+        // Check for extras that should not be present in full position vector
+        if (anchor.getHeading() != null) {
+            processed.addValidationMessage(
+                    "CTI-4501 conformance issue: The anchorPoint (DF_FullPositionVector) 'heading' field is present " +
+                            "but should not included.");
+        }
+
+        if (anchor.getSpeed() != null) {
+            processed.addValidationMessage(
+                    "CTI-4501 conformance issue: The anchorPoint (DF_FullPositionVector) 'speed' field is present " +
+                            "but should not included.");
+        }
+
+        if (anchor.getPosAccuracy() != null) {
+            processed.addValidationMessage(
+                    "CTI-4501 conformance issue: The anchorPoint (DF_FullPositionVector) 'posAccuracy' field is " +
+                            "present but should not included.");
+        }
+
+        if (anchor.getTimeConfidence() != null) {
+            processed.addValidationMessage(
+                    "CTI-4501 conformance issue: The anchorPoint (DF_FullPositionVector) 'timeConfidence' field is " +
+                            "present but should not included.");
+        }
+
+        if (anchor.getPosConfidence() != null) {
+            processed.addValidationMessage(
+                    "CTI-4501 conformance issue: The anchorPoint (DF_FullPositionVector) 'posConfidence' field is " +
+                            "present but should not included.");
+        }
+
+        if (anchor.getSpeedConfidence() != null) {
+            processed.addValidationMessage(
+                    "CTI-4501 conformance issue: The anchorPoint (DF_FullPositionVector) 'speedConfidence' field is " +
+                            "present but should not included.");
+        }
+
     }
 
     private void decodeMessages(ProcessedRTCM processed, RTCMmessageList messageList) {

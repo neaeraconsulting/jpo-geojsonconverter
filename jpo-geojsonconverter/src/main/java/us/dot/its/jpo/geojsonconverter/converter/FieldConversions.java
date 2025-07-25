@@ -1,5 +1,7 @@
 package us.dot.its.jpo.geojsonconverter.converter;
 
+import us.dot.its.jpo.asn.j2735.r2024.Common.DDateTime;
+
 public class FieldConversions {
     public static Double convertLong(long j2735Long) {
         // Longitude ::= INTEGER (-1799999999..1800000001)
@@ -154,5 +156,9 @@ public class FieldConversions {
             returnValue = speed * 0.02;
         }
         return returnValue;
+    }
+
+    public static long convertDDateTime(DDateTime dDateTime) {
+        return 0;
     }
 }
