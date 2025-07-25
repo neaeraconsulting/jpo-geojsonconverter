@@ -20,7 +20,6 @@ public class JsonSerializer<T> implements Serializer<T> {
 
     private final OdeCustomJsonMapper mapper = DateJsonMapper.getOdeInstance();
 
-
     @Override
     public byte[] serialize(String topic, T data) {
         try {

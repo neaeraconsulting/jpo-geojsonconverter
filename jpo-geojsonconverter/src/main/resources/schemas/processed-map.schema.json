@@ -256,6 +256,9 @@
         "originIp" : {
           "type" : "string"
         },
+        "asn1" : {
+          "type" : "string"
+        },
         "refPoint" : {
           "$ref" : "#/$defs/OdePosition3D"
         },

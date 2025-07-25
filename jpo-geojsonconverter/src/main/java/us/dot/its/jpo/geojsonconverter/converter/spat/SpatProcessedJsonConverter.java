@@ -8,12 +8,12 @@ import us.dot.its.jpo.asn.j2735.r2024.SPAT.SPAT;
 import us.dot.its.jpo.geojsonconverter.partitioner.RsuIntersectionKey;
 import us.dot.its.jpo.geojsonconverter.pojos.ProcessedValidationMessage;
 import us.dot.its.jpo.geojsonconverter.pojos.spat.DeserializedRawSpat;
-import us.dot.its.jpo.geojsonconverter.pojos.spat.ProcessedIntersectionStatusObject;
 import us.dot.its.jpo.geojsonconverter.pojos.spat.ProcessedMovementEvent;
 import us.dot.its.jpo.geojsonconverter.pojos.spat.ProcessedMovementState;
 import us.dot.its.jpo.geojsonconverter.pojos.spat.ProcessedSpat;
 import us.dot.its.jpo.geojsonconverter.pojos.spat.TimingChangeDetails;
 import us.dot.its.jpo.geojsonconverter.utils.ProcessedSchemaVersions;
+import us.dot.its.jpo.geojsonconverter.validator.CTI4501Validator;
 import us.dot.its.jpo.geojsonconverter.validator.JsonValidatorResult;
 import us.dot.its.jpo.ode.model.OdeMessageFrameData;
 import us.dot.its.jpo.ode.model.OdeMessageFrameMetadata;
@@ -53,7 +53,7 @@ public class SpatProcessedJsonConverter
     @Override
     public KeyValue<RsuIntersectionKey, ProcessedSpat> transform(Void rawKey, DeserializedRawSpat rawSpat) {
         try {
-            if (!rawSpat.getValidationFailure()) {
+            if (!rawSpat.isValidationFailure()) {
                 OdeMessageFrameData rawValue = new OdeMessageFrameData();
                 rawValue.setMetadata(rawSpat.getOdeSpatMessageFrameData().getMetadata());
                 OdeMessageFrameMetadata spatMetadata = rawValue.getMetadata();
@@ -124,13 +124,13 @@ public class SpatProcessedJsonConverter
 
             processedSpatValidationMessages.add(object);
         }
-        processedSpatValidationMessages.addAll(checkIfCti4501Conformant(spat));
+        processedSpatValidationMessages.addAll(CTI4501Validator.spatValidation(spat));
         processedSpat.setValidationMessages(processedSpatValidationMessages);
         processedSpat.setCti4501Conformant(processedSpat.getValidationMessages().size() == 0);
 
         processedSpat.setRevision(
                 intersectionState.getRevision() != null ? (int) intersectionState.getRevision().getValue() : null);
-        processedSpat.setStatus(new ProcessedIntersectionStatusObject(intersectionState.getStatus()));
+        processedSpat.setStatus(intersectionState.getStatus());
         processedSpat.setEnabledLanes(
                 intersectionState.getEnabledLanes() != null ? intersectionState.getEnabledLanes() : null);
 
@@ -222,96 +222,6 @@ public class SpatProcessedJsonConverter
 
         return processedSpat;
     }
-
-
-    /**
-     * Checks if the provided SPAT (Signal Phase and Timing) object conforms to the CTI-4501 specification. This method
-     * validates the presence of CTI-4501 required fields in the SPAT object and assumes only 1 intersection is defined.
-     * <p>
-     * Checks for the following fields:
-     * <p>
-     * SPAT.timeStamp
-     * <p>
-     * SPAT.intersections[0].id.region
-     * <p>
-     * SPAT.intersections[0].timeStamp
-     * <p>
-     * SPAT.intersections[0].states[*].state_time_speed[*].timing
-     * <p>
-     * SPAT.intersections[0].states[*].state_time_speed[*].timing.startTime
-     * <p>
-     * SPAT.intersections[0].states[*].state_time_speed[*].timing.maxEndTime
-     * <p>
-     * SPAT.intersections[0].states[*].state_time_speed[*].timing.nextTime
-     *
-     * @param spat The SPAT object to be validated for CTI-4501 conformance.
-     * @return {@code true} if the SPAT object is CTI-4501 conformant; {@code false} otherwise.
-     */
-    public List<ProcessedValidationMessage> checkIfCti4501Conformant(SPAT spat) {
-        List<ProcessedValidationMessage> validationMessages = new ArrayList<>();
-
-        // Check SPAT timestamp
-        if (spat.getTimeStamp() == null) {
-            validationMessages.add(createValidationMessage(
-                    "CTI-4501 conformance issue: the SPAT 'timeStamp' DE_MinuteOfTheYear is missing"));
-        }
-
-        // Get the first intersection from the SPAT object
-        IntersectionState intersection = spat.getIntersections().get(0);
-
-        // Check intersection fields
-        if (intersection.getId().getRegion() == null) {
-            validationMessages.add(createValidationMessage(
-                    "CTI-4501 conformance issue: the intersections 'id.region' DE_RoadRegulatorID is missing"));
-        }
-        if (intersection.getTimeStamp() == null) {
-            validationMessages.add(createValidationMessage(
-                    "CTI-4501 conformance issue: the intersections 'timeStamp' DE_Dsecond is missing"));
-        }
-
-        // Track which timing validations have been added to avoid duplicates
-        boolean timingMissingAdded = false;
-        boolean startTimeMissingAdded = false;
-        boolean maxEndTimeMissingAdded = false;
-        boolean nextTimeMissingAdded = false;
-
-        // Iterate through each movement state and check for CTI-4501 required fields
-        for (MovementState mState : intersection.getStates()) {
-            for (MovementEvent mEvent : mState.getState_time_speed()) {
-                if (mEvent.getTiming() != null) {
-                    if (mEvent.getTiming().getStartTime() == null && !startTimeMissingAdded) {
-                        validationMessages.add(createValidationMessage(
-                                "CTI-4501 conformance issue: the state-time-speed 'timing.startTime' DE_TimeMark is missing"));
-                        startTimeMissingAdded = true;
-                    }
-                    if (mEvent.getTiming().getMaxEndTime() == null && !maxEndTimeMissingAdded) {
-                        validationMessages.add(createValidationMessage(
-                                "CTI-4501 conformance issue: the state-time-speed 'timing.maxEndTime' DE_TimeMark is missing"));
-                        maxEndTimeMissingAdded = true;
-                    }
-                    if (mEvent.getTiming().getNextTime() == null && !nextTimeMissingAdded) {
-                        validationMessages.add(createValidationMessage(
-                                "CTI-4501 conformance issue: the state-time-speed 'timing.nextTime' DE_TimeMark is missing"));
-                        nextTimeMissingAdded = true;
-                    }
-                } else if (!timingMissingAdded) {
-                    validationMessages.add(createValidationMessage(
-                            "CTI-4501 conformance issue: the state-time-speed 'timing' DF_TimeChangeDetails is missing"));
-                    timingMissingAdded = true;
-                }
-            }
-        }
-
-        return validationMessages;
-    }
-
-    // Helper method to create a validation message
-    private ProcessedValidationMessage createValidationMessage(String message) {
-        ProcessedValidationMessage validationMessage = new ProcessedValidationMessage();
-        validationMessage.setMessage(message);
-        return validationMessage;
-    }
-
 
     public ZonedDateTime generateUTCTimestamp(Integer moy, Integer dSecond, String odeTimestamp) { //
         // 2022-10-31T15:40:26.687292Z
