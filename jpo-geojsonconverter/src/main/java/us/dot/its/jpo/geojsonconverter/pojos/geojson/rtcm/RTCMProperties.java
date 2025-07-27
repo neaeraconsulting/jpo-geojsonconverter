@@ -1,8 +1,13 @@
-package us.dot.its.jpo.geojsonconverter.pojos.rtcm;
+package us.dot.its.jpo.geojsonconverter.pojos.geojson.rtcm;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Generated;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import us.dot.its.jpo.asn.j2735.r2024.Common.FullPositionVector;
-import us.dot.its.jpo.asn.j2735.r2024.RTCMcorrections.RTCMcorrectionsMessageFrame;
 import us.dot.its.jpo.geojsonconverter.pojos.ProcessedValidationMessage;
 
 import java.time.ZonedDateTime;
@@ -11,8 +16,9 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * A processed J2735 {@link RTCMcorrectionsMessageFrame}.
- * <p>Contains only fields from the J2735 messagerequired by CIMMS and CTI4501</p>
+ * Decoded properties from RTCM messages
+ *
+ * <p>Contains fields from the J2735 message required by CIMMS and CTI4501</p>
  *
  * <p>Includes the decoded RTCM payloads with station ID and message type</p>
  *
@@ -37,7 +43,13 @@ import java.util.Set;
  *  indicate if present.</p>
  */
 @Data
-public class ProcessedRTCM {
+@Generated
+@NoArgsConstructor
+@AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
+@Slf4j
+public class RTCMProperties {
 
     /* -----------------------------------------------------------------------
      * Metadata properties
@@ -100,8 +112,11 @@ public class ProcessedRTCM {
      */
     private Integer stationId;
 
-    private List<DecodedRTCMmessage> messages = new ArrayList<>();
 
+    /**
+     * Decoded messages
+     */
+    private List<DecodedRTCMmessage> messages = new ArrayList<>();
 
     /* -----------------------------------------------------------------------
        Validation

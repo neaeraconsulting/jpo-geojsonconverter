@@ -7,8 +7,9 @@ import org.apache.kafka.streams.kstream.Transformer;
 import org.apache.kafka.streams.processor.ProcessorContext;
 import us.dot.its.jpo.asn.j2735.r2024.RTCMcorrections.RTCMcorrectionsMessageFrame;
 import us.dot.its.jpo.geojsonconverter.partitioner.RsuStationIdKey;
-import us.dot.its.jpo.geojsonconverter.pojos.rtcm.DeserializedRawRTCM;
-import us.dot.its.jpo.geojsonconverter.pojos.rtcm.ProcessedRTCM;
+import us.dot.its.jpo.geojsonconverter.pojos.geojson.rtcm.DeserializedRawRTCM;
+import us.dot.its.jpo.geojsonconverter.pojos.geojson.rtcm.ProcessedRTCM;
+import us.dot.its.jpo.geojsonconverter.pojos.geojson.rtcm.RTCMProperties;
 import us.dot.its.jpo.ode.model.OdeMessageFrameData;
 import us.dot.its.jpo.ode.model.OdeMessageFrameMetadata;
 import us.dot.its.jpo.ode.model.OdeMessageFramePayload;
@@ -52,35 +53,35 @@ public class RTCMTransformer
                 ProcessedRTCM processed = rtcmConverter.processRTCM(rtcmMessageFrame);
 
                 // Metadata
-                processed.setSchemaVersion(metadata.getSchemaVersion());
+                processed.getProperties().setSchemaVersion(metadata.getSchemaVersion());
                 try {
                     ZonedDateTime odeReceivedAt = Instant.parse(metadata.getOdeReceivedAt()).atZone(ZoneId.of("UTC"));
-                    processed.setOdeReceivedAt(odeReceivedAt);
+                    processed.getProperties().setOdeReceivedAt(odeReceivedAt);
                 } catch (DateTimeParseException e) {
                     log.error("Error parsing ODE received at {}", metadata.getOdeReceivedAt());
-                    processed.addValidationMessage("Error parsing ODE received at date/time: " + metadata.getOdeReceivedAt());
+                    processed.getProperties().addValidationMessage("Error parsing ODE received at date/time: " + metadata.getOdeReceivedAt());
                 }
-                processed.setAsn1(metadata.getAsn1());
+                processed.getProperties().setAsn1(metadata.getAsn1());
                 if (metadata.getOriginIp() != null && !metadata.getOriginIp().isEmpty()) {
-                    processed.setOriginIp(metadata.getOriginIp());
+                    processed.getProperties().setOriginIp(metadata.getOriginIp());
                 }
 
                 // Validation results
-                rtcmConverter.jsonValidation(processed, rawRtcm.getValidatorResults());
+                rtcmConverter.jsonValidation(processed.getProperties(), rawRtcm.getValidatorResults());
 
                 // Key
                 var key = new RsuStationIdKey();
                 key.setRsuId(metadata.getOriginIp());
-                key.setStationId(processed.getStationId());
+                key.setStationId(processed.getProperties().getStationId());
 
                 return KeyValue.pair(key, processed);
 
             } else {
-                var processed = new ProcessedRTCM();
+                var processed = new ProcessedRTCM(null, new RTCMProperties());
                 ZonedDateTime utcDateTime = ZonedDateTime.now(ZoneOffset.UTC);
-                processed.setOdeReceivedAt(utcDateTime);
-                rtcmConverter.jsonValidation(processed, rawRtcm.getValidatorResults());
-                processed.addValidationMessage(rawRtcm.getFailedMessage());
+                processed.getProperties().setOdeReceivedAt(utcDateTime);
+                rtcmConverter.jsonValidation(processed.getProperties(), rawRtcm.getValidatorResults());
+                processed.getProperties().addValidationMessage(rawRtcm.getFailedMessage());
                 RsuStationIdKey key = new RsuStationIdKey();
                 key.setRsuId("ERROR");
                 return KeyValue.pair(key, processed);

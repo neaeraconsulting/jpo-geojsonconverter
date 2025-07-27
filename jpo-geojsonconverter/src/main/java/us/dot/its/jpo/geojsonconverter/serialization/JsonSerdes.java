@@ -5,7 +5,7 @@ import us.dot.its.jpo.geojsonconverter.partitioner.RsuLogKey;
 import us.dot.its.jpo.geojsonconverter.partitioner.RsuStationIdKey;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.bsm.ProcessedBsm;
 import us.dot.its.jpo.geojsonconverter.partitioner.RsuPsmIdKey;
-import us.dot.its.jpo.geojsonconverter.pojos.rtcm.ProcessedRTCM;
+import us.dot.its.jpo.geojsonconverter.pojos.geojson.rtcm.ProcessedRTCM;
 import us.dot.its.jpo.geojsonconverter.pojos.spat.*;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.LineString;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.Point;

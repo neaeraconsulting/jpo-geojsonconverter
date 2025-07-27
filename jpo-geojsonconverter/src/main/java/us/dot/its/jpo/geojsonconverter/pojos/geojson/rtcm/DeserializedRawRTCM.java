@@ -1,4 +1,4 @@
-package us.dot.its.jpo.geojsonconverter.pojos.rtcm;
+package us.dot.its.jpo.geojsonconverter.pojos.geojson.rtcm;
 
 import lombok.Data;
 import us.dot.its.jpo.geojsonconverter.validator.JsonValidatorResult;

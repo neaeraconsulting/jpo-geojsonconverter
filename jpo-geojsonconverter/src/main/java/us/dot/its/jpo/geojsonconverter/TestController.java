@@ -3,15 +3,13 @@ package us.dot.its.jpo.geojsonconverter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import us.dot.its.jpo.asn.j2735.r2024.RTCMcorrections.RTCMcorrections;
 import us.dot.its.jpo.asn.j2735.r2024.RTCMcorrections.RTCMcorrectionsMessageFrame;
 import us.dot.its.jpo.geojsonconverter.converter.rtcm.RTCMDecoder;
 import us.dot.its.jpo.geojsonconverter.converter.rtcm.RTCMConverter;
-import us.dot.its.jpo.geojsonconverter.pojos.rtcm.ProcessedRTCM;
+import us.dot.its.jpo.geojsonconverter.pojos.geojson.rtcm.ProcessedRTCM;
 
 @RestController
 public class TestController {

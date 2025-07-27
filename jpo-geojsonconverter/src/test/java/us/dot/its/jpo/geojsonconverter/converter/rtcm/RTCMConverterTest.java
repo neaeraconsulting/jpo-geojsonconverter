@@ -10,7 +10,8 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import us.dot.its.jpo.asn.j2735.r2024.RTCMcorrections.RTCMcorrectionsMessageFrame;
 import us.dot.its.jpo.geojsonconverter.pojos.ProcessedValidationMessage;
-import us.dot.its.jpo.geojsonconverter.pojos.rtcm.ProcessedRTCM;
+import us.dot.its.jpo.geojsonconverter.pojos.geojson.rtcm.ProcessedRTCM;
+import us.dot.its.jpo.geojsonconverter.pojos.geojson.rtcm.RTCMProperties;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -47,20 +48,22 @@ public class RTCMConverterTest {
         log.info(str);
         ProcessedRTCM processedRtcm = converter.processRTCM(messageFrame);
         assertThat(processedRtcm, notNullValue());
-        assertThat(processedRtcm.getMsgCnt(), equalTo(82));
-        assertThat(processedRtcm.getRev(), equalTo("rtcmRev3"));
+        RTCMProperties properties = processedRtcm.getProperties();
+        assertThat(properties, notNullValue());
+        assertThat(properties.getMsgCnt(), equalTo(82));
+        assertThat(properties.getRev(), equalTo("rtcmRev3"));
         log.info(mapper.writeValueAsString(processedRtcm));
         if (expectCti4501Conformant) {
-            assertThat(processedRtcm.getValidationMessages(), hasSize(equalTo(0)));
-            assertThat(processedRtcm.isCti4501Conformant(), equalTo(true));
+            assertThat(properties.getValidationMessages(), hasSize(equalTo(0)));
+            assertThat(properties.isCti4501Conformant(), equalTo(true));
         } else {
-            assertThat(processedRtcm.getValidationMessages(), hasSize(greaterThanOrEqualTo(1)));
-            Set<String> messages = processedRtcm.getValidationMessages().stream().map(ProcessedValidationMessage::getMessage).collect(Collectors.toSet());
+            assertThat(properties.getValidationMessages(), hasSize(greaterThanOrEqualTo(1)));
+            Set<String> messages = properties.getValidationMessages().stream().map(ProcessedValidationMessage::getMessage).collect(Collectors.toSet());
             assertThat(messages, hasItems(containsString(expectValidationMessageIncludes)));
-            assertThat(processedRtcm.isCti4501Conformant(), equalTo(false));
+            assertThat(properties.isCti4501Conformant(), equalTo(false));
         }
         if (expectUtcTime != null) {
-            assertThat(processedRtcm.getUtcTime(), equalTo(expectUtcTime));
+            assertThat(properties.getUtcTime(), equalTo(expectUtcTime));
         }
     }
 

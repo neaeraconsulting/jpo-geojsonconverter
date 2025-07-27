@@ -1,4 +1,4 @@
-package us.dot.its.jpo.geojsonconverter.pojos.rtcm;
+package us.dot.its.jpo.geojsonconverter.pojos.geojson.rtcm;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
