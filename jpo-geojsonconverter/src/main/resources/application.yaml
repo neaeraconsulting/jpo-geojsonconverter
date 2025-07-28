@@ -43,6 +43,9 @@ kafka.topics:
     - name: topic.ProcessedPsm
       cleanupPolicy: delete
       retentionMs: 300000
+    - name: topic.ProcessedRtcm
+      cleanupPolicy: delete
+      retentionMs: 300000
 
 # Jackson Properties
 spring.jackson.serialization.write-dates-as-timestamps: false
@@ -53,3 +56,7 @@ kafka.linger_ms: 50
 # true = fully decode using the native gpsdecode tool
 # false = partial decode: message type and station id only
 rtcm.full.decode: true
+
+geojsonconverter:
+  kafka-topic-ode-rtcm-json: topic.OdeRtcmJson
+  kafka-topic-processed-rtcm: topic.ProcessedRtcm

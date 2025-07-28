@@ -12,7 +12,7 @@ import us.dot.its.jpo.geojsonconverter.pojos.geojson.Point;
 /**
  * A point feature representing a processed J2735 {@link RTCMcorrectionsMessageFrame}.
  *
- * <p>The geometry is the point location from FullPositionVector (GeoJSON or WKT)</p>
+ * <p>The geometry is the point location from FullPositionVector</p>
  *
  */
 @Generated

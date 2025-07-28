@@ -17,8 +17,7 @@ import us.dot.its.jpo.geojsonconverter.validator.RTCMJsonValidator;
 import us.dot.its.jpo.ode.model.OdeMessageFrameData;
 
 /**
- * Kafka Streams Topology for processing RTCMcorrections messages received
- * from the ODE.
+ * Kafka Streams Topology for processing RTCMcorrections messages received from the ODE.
  */
 @Slf4j
 public class RTCMTopology {
@@ -56,8 +55,6 @@ public class RTCMTopology {
                 }
                 return deserializedRawRTCM;
             });
-
-        // CTI 4501 Validation
 
         // Convert to ProcessedRTCM
         KStream<RsuStationIdKey, ProcessedRTCM> processedRTCMStream =

@@ -67,6 +67,10 @@ public class GeoJsonConverterProperties implements EnvironmentAware {
     private String kafkaTopicOdePsmJson = "topic.OdePsmJson";
     private String kafkaTopicProcessedPsm = "topic.ProcessedPsm";
 
+    // RTCM
+    @Getter @Setter private String kafkaTopicOdeRtcmJson;
+    @Getter @Setter private String kafkaTopicProcessedRtcm;
+
     private int lingerMs = 0;
 
     private GeometryOutputMode geometryOutputMode = GeometryOutputMode.GEOJSON_ONLY;
