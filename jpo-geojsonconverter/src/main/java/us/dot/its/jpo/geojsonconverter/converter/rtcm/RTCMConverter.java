@@ -62,6 +62,7 @@ public class RTCMConverter {
         properties.setRev(rev);
         if (!RTCM_Revision.RTCMREV3.getName().equals(rev)) {
             // CTI 4501 v01.01, Sec. 4.3.3.5.1: Revision 3 is required
+            log.debug("Invalid rev: {}", rev);
             properties.addValidationMessage(
                     "CTI-4501 conformance issue: The RTCMcorrections 'rev' (DE_RTCM_Revision) is not 'rtcmRev3'.");
         }
@@ -270,11 +271,15 @@ public class RTCMConverter {
             categories.add("MSM7");
         }
 
+        log.debug("Categories: {}", categories);
+
         if (categories.isEmpty()) {
+            log.debug("No CTI 4501 categories found.");
             properties.addValidationMessage(
                     "CTI-4501 conformance issue: None of the message types are in categories mentioned in CTI-4501");
         }
         if (categories.size() > 1) {
+            log.debug("Multiple CTI 4501 categories found.");
             properties.addValidationMessage(
                     String.format(
                             "CTI-4501 conformance issue: The message list contains message types from more than" +
@@ -340,9 +345,6 @@ public class RTCMConverter {
             msg.setJsonPath(vm.getPath());
             messages.add(msg);
         }
-        if (properties.getElevation() == null) {
-            properties.setValidationMessages(new ArrayList<>());
-        }
-        properties.getValidationMessages().addAll(messages);
+        properties.addValidationMessages(messages);
     }
 }

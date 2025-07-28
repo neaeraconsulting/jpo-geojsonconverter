@@ -37,6 +37,7 @@ public class RTCMDecoder {
     private static final String EXECUTABLE = "/usr/bin/gpsdecode";
 
     public JsonNode decodeRtcm(String hex) {
+        log.debug("Decode RTCM hex: {}", hex);
         byte[] bytes = hexFormat.parseHex(hex);
 
         if (!fullDecode) {
@@ -130,15 +131,19 @@ public class RTCMDecoder {
         }
         try {
             int exitCode = process.waitFor();
-            log.info("RTCM process exited with code {}", exitCode);
+            log.debug("RTCM process exited with code {}", exitCode);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+        log.debug("decode RTCM json: {}", json);
         ObjectMapper mapper = DateJsonMapper.getInstance();
         try {
             return mapper.readValue(json, JsonNode.class);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            log.error("Decode RTCM json failed", e);
+            var errNode = mapper.createObjectNode();
+            errNode.put("error", e.getMessage());
+            return errNode;
         }
     }
 
