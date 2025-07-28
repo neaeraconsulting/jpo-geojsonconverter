@@ -280,11 +280,13 @@ public class RTCMConverter {
                             "CTI-4501 conformance issue: The message list contains message types from more than" +
                                     " one category: %s", categories));
         }
-        String category = categories.iterator().next();
-        checkMsmTypes(category, types, "MSM4", MSM4_GPS, properties);
-        checkMsmTypes(category, types, "MSM5", MSM5_GPS, properties);
-        checkMsmTypes(category, types, "MSM6", MSM6_GPS, properties);
-        checkMsmTypes(category, types, "MSM7", MSM7_GPS, properties);
+        if (categories.size() == 1) {
+            String category = categories.iterator().next();
+            checkMsmTypes(category, types, "MSM4", MSM4_GPS, properties);
+            checkMsmTypes(category, types, "MSM5", MSM5_GPS, properties);
+            checkMsmTypes(category, types, "MSM6", MSM6_GPS, properties);
+            checkMsmTypes(category, types, "MSM7", MSM7_GPS, properties);
+        }
     }
 
     private void checkMsmTypes(String category, Set<Integer> types, String msmVersion, int gpsType, RTCMProperties properties) {

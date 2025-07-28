@@ -1,0 +1,46 @@
+{
+  "metadata": {
+    "logFileName": "",
+    "recordType": "rtcmTx",
+    "securityResultCode": "success",
+    "receivedMessageDetails": {
+      "rxSource": "NA"
+    },
+    "payloadType": "us.dot.its.jpo.ode.model.OdeMessageFramePayload",
+    "serialId": {
+      "streamId": "8aa7793c-0a5b-42e2-8e90-f871834374ce",
+      "bundleSize": 1,
+      "bundleId": 0,
+      "recordId": 0,
+      "serialNumber": 0
+    },
+    "odeReceivedAt": "2025-07-28T15:26:25.439Z",
+    "schemaVersion": 9,
+    "maxDurationTime": 0,
+    "recordGeneratedAt": "",
+    "recordGeneratedBy": "RSU",
+    "sanitized": false,
+    "odePacketID": "",
+    "odeTimStartDateTime": "",
+    "asn1": "001C809D41430158009639310D0A66414243407963676F4A747D47684240684145654051795F4A6A73775F4868434068496C7E5B5B40407047796340417B7F4472517B4F5B75434471785342544F627F7F7C6E654051757F5A7272786F41427C4F407459467C7C60466E50754A747F5B5F7F40607D6270405C717F5E6670715F4F47406C494A4C7C6D7A687F647D6C6F604841404F6770786F574B7F67496D0D0A",
+    "source": "RSU",
+    "originIp": "172.18.0.1",
+    "isCertPresent": false
+  },
+  "payload": {
+    "data": {
+      "messageId": 28,
+      "value": {
+        "RTCMcorrections": {
+          "msgCnt": 20,
+          "rev": "rtcmRev2",
+          "timeStamp": 527040,
+          "msgs": [
+            "39310D0A66414243407963676F4A747D47684240684145654051795F4A6A73775F4868434068496C7E5B5B40407047796340417B7F4472517B4F5B75434471785342544F627F7F7C6E654051757F5A7272786F41427C4F407459467C7C60466E50754A747F5B5F7F40607D6270405C717F5E6670715F4F47406C494A4C7C6D7A687F647D6C6F604841404F6770786F574B7F67496D0D0A"
+          ]
+        }
+      }
+    },
+    "dataType": "us.dot.its.jpo.asn.j2735.r2024.RTCMcorrections.RTCMcorrectionsMessageFrame"
+  }
+}
