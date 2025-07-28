@@ -51,9 +51,10 @@ public class RTCMConverterTest {
         RTCMProperties properties = processedRtcm.getProperties();
         assertThat(properties, notNullValue());
         assertThat(properties.getMsgCnt(), equalTo(82));
-        assertThat(properties.getRev(), equalTo("rtcmRev3"));
+
         log.info(mapper.writeValueAsString(processedRtcm));
         if (expectCti4501Conformant) {
+            assertThat(properties.getRev(), equalTo("rtcmRev3"));
             assertThat(properties.getValidationMessages(), hasSize(equalTo(0)));
             assertThat(properties.isCti4501Conformant(), equalTo(true));
         } else {
@@ -71,7 +72,8 @@ public class RTCMConverterTest {
     public static Collection<Object[]> params() {
         return Arrays.asList(new Object[][] {
                 { RTCM , false, "DDateTime", null },
-                { RTCM_CTI4501_VALID, true, null,  1753482274168L }
+                { RTCM_CTI4501_VALID, true, null,  1753482274168L },
+                { RTCM_REV2_INVALID, false, "DE_RTCM_Revision", null }
         });
     };
 
@@ -127,6 +129,20 @@ public class RTCMConverterTest {
         }
         """;
 
-
+    public static final String RTCM_REV2_INVALID = """
+            {
+              "messageId": 28,
+              "value": {
+                "RTCMcorrections": {
+                  "msgCnt": 82,
+                  "rev": "rtcmRev2",
+                  "timeStamp": 527040,
+                  "msgs": [
+                    "66300D0A597E7D7C5A7963686F7D4B4278774F4068414565405145404E6A73775F486841406865534164645A40704779467F7E44405E72517B4F7E727F7F4E6E5342544F47404043517F405145406B4D4D47507E437C7F7F7A59467C7C60466E5B75664B406460657F637D624E7F634E60536670715F4F4740604968734352654040594253595F777E7F70584F475068747C5F767159567E7C5C79634C4A5E546F564B7C675D6E776559627C7C7A465C7D71635577784F404060707F534F7C7F714A665D434360465C55775E6A48476C78767F7F7F646F42757F5F4040505A6C7F7F7B5F564C704043534C6A6F5263534F7E7F530D0A"
+                  ]
+                }
+              }
+            }
+            """;
 
 }
