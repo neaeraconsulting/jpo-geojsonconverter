@@ -33,7 +33,9 @@ services:
         max-size: "10m"
         max-file: "5"
     depends_on:
-      - kafka
+      kafka:
+        condition: service_healthy
+        required: false
 
   geojsonconverter_base:
     profiles:
@@ -114,6 +116,7 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
+        required: false
     healthcheck:
       test: ["CMD", "wget", "--spider", "http://localhost:8080"]
       interval: 5s
@@ -148,6 +151,7 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
+        required: false
     logging:
       options:
         max-size: "10m"
