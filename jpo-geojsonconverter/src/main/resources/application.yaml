@@ -1,5 +1,3 @@
-server.port: 8188
-
 #General Properties
 groupId: '@project.groupId@'
 artifactId: '@project.artifactId@'
