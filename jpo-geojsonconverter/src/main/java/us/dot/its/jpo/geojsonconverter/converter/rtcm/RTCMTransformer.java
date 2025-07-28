@@ -10,6 +10,7 @@ import us.dot.its.jpo.geojsonconverter.partitioner.RsuStationIdKey;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.rtcm.DeserializedRawRTCM;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.rtcm.ProcessedRTCM;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.rtcm.RTCMProperties;
+import us.dot.its.jpo.geojsonconverter.utils.ProcessedSchemaVersions;
 import us.dot.its.jpo.ode.model.OdeMessageFrameData;
 import us.dot.its.jpo.ode.model.OdeMessageFrameMetadata;
 import us.dot.its.jpo.ode.model.OdeMessageFramePayload;
@@ -53,7 +54,7 @@ public class RTCMTransformer
                 ProcessedRTCM processed = rtcmConverter.processRTCM(rtcmMessageFrame);
 
                 // Metadata
-                processed.getProperties().setSchemaVersion(metadata.getSchemaVersion());
+                processed.getProperties().setSchemaVersion(ProcessedSchemaVersions.PROCESSED_RTCM_SCHEMA_VERSION);
                 try {
                     ZonedDateTime odeReceivedAt = Instant.parse(metadata.getOdeReceivedAt()).atZone(ZoneId.of("UTC"));
                     processed.getProperties().setOdeReceivedAt(odeReceivedAt);
