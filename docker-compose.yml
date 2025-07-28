@@ -51,6 +51,8 @@ services:
         limits:
           cpus: "1"
           memory: 2G
+    ports:
+      - "8188:8188"
     environment:
       DOCKER_HOST_IP: ${DOCKER_HOST_IP:?error}
       KAFKA_TYPE: ${KAFKA_TYPE}
