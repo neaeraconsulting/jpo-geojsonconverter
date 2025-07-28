@@ -9,27 +9,27 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @JsonInclude(Include.NON_NULL)
 public class Point extends Geometry {
-    private final double[] coordinates;
-    private final double[] bbox;
+    private final Double[] coordinates;
+    private final Double[] bbox;
 
-    public Point (double longitude, double latitude) {
+    public Point(Double longitude, Double latitude) {
         super();
-        this.coordinates = new double[] {longitude, latitude};
+        this.coordinates = new Double[] {longitude, latitude};
         this.bbox = null;
     }
 
     @JsonCreator
-    public Point(@JsonProperty("coordinates") double [] coordinates) {
+    public Point(@JsonProperty("coordinates") Double[] coordinates) {
         super();
         this.coordinates = coordinates;
         this.bbox = null;
     }
 
-    public double[] getCoordinates() {
+    public Double[] getCoordinates() {
         return coordinates;
     }
 
-    public double[] getBbox() {
+    public Double[] getBbox() {
         return bbox;
     }
 
@@ -51,10 +51,7 @@ public class Point extends Geometry {
 
     @Override
     public String toString() {
-        return "{" +
-            " coordinates='" + getCoordinates() + "'" +
-            ", bbox='" + getBbox() + "'" +
-            "}";
+        return "{" + " coordinates='" + getCoordinates() + "'" + ", bbox='" + getBbox() + "'" + "}";
     }
 
 }

@@ -18,23 +18,28 @@ import org.slf4j.LoggerFactory;
 import com.networknt.schema.ValidationMessage;
 
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.Point;
+import us.dot.its.jpo.geojsonconverter.converter.FieldConversions;
 import us.dot.its.jpo.geojsonconverter.partitioner.RsuLogKey;
 import us.dot.its.jpo.geojsonconverter.pojos.ProcessedValidationMessage;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.bsm.BsmProperties;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.bsm.DeserializedRawBsm;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.bsm.ProcessedBsm;
+import us.dot.its.jpo.geojsonconverter.pojos.geojson.bsm.ProcessedBsmAccelerationSet4Way;
+import us.dot.its.jpo.geojsonconverter.pojos.geojson.bsm.ProcessedBsmPositionalAccuracy;
+import us.dot.its.jpo.geojsonconverter.utils.ProcessedSchemaVersions;
 import us.dot.its.jpo.geojsonconverter.validator.JsonValidatorResult;
 
-import us.dot.its.jpo.ode.model.OdeBsmData;
-import us.dot.its.jpo.ode.model.OdeBsmMetadata;
-import us.dot.its.jpo.ode.model.OdeBsmPayload;
-import us.dot.its.jpo.ode.plugin.j2735.J2735BsmCoreData;
+import us.dot.its.jpo.ode.model.OdeMessageFrameData;
+import us.dot.its.jpo.ode.model.OdeMessageFrameMetadata;
+import us.dot.its.jpo.asn.j2735.r2024.BasicSafetyMessage.BasicSafetyMessageMessageFrame;
+import us.dot.its.jpo.asn.j2735.r2024.Common.BSMcoreData;
 
-public class BsmProcessedJsonConverter implements Transformer<Void, DeserializedRawBsm, KeyValue<RsuLogKey, ProcessedBsm<Point>>> {
+public class BsmProcessedJsonConverter
+        implements Transformer<Void, DeserializedRawBsm, KeyValue<RsuLogKey, ProcessedBsm<Point>>> {
     private static final Logger logger = LoggerFactory.getLogger(BsmProcessedJsonConverter.class);
 
     @Override
-    public void init(ProcessorContext arg0) { }
+    public void init(ProcessorContext arg0) {}
 
     /**
      * Transform an ODE BSM POJO to Processed BSM POJO.
@@ -46,26 +51,29 @@ public class BsmProcessedJsonConverter implements Transformer<Void, Deserialized
     @Override
     public KeyValue<RsuLogKey, ProcessedBsm<Point>> transform(Void rawKey, DeserializedRawBsm rawBsm) {
         try {
-            if (!rawBsm.getValidationFailure()) {
-                OdeBsmData rawValue = new OdeBsmData();
-                rawValue.setMetadata(rawBsm.getOdeBsmData().getMetadata());
-                OdeBsmMetadata bsmMetadata = (OdeBsmMetadata)rawValue.getMetadata();
+            if (!rawBsm.isValidationFailure()) {
+                OdeMessageFrameData rawValue = new OdeMessageFrameData();
+                rawValue.setMetadata(rawBsm.getOdeBsmMessageFrameData().getMetadata());
+                OdeMessageFrameMetadata bsmMetadata = rawValue.getMetadata();
 
-                rawValue.setPayload(rawBsm.getOdeBsmData().getPayload());
-                OdeBsmPayload bsmPayload = (OdeBsmPayload)rawValue.getPayload();
+                rawValue.setPayload(rawBsm.getOdeBsmMessageFrameData().getPayload());
+                BasicSafetyMessageMessageFrame bsmMessageFrame =
+                        (BasicSafetyMessageMessageFrame) rawValue.getPayload().getData();
 
-                ProcessedBsm<Point> processedBsm = createProcessedBsm(bsmMetadata, bsmPayload, rawBsm.getValidatorResults());
+                ProcessedBsm<Point> processedBsm =
+                        createProcessedBsm(bsmMetadata, bsmMessageFrame, rawBsm.getValidatorResults());
 
                 // Set the schema version
-                processedBsm.getProperties().setSchemaVersion(bsmMetadata.getSchemaVersion());
+                processedBsm.getProperties().setSchemaVersion(ProcessedSchemaVersions.PROCESSED_BSM_SCHEMA_VERSION);
                 RsuLogKey key = new RsuLogKey();
                 key.setRsuId(bsmMetadata.getOriginIp());
                 key.setLogId(bsmMetadata.getLogFileName());
-                key.setBsmId(bsmPayload.getBsm().getCoreData().getId());
+                key.setBsmId(bsmMessageFrame.getValue().getCoreData().getId().toString());
 
                 return KeyValue.pair(key, processedBsm);
             } else {
-                ProcessedBsm<Point> processedBsm = createFailureProcessedBsm(rawBsm.getValidatorResults(), rawBsm.getFailedMessage());
+                ProcessedBsm<Point> processedBsm =
+                        createFailureProcessedBsm(rawBsm.getValidatorResults(), rawBsm.getFailedMessage());
                 RsuLogKey key = new RsuLogKey();
                 key.setBsmId("ERROR");
                 return KeyValue.pair(key, processedBsm);
@@ -85,12 +93,13 @@ public class BsmProcessedJsonConverter implements Transformer<Void, Deserialized
         // Nothing to do here
     }
 
-    @SuppressWarnings("unchecked")
-    public ProcessedBsm<Point> createProcessedBsm(OdeBsmMetadata metadata, OdeBsmPayload payload, JsonValidatorResult validationMessages) {
+    public ProcessedBsm<Point> createProcessedBsm(OdeMessageFrameMetadata metadata,
+            BasicSafetyMessageMessageFrame bsmMessageFrame, JsonValidatorResult validationMessages) {
 
-        ProcessedBsm<Point> processedBsm = createProcessedBsmGeometryAndProperties(payload);
-        processedBsm.getProperties().setOdeReceivedAt(metadata.getOdeReceivedAt()); // ISO 8601: 2022-11-11T16:36:10.529530Z
-
+        ProcessedBsm<Point> processedBsm = createProcessedBsmGeometryAndProperties(bsmMessageFrame);
+        // ISO 8601: 2022-11-11T16:36:10.529530Z
+        processedBsm.getProperties().setOdeReceivedAt(metadata.getOdeReceivedAt());
+        processedBsm.getProperties().setAsn1(metadata.getAsn1());
         if (metadata.getOriginIp() != null && !metadata.getOriginIp().isEmpty())
             processedBsm.getProperties().setOriginIp(metadata.getOriginIp());
         if (metadata.getLogFileName() != null && !metadata.getLogFileName().isEmpty())
@@ -103,7 +112,7 @@ public class BsmProcessedJsonConverter implements Transformer<Void, Deserialized
             object.setException(exception.getStackTrace().toString());
             processedBsmValidationMessages.add(object);
         }
-        for (ValidationMessage vm : validationMessages.getValidationMessages()){
+        for (ValidationMessage vm : validationMessages.getValidationMessages()) {
             ProcessedValidationMessage object = new ProcessedValidationMessage();
             object.setMessage(vm.getMessage());
             object.setSchemaPath(vm.getSchemaPath());
@@ -115,7 +124,8 @@ public class BsmProcessedJsonConverter implements Transformer<Void, Deserialized
         ZonedDateTime odeDate = Instant.parse(metadata.getOdeReceivedAt()).atZone(ZoneId.of("UTC"));
 
         processedBsm.getProperties().setValidationMessages(processedBsmValidationMessages);
-        processedBsm.getProperties().setTimeStamp(generateOffsetUTCTimestamp(odeDate, payload.getBsm().getCoreData().getSecMark()));
+        processedBsm.getProperties().setTimeStamp(
+                generateOffsetUTCTimestamp(odeDate, bsmMessageFrame.getValue().getCoreData().getSecMark().getValue()));
 
         return processedBsm;
     }
@@ -126,7 +136,7 @@ public class BsmProcessedJsonConverter implements Transformer<Void, Deserialized
         List<ProcessedValidationMessage> processedBsmValidationMessages = new ArrayList<ProcessedValidationMessage>();
 
         ZonedDateTime utcDateTime = ZonedDateTime.now(ZoneOffset.UTC);
-        
+
         object.setMessage(message);
         object.setException(ExceptionUtils.getStackTrace(validatorResult.getExceptions().get(0)));
 
@@ -137,46 +147,58 @@ public class BsmProcessedJsonConverter implements Transformer<Void, Deserialized
         return processedBsm;
     }
 
-    private ProcessedBsm<Point> createProcessedBsmGeometryAndProperties(OdeBsmPayload payload) {
-        J2735BsmCoreData coreData = payload.getBsm().getCoreData();
+    private ProcessedBsm<Point> createProcessedBsmGeometryAndProperties(
+            BasicSafetyMessageMessageFrame bsmMessageFrame) {
+        BSMcoreData coreData = bsmMessageFrame.getValue().getCoreData();
 
         // Create the Geometry Point
-        double bsmLong = coreData.getPosition().getLongitude().doubleValue();
-        double bsmLat = coreData.getPosition().getLatitude().doubleValue();
+        Double bsmLong = FieldConversions.convertLong(coreData.getLong_().getValue());
+        Double bsmLat = FieldConversions.convertLat(coreData.getLat().getValue());
         Point bsmPoint = new Point(bsmLong, bsmLat);
 
         // Create the BSM Properties
         BsmProperties bsmProps = new BsmProperties();
-        bsmProps.setAccelSet(coreData.getAccelSet());
-        bsmProps.setAccuracy(coreData.getAccuracy());
-        bsmProps.setAngle(coreData.getAngle());
+        bsmProps.setAccelSet(new ProcessedBsmAccelerationSet4Way(
+                FieldConversions.convertAccelLatLong(coreData.getAccelSet().getLat().getValue()),
+                FieldConversions.convertAccelLatLong(coreData.getAccelSet().getLong_().getValue()),
+                FieldConversions.convertAccelVert(coreData.getAccelSet().getVert().getValue()),
+                FieldConversions.convertAccelYaw(coreData.getAccelSet().getYaw().getValue())));
+        bsmProps.setAccuracy(new ProcessedBsmPositionalAccuracy(
+                FieldConversions.convertSemiMajor(coreData.getAccuracy().getSemiMajor().getValue()),
+                FieldConversions.convertSemiMinor(coreData.getAccuracy().getSemiMinor().getValue()),
+                FieldConversions.convertOrientation(coreData.getAccuracy().getOrientation().getValue())));
+        bsmProps.setAngle(FieldConversions.convertAngle(coreData.getAngle().getValue()));
         bsmProps.setBrakes(coreData.getBrakes());
-        bsmProps.setHeading(coreData.getHeading());
-        bsmProps.setId(coreData.getId());
-        bsmProps.setMsgCnt(coreData.getMsgCnt());
-        bsmProps.setSecMark(coreData.getSecMark());
+        bsmProps.setHeading(FieldConversions.convertHeading(coreData.getHeading().getValue()));
+        bsmProps.setId(coreData.getId().getValue());
+        bsmProps.setMsgCnt(coreData.getMsgCnt().getValue());
+        bsmProps.setSecMark(coreData.getSecMark().getValue());
         bsmProps.setSize(coreData.getSize());
-        bsmProps.setSpeed(coreData.getSpeed());
+        bsmProps.setSpeed(FieldConversions.convertSpeed(coreData.getSpeed().getValue()));
         bsmProps.setTransmission(coreData.getTransmission());
 
         return new ProcessedBsm<Point>(null, bsmPoint, bsmProps);
     }
 
-    public ZonedDateTime generateOffsetUTCTimestamp(ZonedDateTime odeReceivedAt, Integer secMark){
+    public ZonedDateTime generateOffsetUTCTimestamp(ZonedDateTime odeReceivedAt, Long secMark) {
         try {
-            if (secMark != null){
-                int millis = (int)(secMark % 1000);
-                int seconds = (int)(secMark / 1000);
+            if (secMark != null) {
+                int millis = (int) (secMark % 1000);
+                int seconds = (int) (secMark / 1000);
                 ZonedDateTime date = odeReceivedAt;
-                if(secMark == 65535){
+                if (secMark == 65535) {
 
-                    // Return UTC time zero if the Zoned Date time is marked as unknown, UTC time zero chosen so that a null value can represent an empty field in the BSM. But 65535, can represent an intentionally unidentified field.
+                    // Return UTC time zero if the Zoned Date time is marked as unknown, UTC time zero chosen so that a
+                    // null value can represent an empty field in the BSM. But 65535, can represent an intentionally
+                    // unidentified field.
                     return ZonedDateTime.ofInstant(Instant.ofEpochMilli(0), ZoneId.of("UTC"));
-                    
-                }else{
-                    // If we are within 10 seconds of the next minute, and the timeMark is a large number, it probably means that the time rolled over before reception.
-                    // In this case, subtract a minute from the odeReceivedAt so that the true time represents the minute in the past. 
-                    if(odeReceivedAt.getSecond() < 10 && secMark > 50000){
+
+                } else {
+                    // If we are within 10 seconds of the next minute, and the timeMark is a large number, it probably
+                    // means that the time rolled over before reception.
+                    // In this case, subtract a minute from the odeReceivedAt so that the true time represents the
+                    // minute in the past.
+                    if (odeReceivedAt.getSecond() < 10 && secMark > 50000) {
                         date = date.minusMinutes(1);
                     }
 
@@ -186,14 +208,15 @@ public class BsmProcessedJsonConverter implements Transformer<Void, Deserialized
                     return date;
                 }
 
-                
+
             } else {
                 return null;
             }
         } catch (Exception e) {
-            String errMsg = String.format("Failed to generateOffsetUTCTimestamp - BSMProcessedJsonConverter. Message: %s", e.getMessage());
+            String errMsg = String.format(
+                    "Failed to generateOffsetUTCTimestamp - BSMProcessedJsonConverter. Message: %s", e.getMessage());
             logger.error(errMsg, e);
             return null;
-        }               
+        }
     }
 }

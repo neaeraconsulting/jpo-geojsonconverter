@@ -5,32 +5,28 @@ import java.io.IOException;
 import org.apache.kafka.common.serialization.Deserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.JavaType;
 import us.dot.its.jpo.asn.runtime.serialization.OdeCustomJsonMapper;
 import us.dot.its.jpo.geojsonconverter.DateJsonMapper;
-import us.dot.its.jpo.geojsonconverter.pojos.geojson.psm.ProcessedPsm;
 
-public class ProcessedPsmDeserializer<T> implements Deserializer<ProcessedPsm<T>> {
-    private static Logger logger = LoggerFactory.getLogger(ProcessedPsmDeserializer.class);
+public class OdeCustomJsonDeserializer<T> implements Deserializer<T> {
+    private static Logger logger = LoggerFactory.getLogger(OdeCustomJsonDeserializer.class);
 
     private final OdeCustomJsonMapper mapper = DateJsonMapper.getOdeInstance();
 
-    private Class<T> geometryClass;
+    private Class<T> destinationClass;
 
-    public ProcessedPsmDeserializer(Class<T> geometryClass) {
-        this.geometryClass = geometryClass;
+    public OdeCustomJsonDeserializer(Class<T> destinationClass) {
+        this.destinationClass = destinationClass;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public ProcessedPsm<T> deserialize(String topic, byte[] data) {
+    public T deserialize(String topic, byte[] data) {
         if (data == null) {
             return null;
         }
         try {
-            JavaType javaType = mapper.getTypeFactory().constructParametricType(ProcessedPsm.class, geometryClass);
-            return (ProcessedPsm<T>) mapper.readValue(data, javaType);
+            T returnData = mapper.readValue(data, destinationClass);
+            return returnData;
         } catch (IOException e) {
             String errMsg = String.format("Exception deserializing for topic %s: %s", topic, e.getMessage());
             logger.error(errMsg, e);
