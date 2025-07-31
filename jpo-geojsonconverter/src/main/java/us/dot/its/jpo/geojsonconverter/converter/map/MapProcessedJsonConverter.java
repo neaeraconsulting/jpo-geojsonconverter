@@ -156,6 +156,7 @@ public class MapProcessedJsonConverter
     }
 
     private ProcessedPosition3D convertPosition3D(Position3D p) {
+        if (p == null) return null;
         ProcessedPosition3D processed = new ProcessedPosition3D();
         processed.setLat(p.getLat() != null ? (int)p.getLat().getValue() : null);
         processed.setLong_(p.getLong_() != null ? (int)p.getLong_().getValue() : null);
@@ -164,6 +165,7 @@ public class MapProcessedJsonConverter
     }
 
     private ProcessedIntersectionReferenceID convertIntersectionReferenceID(IntersectionReferenceID intersectionReferenceID) {
+        if (intersectionReferenceID == null) return null;
         ProcessedIntersectionReferenceID processed = new ProcessedIntersectionReferenceID();
         processed.setId(intersectionReferenceID.getId() != null ? (int)intersectionReferenceID.getId().getValue() : null);
         processed.setRegion(intersectionReferenceID.getRegion() != null ? (int)intersectionReferenceID.getRegion().getValue() : null);
@@ -229,7 +231,42 @@ public class MapProcessedJsonConverter
     }
 
     private ProcessedLaneTypeAttributes convertLaneTypeAttributes(LaneTypeAttributes laneTypeAttributes) {
-
+        if (laneTypeAttributes == null) return null;
+        ProcessedLaneTypeAttributes processed = new ProcessedLaneTypeAttributes();
+        if (laneTypeAttributes.getVehicle() != null) {
+            var processedVehicle = new ProcessedLaneAttributes_Vehicle();
+            BitstringUtils.processBitstring(processedVehicle, laneTypeAttributes.getVehicle());
+            processed.setVehicle(processedVehicle);
+        } else if (laneTypeAttributes.getCrosswalk() != null) {
+            var processedCrosswalk = new ProcessedLaneAttributes_Crosswalk();
+            BitstringUtils.processBitstring(processedCrosswalk, laneTypeAttributes.getCrosswalk());
+            processed.setCrosswalk(processedCrosswalk);
+        } else if (laneTypeAttributes.getBikeLane() != null) {
+            var processedBike = new ProcessedLaneAttributes_Bike();
+            BitstringUtils.processBitstring(processedBike, laneTypeAttributes.getBikeLane());
+            processed.setBikeLane(processedBike);
+        } else if (laneTypeAttributes.getSidewalk() != null) {
+            var processedSidewalk = new ProcessedLaneAttributes_Sidewalk();
+            BitstringUtils.processBitstring(processedSidewalk, laneTypeAttributes.getSidewalk());
+            processed.setSidewalk(processedSidewalk);
+        } else if (laneTypeAttributes.getMedian() != null) {
+            var processedMedian = new ProcessedLaneAttributes_Barrier();
+            BitstringUtils.processBitstring(processedMedian, laneTypeAttributes.getMedian());
+            processed.setMedian(processedMedian);
+        } else if (laneTypeAttributes.getStriping() != null) {
+            var processedStriping = new ProcessedLaneAttributes_Striping();
+            BitstringUtils.processBitstring(processedStriping, laneTypeAttributes.getStriping());
+            processed.setStriping(processedStriping);
+        } else if (laneTypeAttributes.getTrackedVehicle() != null) {
+            var processedTrackedVehicle = new ProcessedLaneAttributes_TrackedVehicle();
+            BitstringUtils.processBitstring(processedTrackedVehicle, laneTypeAttributes.getTrackedVehicle());
+            processed.setTrackedVehicle(processedTrackedVehicle);
+        } else if (laneTypeAttributes.getParking() != null) {
+            var processedParking = new ProcessedLaneAttributes_Parking();
+            BitstringUtils.processBitstring(processedParking, laneTypeAttributes.getParking());
+            processed.setParking(processedParking);
+        }
+        return processed;
     }
 
     private ProcessedConnectsToList convertConnectsToList(ConnectsToList connectsToList) {
