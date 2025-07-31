@@ -1,4 +1,4 @@
-package us.dot.its.jpo.geojsonconverter.pojos.common;
+package us.dot.its.jpo.geojsonconverter.pojos;
 
 import java.util.LinkedHashMap;
 
@@ -23,6 +23,11 @@ public abstract class ProcessedBitstring extends LinkedHashMap<String, Boolean> 
     public void set(int index, boolean value) {
         String key = keySet().toArray(new String[0])[index];
         this.put(key, value);
+    }
+
+    public boolean get(int index) {
+        String key = keySet().toArray(new String[0])[index];
+        return this.get(key);
     }
 
 }

@@ -8,6 +8,7 @@ import us.dot.its.jpo.geojsonconverter.pojos.ProcessedValidationMessage;
 import us.dot.its.jpo.geojsonconverter.pojos.common.ProcessedIntersectionReferenceID;
 import us.dot.its.jpo.geojsonconverter.pojos.common.ProcessedSpeedConfidence;
 import us.dot.its.jpo.geojsonconverter.pojos.spat.*;
+import us.dot.its.jpo.geojsonconverter.utils.BitstringUtils;
 import us.dot.its.jpo.geojsonconverter.utils.ProcessedSchemaVersions;
 import us.dot.its.jpo.geojsonconverter.validator.CTI4501Validator;
 import us.dot.its.jpo.geojsonconverter.validator.JsonValidatorResult;
@@ -130,7 +131,9 @@ public class SpatProcessedJsonConverter
 
         processedSpat.setRevision(
                 intersectionState.getRevision() != null ? (int) intersectionState.getRevision().getValue() : null);
-        processedSpat.setStatus(intersectionState.getStatus());
+        ProcessedIntersectionStatusObject processedStatus = new ProcessedIntersectionStatusObject();
+        BitstringUtils.processBitstring(processedStatus, intersectionState.getStatus());
+        processedSpat.setStatus(processedStatus);
         List<Integer> enabledLanes = new ArrayList<>();
         if (intersectionState.getEnabledLanes() != null) {
             enabledLanes.addAll(intersectionState.getEnabledLanes().stream().map(laneId -> (int)laneId.getValue()).toList());

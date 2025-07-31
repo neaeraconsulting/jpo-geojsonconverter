@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 
 import static org.junit.Assert.fail;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Value;
@@ -118,7 +119,7 @@ public class JsonSerializerTest {
         try (var serializer = new JsonSerializer<ProcessedBsm<Point>>();
                 BufferedInputStream inputStream = new BufferedInputStream(validProcessedBsmResource.getInputStream())) {
             final String bsmString = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
-            final OdeCustomJsonMapper mapper = DateJsonMapper.getOdeInstance();
+            final ObjectMapper mapper = DateJsonMapper.getInstance();
             final JavaType javaType = mapper.getTypeFactory().constructParametricType(ProcessedBsm.class, Point.class);
             final ProcessedBsm<Point> bsm = mapper.readValue(bsmString, javaType);
             final byte[] bytes = serializer.serialize("the_topic", bsm);

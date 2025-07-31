@@ -1,6 +1,6 @@
 package us.dot.its.jpo.geojsonconverter.pojos.spat;
 
-import us.dot.its.jpo.geojsonconverter.pojos.common.ProcessedBitstring;
+import us.dot.its.jpo.geojsonconverter.pojos.ProcessedBitstring;
 
 public class ProcessedIntersectionStatusObject extends ProcessedBitstring {
     public ProcessedIntersectionStatusObject() {
