@@ -1,18 +1,10 @@
 package us.dot.its.jpo.geojsonconverter.converter.spat;
 
 import us.dot.its.jpo.asn.j2735.r2024.Common.LaneID;
-import us.dot.its.jpo.asn.j2735.r2024.SPAT.IntersectionState;
-import us.dot.its.jpo.asn.j2735.r2024.SPAT.SPATMessageFrame;
-import us.dot.its.jpo.asn.j2735.r2024.SPAT.MovementEvent;
-import us.dot.its.jpo.asn.j2735.r2024.SPAT.MovementState;
-import us.dot.its.jpo.asn.j2735.r2024.SPAT.SPAT;
+import us.dot.its.jpo.asn.j2735.r2024.SPAT.*;
 import us.dot.its.jpo.geojsonconverter.partitioner.RsuIntersectionKey;
 import us.dot.its.jpo.geojsonconverter.pojos.ProcessedValidationMessage;
-import us.dot.its.jpo.geojsonconverter.pojos.spat.DeserializedRawSpat;
-import us.dot.its.jpo.geojsonconverter.pojos.spat.ProcessedMovementEvent;
-import us.dot.its.jpo.geojsonconverter.pojos.spat.ProcessedMovementState;
-import us.dot.its.jpo.geojsonconverter.pojos.spat.ProcessedSpat;
-import us.dot.its.jpo.geojsonconverter.pojos.spat.TimingChangeDetails;
+import us.dot.its.jpo.geojsonconverter.pojos.spat.*;
 import us.dot.its.jpo.geojsonconverter.utils.ProcessedSchemaVersions;
 import us.dot.its.jpo.geojsonconverter.validator.CTI4501Validator;
 import us.dot.its.jpo.geojsonconverter.validator.JsonValidatorResult;
@@ -166,7 +158,12 @@ public class SpatProcessedJsonConverter
             if (signalGroupState.getState_time_speed() != null) {
                 for (MovementEvent incomingMovementEvent : signalGroupState.getState_time_speed()) {
                     ProcessedMovementEvent processedMovementEvent = new ProcessedMovementEvent();
-                    processedMovementEvent.setEventState(incomingMovementEvent.getEventState());
+                    MovementPhaseState phaseState = incomingMovementEvent.getEventState();
+                    if  (phaseState != null) {
+                        ProcessedMovementPhaseState processedMovementPhaseState = ProcessedMovementPhaseState.fromName(phaseState.getName());
+                        processedMovementEvent.setEventState(processedMovementPhaseState);
+                    }
+
 
                     // Calculate the UTC timestamps for the movement event states and account for null values
                     TimingChangeDetails spatTimingDetails = new TimingChangeDetails();
