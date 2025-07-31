@@ -20,4 +20,9 @@ public abstract class ProcessedBitstring extends LinkedHashMap<String, Boolean> 
         }
     }
 
+    public void set(int index, boolean value) {
+        String key = keySet().toArray(new String[0])[index];
+        this.put(key, value);
+    }
+
 }
