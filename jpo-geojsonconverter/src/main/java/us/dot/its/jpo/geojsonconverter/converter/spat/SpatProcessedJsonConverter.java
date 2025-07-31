@@ -1,5 +1,6 @@
 package us.dot.its.jpo.geojsonconverter.converter.spat;
 
+import us.dot.its.jpo.asn.j2735.r2024.Common.LaneID;
 import us.dot.its.jpo.asn.j2735.r2024.SPAT.IntersectionState;
 import us.dot.its.jpo.asn.j2735.r2024.SPAT.SPATMessageFrame;
 import us.dot.its.jpo.asn.j2735.r2024.SPAT.MovementEvent;
@@ -131,8 +132,11 @@ public class SpatProcessedJsonConverter
         processedSpat.setRevision(
                 intersectionState.getRevision() != null ? (int) intersectionState.getRevision().getValue() : null);
         processedSpat.setStatus(intersectionState.getStatus());
-        processedSpat.setEnabledLanes(
-                intersectionState.getEnabledLanes() != null ? intersectionState.getEnabledLanes() : null);
+        List<Integer> enabledLanes = new ArrayList<>();
+        if (intersectionState.getEnabledLanes() != null) {
+            enabledLanes.addAll(intersectionState.getEnabledLanes().stream().map(laneId -> (int)laneId.getValue()).toList());
+        }
+        processedSpat.setEnabledLanes(enabledLanes);
 
         // Retrieve all relevant timestamp-based fields to calculate the UTC timestamp
         Integer spatMoy = spat.getTimeStamp() != null ? (int) spat.getTimeStamp().getValue() : null;

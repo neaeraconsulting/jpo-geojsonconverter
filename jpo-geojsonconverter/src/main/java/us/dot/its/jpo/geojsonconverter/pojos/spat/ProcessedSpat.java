@@ -75,7 +75,7 @@ public class ProcessedSpat {
     private Integer revision;
     private IntersectionStatusObject status;
     private ZonedDateTime utcTimeStamp;
-    private List<LaneID> enabledLanes = new ArrayList<>();
+    private List<Integer> enabledLanes = new ArrayList<>();
     private List<ProcessedMovementState> states = null;
 
     /**
