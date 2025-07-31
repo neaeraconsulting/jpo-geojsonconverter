@@ -85,8 +85,8 @@ public class BsmProperties {
     private BrakeSystemStatus brakes;
     private Double heading;
     private String id;
-    private Long msgCnt;
-    private Long secMark;
+    private Integer msgCnt;
+    private Integer secMark;
     private VehicleSize size;
     private Double speed;
     private TransmissionState transmission;

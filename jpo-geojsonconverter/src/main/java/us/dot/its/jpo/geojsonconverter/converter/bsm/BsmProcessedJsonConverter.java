@@ -171,8 +171,8 @@ public class BsmProcessedJsonConverter
         bsmProps.setBrakes(coreData.getBrakes());
         bsmProps.setHeading(FieldConversions.convertHeading(coreData.getHeading().getValue()));
         bsmProps.setId(coreData.getId().getValue());
-        bsmProps.setMsgCnt(coreData.getMsgCnt().getValue());
-        bsmProps.setSecMark(coreData.getSecMark().getValue());
+        bsmProps.setMsgCnt(Math.toIntExact(coreData.getMsgCnt().getValue()));
+        bsmProps.setSecMark(Math.toIntExact(coreData.getSecMark().getValue()));
         bsmProps.setSize(coreData.getSize());
         bsmProps.setSpeed(FieldConversions.convertSpeed(coreData.getSpeed().getValue()));
         bsmProps.setTransmission(coreData.getTransmission());
