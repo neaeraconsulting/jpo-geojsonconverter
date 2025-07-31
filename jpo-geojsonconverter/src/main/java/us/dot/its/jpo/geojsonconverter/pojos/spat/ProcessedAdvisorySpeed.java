@@ -1,38 +1,28 @@
-
 package us.dot.its.jpo.geojsonconverter.pojos.spat;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Generated;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import us.dot.its.jpo.geojsonconverter.DateJsonMapper;
+import us.dot.its.jpo.geojsonconverter.pojos.common.ProcessedSpeedConfidence;
 
-
-/**
- * Contains information regarding the dynamic flow of traffic in relation to a signal group.
- * <p>
- * eventState - The signal group's phase state.
- * <p>
- * timing - The collection of timing details for the signal group.
- * <p>
- * speeds - A list of advisory speeds for the signal group.
- */
 @Data
+@Slf4j
 @Generated
-@NoArgsConstructor
-@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Slf4j
-public class ProcessedMovementEvent {
-    private ProcessedMovementPhaseState eventState;
-    private TimingChangeDetails timing;
-    private ProcessedAdvisorySpeedList speeds;
+public class ProcessedAdvisorySpeed {
+    private ProcessedAdvisorySpeedType type;
+    private Integer speed;
+    private ProcessedSpeedConfidence confidence;
+    private Integer distance;
+    @JsonProperty("class")
+    private Integer class_;
 
     @Override
     public String toString() {
