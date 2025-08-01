@@ -5,12 +5,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Generated;
-import us.dot.its.jpo.asn.j2735.r2024.RTCMcorrections.RTCMcorrectionsMessageFrame;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.BaseFeature;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.Point;
 
 /**
- * A point feature representing a processed J2735 {@link RTCMcorrectionsMessageFrame}.
+ * A point feature representing a processed J2735 RTCMcorrectionsMessageFrame
  *
  * <p>The geometry is the point location from FullPositionVector</p>
  *

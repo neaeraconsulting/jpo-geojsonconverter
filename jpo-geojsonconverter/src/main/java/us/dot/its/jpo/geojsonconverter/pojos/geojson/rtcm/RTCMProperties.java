@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.Generated;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import us.dot.its.jpo.asn.j2735.r2024.Common.FullPositionVector;
 import us.dot.its.jpo.geojsonconverter.pojos.ProcessedValidationMessage;
 
 import java.time.ZonedDateTime;
@@ -23,7 +22,7 @@ import java.util.Set;
  * <p>Includes the decoded RTCM payloads with station ID and message type</p>
  *
  * <p>CTI 4501 v01.01: Sec. 4.3.3.5.1 specification:</p>
- * <p>On what to include from the {@link FullPositionVector}:</p>
+ * <p>On what to include from the FullPositionVector</p>
  *
  * <p>"The anchorPoint (DF_FullPositionVector) for a connection intersection
  *  shall  include UTC, latitude, longitude, and elevation. UTC is the time
