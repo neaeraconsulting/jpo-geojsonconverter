@@ -30,11 +30,15 @@ public class RTCMDecoder {
 
     public RTCMDecoder(@Value("${rtcm.full.decode}") boolean fullDecode) {
         this.fullDecode = fullDecode;
+        File executable = new File(EXECUTABLE);
+        this.executableExists = executable.exists();
     }
 
     private static final HexFormat hexFormat = HexFormat.of();
 
     private static final String EXECUTABLE = "/usr/bin/gpsdecode";
+
+    private final boolean executableExists;
 
     public JsonNode decodeRtcm(String hex) {
         log.debug("Decode RTCM hex: {}", hex);
@@ -45,8 +49,7 @@ public class RTCMDecoder {
             return partialDecode(bytes);
         }
 
-        File executable = new File(EXECUTABLE);
-        if (!SystemUtils.IS_OS_WINDOWS || executable.exists()) {
+        if (executableExists) {
             return fullDecode(bytes);
         } else {
             log.warn("Executable {} does not exist, or running on Windows. Partially decoding. " +
