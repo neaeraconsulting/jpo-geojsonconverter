@@ -1,6 +1,7 @@
 package us.dot.its.jpo.geojsonconverter.converter;
 
 import org.apache.kafka.streams.KafkaStreams;
+import org.apache.kafka.streams.Topology;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,12 +12,11 @@ import us.dot.its.jpo.geojsonconverter.GeoJsonConverterProperties;
 import us.dot.its.jpo.geojsonconverter.StreamsExceptionHandler;
 import us.dot.its.jpo.geojsonconverter.converter.map.MapTopology;
 import us.dot.its.jpo.geojsonconverter.converter.psm.PsmTopology;
+import us.dot.its.jpo.geojsonconverter.converter.rtcm.RTCMConverter;
+import us.dot.its.jpo.geojsonconverter.converter.rtcm.RTCMTopology;
 import us.dot.its.jpo.geojsonconverter.converter.spat.SpatTopology;
 import us.dot.its.jpo.geojsonconverter.converter.bsm.BsmTopology;
-import us.dot.its.jpo.geojsonconverter.validator.BsmJsonValidator;
-import us.dot.its.jpo.geojsonconverter.validator.MapJsonValidator;
-import us.dot.its.jpo.geojsonconverter.validator.PsmJsonValidator;
-import us.dot.its.jpo.geojsonconverter.validator.SpatJsonValidator;
+import us.dot.its.jpo.geojsonconverter.validator.*;
 
 /**
  * Launches JsonFromJsonConverter service
@@ -29,7 +29,8 @@ public class JsonConverterServiceController {
 
     @Autowired
     public JsonConverterServiceController(GeoJsonConverterProperties geojsonProps, MapJsonValidator mapJsonValidator,
-            SpatJsonValidator spatJsonValidator, BsmJsonValidator bsmJsonValidator, PsmJsonValidator psmJsonValidator) {
+            SpatJsonValidator spatJsonValidator, BsmJsonValidator bsmJsonValidator, PsmJsonValidator psmJsonValidator,
+                                          RTCMJsonValidator rtcmJsonValidator, RTCMConverter rtcmConverter) {
         super();
 
         try {
@@ -99,6 +100,25 @@ public class JsonConverterServiceController {
                 }
             }));
             psmStreams.start();
+
+            // RTCM
+            logger.info("Creating the ProcessedRTCM Kafka Streams topology");
+            Topology rtcmTopology = RTCMTopology.build(
+                    geojsonProps.getKafkaTopicOdeRtcmJson(),
+                    geojsonProps.getKafkaTopicProcessedRtcm(),
+                    rtcmJsonValidator,
+                    rtcmConverter);
+            final var rtcmStreams = new KafkaStreams(rtcmTopology,
+                    geojsonProps.createStreamProperties("processedrcmjson"));
+            rtcmStreams.setUncaughtExceptionHandler(new StreamsExceptionHandler("RTCMStream"));
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                try {
+                    // Workaround to close streams in a finally block to satisfy sonar
+                } finally {
+                    rtcmStreams.close();
+                }
+            }));
+            rtcmStreams.start();
 
             logger.info("All geoJSON conversion services started!");
         } catch (Exception e) {

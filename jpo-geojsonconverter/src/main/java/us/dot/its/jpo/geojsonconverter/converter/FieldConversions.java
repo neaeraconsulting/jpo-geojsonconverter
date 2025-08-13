@@ -1,5 +1,12 @@
 package us.dot.its.jpo.geojsonconverter.converter;
 
+
+import us.dot.its.jpo.asn.j2735.r2024.Common.*;
+
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.util.List;
+
 public class FieldConversions {
     public static Double convertLong(long j2735Long) {
         // Longitude ::= INTEGER (-1799999999..1800000001)
@@ -154,5 +161,131 @@ public class FieldConversions {
             returnValue = speed * 0.02;
         }
         return returnValue;
+    }
+
+    public static Long convertDDateTime(List<String> validationMessages, DDateTime dDateTime) {
+        if (dDateTime == null) {
+            validationMessages.add("DDateTime is missing.");
+            return null;
+        }
+
+        Integer year = convertDYear(dDateTime.getYear());
+        if (year == null) {
+            validationMessages.add("DDateTime 'year' field is missing.");
+        }
+
+        Integer month = convertDMonth(dDateTime.getMonth());
+        if (month == null) {
+            validationMessages.add("DDateTime 'month' field is missing.");
+        }
+
+        Integer dayOfMonth = convertDDay(dDateTime.getDay());
+        if (dayOfMonth == null) {
+            validationMessages.add("DDateTime 'day' field is missing.");
+        }
+
+        Integer hour = convertDHour(dDateTime.getHour());
+        if (hour == null) {
+            validationMessages.add("DDateTime 'hour' field is missing.");
+        }
+
+        Integer minute = convertDMinute(dDateTime.getMinute());
+        if (minute == null) {
+            validationMessages.add("DDateTime 'minute' field is missing.");
+        }
+
+        SecondNanos secondNanos = convertDSecond(dDateTime.getSecond());
+        if (secondNanos == null) {
+            validationMessages.add("DDateTime 'second' (millisecond of minute) field is missing.");
+        }
+
+
+        ZoneOffset offset = convertDOffset(dDateTime.getOffset());
+
+        if (year != null && month != null && dayOfMonth != null && hour != null
+                && minute != null && secondNanos != null) {
+            OffsetDateTime odt = OffsetDateTime.of(year, month, dayOfMonth, hour, minute,
+                    secondNanos.secondOfMinute(), secondNanos.nanoOfSecond(), offset);
+            return odt.toInstant().toEpochMilli();
+        }
+        return null;
+    }
+
+    public static Integer convertDYear(DYear dYear) {
+        if (dYear == null) return null;
+        long value = dYear.getValue();
+        // 0 represents unknown year
+        if (value == 0) return null;
+        return (int) value;
+    }
+
+    public static Integer convertDMonth(DMonth dMonth) {
+        if (dMonth == null) return null;
+        long value = dMonth.getValue();
+        // 0 Represents unknown month
+        if (value == 0) return null;
+        return (int) value;
+    }
+
+    public static Integer convertDDay(DDay dDay) {
+        if (dDay == null) return null;
+        long value = dDay.getValue();
+        // 0 represents unknown day
+        if (value == 0) return null;
+        return (int) value;
+    }
+
+    public static Integer convertDHour(DHour dHour) {
+        if (dHour == null) return null;
+        long value = dHour.getValue();
+        // Per J2735 (2024) sec 7.34: 31 represents unknown hours and the values 24-30 are used by some applications
+        // to represent schedule adherence.
+        // But they are omitted here for use by the RTCM timestamp.
+        if (value > 23) return null;
+        return (int) value;
+    }
+
+    public static Integer convertDMinute(DMinute dMinute) {
+        if (dMinute == null) return null;
+        long value = dMinute.getValue();
+        // Per J2735 (2024) sec 7.37: 60 represents unknown hours
+        if (value == 60) return null;
+        return (int) value;
+    }
+
+    /**
+     * Millisecond of minute.
+     *
+     * @param dSecond DE_DSecond
+     * @return milliseconds or null if absent
+     */
+    public static SecondNanos convertDSecond(DSecond dSecond) {
+        if (dSecond == null) return null;
+        long value = dSecond.getValue();
+        // Per J2735 (2024) sec. 7.43: 65535 represents unavailable, and values 61000 and above are reserved.
+        if (value >= 61000) return null;
+        final int secondOfMinute = Math.floorDiv((int) value, 1000);
+        final int milliOfSecond = (int) value - (secondOfMinute * 1000);
+        final int nanoOfSecond = milliOfSecond * 1000000;
+        return new SecondNanos(secondOfMinute, nanoOfSecond);
+    }
+
+    public record SecondNanos(Integer secondOfMinute, Integer nanoOfSecond) {
+
+    }
+
+
+    /**
+     * Convert time zone offset
+     *
+     * @param dOffset Offset in minutes
+     * @return Java ZoneOffset
+     */
+    public static ZoneOffset convertDOffset(DOffset dOffset) {
+        if (dOffset == null) return ZoneOffset.UTC;
+        final int value = (int) dOffset.getValue();
+        int offsetHours = Math.floorDiv(value, 60);
+        int offsetMinutes = value - (offsetHours * 60);
+        return ZoneOffset.ofHoursMinutes(offsetHours, offsetMinutes);
     }
 }

@@ -2,8 +2,10 @@ package us.dot.its.jpo.geojsonconverter.serialization;
 
 import us.dot.its.jpo.geojsonconverter.partitioner.RsuIntersectionKey;
 import us.dot.its.jpo.geojsonconverter.partitioner.RsuLogKey;
+import us.dot.its.jpo.geojsonconverter.partitioner.RsuStationIdKey;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.bsm.ProcessedBsm;
 import us.dot.its.jpo.geojsonconverter.partitioner.RsuPsmIdKey;
+import us.dot.its.jpo.geojsonconverter.pojos.geojson.rtcm.ProcessedRTCM;
 import us.dot.its.jpo.geojsonconverter.pojos.spat.*;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.LineString;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.Point;
@@ -59,5 +61,13 @@ public class JsonSerdes {
 
     public static Serde<RsuPsmIdKey> RsuTypeIdKey() {
         return Serdes.serdeFrom(new JsonSerializer<RsuPsmIdKey>(), new JsonDeserializer<>(RsuPsmIdKey.class));
+    }
+
+    public static Serde<RsuStationIdKey> RsuStationIdKey() {
+        return Serdes.serdeFrom(new JsonSerializer<>(), new JsonDeserializer<>(RsuStationIdKey.class));
+    }
+
+    public static Serde<ProcessedRTCM> ProcessedRTCM() {
+        return Serdes.serdeFrom(new JsonSerializer<>(), new JsonDeserializer<>(ProcessedRTCM.class));
     }
 }

@@ -331,6 +331,107 @@ Example ProcessedPsm message:
 }
 ```
 
+### ProcessedRtcm
+
+The GeoJSON Converter produces `ProcessedRtcm` objects from `RTCMcorrections` message frames recieved from the ODE.
+
+Validation with reference to the [CTI-4501 specification](https://www.ite.org/ITEORG/assets/File/Standards/CTI%204501v0101.pdf) is performed as required by the Conflict Monitor (CIMMS).
+
+The RTCM decoding functionality can be configured with the `rtcm.full.decode` setting in `application.yaml`.
+
+* If `rtcm.full.decode=true`, the app uses the native `gpsd-client` library to fully decode the RTCM payloads.
+* If `rtcm.full.decode=false`, it uses pure Java methods to partially decode the payload.  In partial mode it is only capable of extracting the message types and station IDs for RTCM rev 3 messages.
+
+`ProcessedRtcm` fields:
+
+* *type* - Always 'Feature'
+* *geometry* - Point geometry, location of the station from the `FullPositionVector` frame.
+* *properties* - Selected properties from the message frame, and decoded from the binary RTCM messages, including:
+  * *msgCnt* - Message count
+  * *rev* - Must equal "rtcmRev3" to be CTI-4501 compliant, although it is possible to decode rev 2 messages in full decode mode.
+  * *messageTypes* - A list of message types from the decoded messages.
+  * *stationId* - The station ID from the decoded messages.
+  * *messages* - A list of fully or partially decoded messages.  
+    * *hex* - The hex-encoded raw RTCM message.
+    * *decodedMessage* - The decoded message in JSON format. There are numerous message types, and the structure of this node varies depending on type.
+
+Example `ProcessedRtcm` message:
+
+```json
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      -111.50943489999999,
+      40.660336
+    ]
+  },
+  "properties": {
+    "schemaVersion": 1,
+    "messageType": "RTCM",
+    "odeReceivedAt": "2025-07-28T20:34:11.033Z",
+    "originIp": "172.18.0.1",
+    "asn1": "001C6D25244028D2D4B29BC25EC0C12C418D300133ED980037BDD1A80C6358121DD4E499FFC6712E91F0D10F4C00F90266005105115939553131053951153939048081393D391400003551492535093114810531313D64513985D880D4B8D0D080BC8109BDBDD080D4B8D0D0023197E4",
+    "msgCnt": 82,
+    "rev": "rtcmRev3",
+    "longitude": -111.50943489999999,
+    "latitude": 40.660336,
+    "elevation": 2063.0,
+    "messageTypes": [
+      1005,
+      1033
+    ],
+    "stationId": 2432,
+    "messages": [
+      {
+        "hex": "D300133ED980037BDD1A80C6358121DD4E499FFC6712E91F0D",
+        "decodedMessage": {
+          "class": "RTCM3",
+          "device": "stdin",
+          "type": 1005,
+          "length": 19,
+          "station_id": 2432,
+          "system": [
+            "GPS",
+            "GLONASS"
+          ],
+          "refstation": true,
+          "sro": false,
+          "x": -1776533.4842,
+          "y": -4507816.005,
+          "z": 4133882.4466
+        }
+      },
+      {
+        "hex": "D3003E409980144144564E554C4C414E54454E4E4120204E4F4E4500000D5452494D424C4520414C4C4F59144E617620352E3434202F20426F6F7420352E3434008C65F9",
+        "decodedMessage": {
+          "class": "RTCM3",
+          "device": "stdin",
+          "type": 1033,
+          "length": 62,
+          "station_id": 2432,
+          "desc": "ADVNULLANTENNA  NONE",
+          "setup_id": 0,
+          "serial": "",
+          "receiver": "TRIMBLE ALLOY",
+          "firmware": "Nav 5.44 / Bo"
+        }
+      }
+    ],
+    "validationMessages": [
+      {
+        "message": "CTI-4501 conformance issue: anchorPoint (DF_FullPositionVector) 'utcTime' field: DDateTime is missing."
+      }
+    ],
+    "cti4501Conformant": false
+  }
+}
+```
+
+
+
+
 [Back to top](#toc)
 
 <!--
