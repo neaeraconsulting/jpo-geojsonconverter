@@ -105,8 +105,11 @@ public class SpatProcessedJsonConverter
         processedSpat.setName(intersectionState.getName() != null ? intersectionState.getName().getValue() : null);
         IntersectionReferenceID intersectionReferenceID = intersectionState.getId();
         ProcessedIntersectionReferenceID processedIntersectionReferenceID = new ProcessedIntersectionReferenceID();
-        processedIntersectionReferenceID.setId(intersectionReferenceID.getId() != null ? (int)intersectionReferenceID.getId().getValue() : null);
-        processedIntersectionReferenceID.setRegion(intersectionReferenceID.getRegion() != null ? (int)intersectionReferenceID.getRegion().getValue() : null);
+        processedIntersectionReferenceID.setId(
+                intersectionReferenceID.getId() != null ? (int) intersectionReferenceID.getId().getValue() : null);
+        processedIntersectionReferenceID.setRegion(
+                intersectionReferenceID.getRegion() != null ? (int) intersectionReferenceID.getRegion().getValue()
+                        : null);
         processedSpat.setIntersectionReferenceID(processedIntersectionReferenceID);
 
         // Handle validation messages for the J2735 and CTI-4501 SPaT conformance validation
@@ -136,16 +139,16 @@ public class SpatProcessedJsonConverter
         processedSpat.setStatus(processedStatus);
         List<Integer> enabledLanes = new ArrayList<>();
         if (intersectionState.getEnabledLanes() != null) {
-            enabledLanes.addAll(intersectionState.getEnabledLanes().stream().map(laneId -> (int)laneId.getValue()).toList());
+            enabledLanes.addAll(
+                    intersectionState.getEnabledLanes().stream().map(laneId -> (int) laneId.getValue()).toList());
         }
         processedSpat.setEnabledLanes(enabledLanes);
 
         // Retrieve all relevant timestamp-based fields to calculate the UTC timestamp
-        Integer spatMoy = spat.getTimeStamp() != null ? (int) spat.getTimeStamp().getValue() : null;
-        Integer intersectionMoy =
-                intersectionState.getMoy() != null ? (int) intersectionState.getMoy().getValue() : null;
-        Integer intersectionDSecond =
-                intersectionState.getTimeStamp() != null ? (int) intersectionState.getTimeStamp().getValue() : null;
+        Long spatMoy = spat.getTimeStamp() != null ? spat.getTimeStamp().getValue() : null;
+        Long intersectionMoy = intersectionState.getMoy() != null ? intersectionState.getMoy().getValue() : null;
+        Long intersectionDSecond =
+                intersectionState.getTimeStamp() != null ? intersectionState.getTimeStamp().getValue() : null;
 
         // Generate the UTC timestamp based on the moy that isn't null and let the function handle the rest
         // If both are null or intersectionDSecond is null, the function will still use the ODE received timestamp to
@@ -169,8 +172,9 @@ public class SpatProcessedJsonConverter
                 for (MovementEvent incomingMovementEvent : signalGroupState.getState_time_speed()) {
                     ProcessedMovementEvent processedMovementEvent = new ProcessedMovementEvent();
                     MovementPhaseState phaseState = incomingMovementEvent.getEventState();
-                    if  (phaseState != null) {
-                        ProcessedMovementPhaseState processedMovementPhaseState = ProcessedMovementPhaseState.fromName(phaseState.getName());
+                    if (phaseState != null) {
+                        ProcessedMovementPhaseState processedMovementPhaseState =
+                                ProcessedMovementPhaseState.fromName(phaseState.getName());
                         processedMovementEvent.setEventState(processedMovementPhaseState);
                     }
 
@@ -222,13 +226,14 @@ public class SpatProcessedJsonConverter
             for (AdvisorySpeed advisorySpeed : advisorySpeedList) {
                 ProcessedAdvisorySpeed processedAdvisorySpeed = new ProcessedAdvisorySpeed();
 
-                Integer speed = advisorySpeed.getSpeed() != null ? (int)advisorySpeed.getSpeed().getValue() : null;
+                Integer speed = advisorySpeed.getSpeed() != null ? (int) advisorySpeed.getSpeed().getValue() : null;
                 processedAdvisorySpeed.setSpeed(speed);
 
-                Integer class_ = advisorySpeed.getClass_() != null ? (int)advisorySpeed.getClass_().getValue() : null;
+                Integer class_ = advisorySpeed.getClass_() != null ? (int) advisorySpeed.getClass_().getValue() : null;
                 processedAdvisorySpeed.setClass_(class_);
 
-                Integer distance = advisorySpeed.getDistance() != null ? (int)advisorySpeed.getDistance().getValue() : null;
+                Integer distance =
+                        advisorySpeed.getDistance() != null ? (int) advisorySpeed.getDistance().getValue() : null;
                 processedAdvisorySpeed.setDistance(distance);
 
                 AdvisorySpeedType advisorySpeedType = advisorySpeed.getType();
@@ -265,7 +270,7 @@ public class SpatProcessedJsonConverter
         return processedSpat;
     }
 
-    public ZonedDateTime generateUTCTimestamp(Integer moy, Integer dSecond, String odeTimestamp) { //
+    public ZonedDateTime generateUTCTimestamp(Long moy, Long dSecond, String odeTimestamp) { //
         // 2022-10-31T15:40:26.687292Z
         ZonedDateTime date = null;
         try {
@@ -273,13 +278,11 @@ public class SpatProcessedJsonConverter
             int year = odeDate.getYear();
             String dateString;
             long milliseconds;
-            if (moy != null) {
-                long minutes = moy;
-                milliseconds = (long) dSecond; // milliseconds in current minute
+            if (moy != null && dSecond != null) {
                 dateString = String.format("%d-01-01T00:00:00.00Z", year);
                 date = Instant.parse(dateString).atZone(ZoneId.of("UTC"));
-                date = date.plusMinutes(minutes);
-                date = date.plus(milliseconds, ChronoUnit.MILLIS);
+                date = date.plusMinutes(moy);
+                date = date.plus(dSecond, ChronoUnit.MILLIS);
             } else {
                 date = odeDate;
                 if (dSecond != null) {
@@ -289,6 +292,7 @@ public class SpatProcessedJsonConverter
                     date = date.plus(milliseconds, ChronoUnit.MILLIS);
                 }
             }
+
 
         } catch (Exception e) {
             String errMsg = String.format("Failed to generateUTCTimestamp - SpatProcessedJsonConverter. Message: %s",
