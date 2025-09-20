@@ -11,7 +11,9 @@ import us.dot.its.jpo.geojsonconverter.pojos.geojson.Point;
 
 /**
  * A point feature representing a processed J2735 SignalRequestMessageFrame.
- * <p>The geometry is the point location of the vehicle that broadcast the SRM</p>
+ * <p>The geometry is the point location of the vehicle that broadcast the SRM.
+ * Note, however, that position is optional in J2735 DF_RequestorDescription, so the geometry
+ * may be null.</p>
  */
 @Generated
 @JsonInclude(JsonInclude.Include.NON_NULL)
