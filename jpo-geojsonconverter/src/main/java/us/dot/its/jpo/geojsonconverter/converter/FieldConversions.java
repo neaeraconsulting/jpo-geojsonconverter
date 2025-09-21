@@ -1,12 +1,14 @@
 package us.dot.its.jpo.geojsonconverter.converter;
 
 
+import lombok.extern.slf4j.Slf4j;
 import us.dot.its.jpo.asn.j2735.r2024.Common.*;
 
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+import java.time.*;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
+@Slf4j
 public class FieldConversions {
     public static Double convertLong(long j2735Long) {
         // Longitude ::= INTEGER (-1799999999..1800000001)
@@ -257,7 +259,7 @@ public class FieldConversions {
      * Millisecond of minute.
      *
      * @param dSecond DE_DSecond
-     * @return milliseconds or null if absent
+     * @return second of minute, and nanosecond of second
      */
     public static SecondNanos convertDSecond(DSecond dSecond) {
         if (dSecond == null) return null;
@@ -288,4 +290,49 @@ public class FieldConversions {
         int offsetMinutes = value - (offsetHours * 60);
         return ZoneOffset.ofHoursMinutes(offsetHours, offsetMinutes);
     }
+
+    /**
+     * Convert Minute of Year to ZonedDateTime.
+     * Requires knowing what year it is.
+     * @param minuteOfTheYear DE_MinuteOfYear
+     * @param year The year
+     * @return ZonedDateTime for the year at the beginning of the minute
+     */
+    public static ZonedDateTime convertMinuteOfYear(final MinuteOfTheYear minuteOfTheYear, final int year) { //
+        if (minuteOfTheYear == null) return null;
+        final long moy = minuteOfTheYear.getValue();
+        final String dateString = String.format("%d-01-01T00:00:00.00Z", year);
+        final ZonedDateTime yearDate = Instant.parse(dateString).atZone(ZoneId.of("UTC"));
+        return yearDate.plusMinutes(moy);
+    }
+
+    public static ZonedDateTime convertMinuteOfYearAndDSecond(final MinuteOfTheYear minuteOfTheYear, final int year, final DSecond dSecond) {
+        ZonedDateTime minuteDate = convertMinuteOfYear(minuteOfTheYear, year);
+        if (minuteDate == null) return null;
+        if (dSecond == null) return minuteDate;
+        SecondNanos secondNanos = convertDSecond(dSecond);
+        if (secondNanos == null) return minuteDate;
+        return minuteDate
+                .withSecond(secondNanos.secondOfMinute())
+                .withNano(secondNanos.nanoOfSecond());
+    }
+
+    public static Integer convertMsgCount(final MsgCount msgCount) {
+        if (msgCount == null) return null;
+        return (int)msgCount.getValue();
+    }
+
+    public static RegionIntersectionId convertIntersectionReferenceID(IntersectionReferenceID intersectionReferenceID) {
+        if (intersectionReferenceID == null) return new RegionIntersectionId(null, null);
+        var region = intersectionReferenceID.getRegion();
+        Integer regionValue = region != null ? (int)region.getValue() : null;
+        var id = intersectionReferenceID.getId();
+        Integer idValue = id != null ? (int)id.getValue() : null;
+        return new RegionIntersectionId(regionValue, idValue);
+    }
+
+    public record RegionIntersectionId(Integer region, Integer intersectionId) {
+
+    }
+
 }
