@@ -3,6 +3,10 @@ package us.dot.its.jpo.geojsonconverter.converter;
 
 import lombok.extern.slf4j.Slf4j;
 import us.dot.its.jpo.asn.j2735.r2024.Common.*;
+import us.dot.its.jpo.geojsonconverter.pojos.common.ProcessedBasicVehicleRole;
+import us.dot.its.jpo.geojsonconverter.pojos.common.ProcessedRequestImportanceLevel;
+import us.dot.its.jpo.geojsonconverter.pojos.common.ProcessedRequestSubRole;
+import us.dot.its.jpo.geojsonconverter.pojos.common.ProcessedVehicleType;
 
 import java.time.*;
 import java.time.temporal.ChronoUnit;
@@ -332,7 +336,71 @@ public class FieldConversions {
     }
 
     public record RegionIntersectionId(Integer region, Integer intersectionId) {
-
     }
+
+    public static String convertVehicleID(final VehicleID vehicleID) {
+        if (vehicleID == null) return null;
+        // CHOICE of EntityID or StationID
+        // EntityID is an Octet string, StationId is an integer
+        // Return a String in either case
+        if (vehicleID.getEntityID() != null) {
+            return vehicleID.getEntityID().getValue();
+        }
+        if (vehicleID.getStationID() != null) {
+            return Long.toString(vehicleID.getStationID().getValue());
+        }
+        return null;
+    }
+
+    public static AccessPointID convertIntersectionAccessPointID(final IntersectionAccessPoint iap) {
+        if (iap == null) return null;
+
+        // CHOICE of LaneID, ConnectionID, or ApproachID
+        Integer laneId = null;
+        Integer approachId = null;
+        Integer connectionId = null;
+        if (iap.getLane() != null) {
+            laneId = (int)iap.getLane().getValue();
+        }
+        if (iap.getApproach() != null) {
+            approachId = (int)iap.getApproach().getValue();
+        }
+        if (iap.getConnection() != null) {
+            connectionId = (int)iap.getConnection().getValue();
+        }
+        return new AccessPointID(laneId, approachId, connectionId);
+    }
+
+    public record AccessPointID(Integer laneID, Integer approachID, Integer connectionID) {
+    }
+
+    public static ProcessedBasicVehicleRole convertBasicVehicleRole(final BasicVehicleRole role) {
+        if (role != null && role.getName() != null) {
+            return ProcessedBasicVehicleRole.fromName(role.getName());
+        }
+        return null;
+    }
+
+    public static ProcessedRequestSubRole convertRequestSubRole(final RequestSubRole role) {
+        if (role != null && role.getName() != null) {
+            return ProcessedRequestSubRole.fromName(role.getName());
+        }
+        return null;
+    }
+
+    public static ProcessedVehicleType convertVehicleType(final VehicleType vehicleType) {
+        if (vehicleType != null && vehicleType.getName() != null) {
+            return ProcessedVehicleType.fromName(vehicleType.getName());
+        }
+        return null;
+    }
+
+    public static ProcessedRequestImportanceLevel convertRequestImportanceLevel(final RequestImportanceLevel importanceLevel) {
+        if (importanceLevel != null && importanceLevel.getName() != null) {
+            return ProcessedRequestImportanceLevel.valueOf(importanceLevel.getName());
+        }
+        return null;
+    }
+
 
 }
