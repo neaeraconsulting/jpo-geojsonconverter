@@ -31,6 +31,7 @@ public class SrmProperties {
 
     // Top-level timestamp of the SRM
     private ZonedDateTime timeStamp;
+    private Integer sequenceNumber;
 
     // Signal Request Package properties
 
