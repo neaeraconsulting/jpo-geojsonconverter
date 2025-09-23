@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import us.dot.its.jpo.asn.j2735.r2024.Common.*;
 import us.dot.its.jpo.asn.j2735.r2024.SignalRequestMessage.*;
 import us.dot.its.jpo.asn.j2735.r2024.SignalStatusMessage.SignalStatusMessageMessageFrame;
+import us.dot.its.jpo.geojsonconverter.pojos.common.ProcessedTransmissionState;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.Point;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.srm.ProcessedSrm;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.srm.SrmProperties;
@@ -14,8 +15,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static us.dot.its.jpo.geojsonconverter.converter.FieldConversions.convertMinuteOfYearAndDSecond;
-import static us.dot.its.jpo.geojsonconverter.converter.FieldConversions.convertMsgCount;
+import static us.dot.its.jpo.geojsonconverter.converter.FieldConversions.*;
 
 @Component
 @Slf4j
@@ -66,13 +66,58 @@ public class SrmConverter {
     private Point processRequestorDescription(final RequestorDescription requestor, SrmProperties props) {
         RequestorPositionVector vector = requestor.getPosition();
 
+        if (vector != null) {
+
+
+            if (vector.getHeading() != null) {
+                props.setHeading(convertHeading(vector.getHeading().getValue()));
+            }
+
+            TransmissionAndSpeed tSpeed = vector.getSpeed();
+            if (tSpeed != null) {
+                Velocity speed = tSpeed.getSpeed();
+                if (speed != null) {
+                    props.setSpeed(convertSpeed(speed.getValue()));
+                }
+                TransmissionState transmission = tSpeed.getTransmisson();
+                if (transmission != null) {
+                    props.setTransmission(ProcessedTransmissionState.fromName(transmission.getName()));
+                }
+            }
+
+            Position3D position = vector.getPosition();
+            if (position != null) {
+                if (position.getLong_() != null) {
+                    props.setLongitude(convertLong(position.getLong_().getValue()));
+                }
+                if (position.getLat() != null) {
+                    props.setLatitude(convertLat(position.getLat().getValue()));
+                }
+                if (position.getElevation() != null) {
+                    props.setElevation(convertElevation(position.getElevation().getValue()));
+                }
+            }
+        }
+
         VehicleID id = requestor.getId();
+        props.setVehicleID(convertVehicleID(id));
+
         DescriptiveName name = requestor.getName();
+        if (name != null) {
+            props.setDescriptiveName(name.getValue());
+        }
         DescriptiveName routeName = requestor.getRouteName();
+
         TransitVehicleOccupancy occupancy = requestor.getTransitOccupancy();
         DeltaTime schedule = requestor.getTransitSchedule();
         TransitVehicleStatus status = requestor.getTransitStatus();
         RequestorType type = requestor.getType();
+
+        if (props.getLongitude() != null && props.getLatitude() != null) {
+            return new Point(props.getLongitude(), props.getLatitude());
+        } else {
+            return null;
+        }
     }
 
     private void processSignalRequestPackage(SignalRequestPackage pkg, SrmProperties props) {
