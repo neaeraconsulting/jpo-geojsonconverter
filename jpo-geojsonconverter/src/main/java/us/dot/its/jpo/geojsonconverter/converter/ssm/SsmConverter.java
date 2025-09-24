@@ -18,7 +18,7 @@ import static us.dot.its.jpo.geojsonconverter.converter.FieldConversions.*;
 @Slf4j
 public class SsmConverter {
 
-    public List<ProcessedSsm> processedSsm(final SignalStatusMessageMessageFrame ssmFrame) {
+    public List<ProcessedSsm> processSsm(final SignalStatusMessageMessageFrame ssmFrame) {
         // We don't know what year it is; assume it is this year.
         var now = ZonedDateTime.now();
         return processSsm(ssmFrame, now.getYear());
