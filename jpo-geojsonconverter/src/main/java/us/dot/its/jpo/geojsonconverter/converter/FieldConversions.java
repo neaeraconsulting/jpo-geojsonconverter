@@ -3,12 +3,14 @@ package us.dot.its.jpo.geojsonconverter.converter;
 
 import lombok.extern.slf4j.Slf4j;
 import us.dot.its.jpo.asn.j2735.r2024.Common.*;
+import us.dot.its.jpo.asn.j2735.r2024.SignalRequestMessage.DeltaTime;
 import us.dot.its.jpo.geojsonconverter.pojos.common.ProcessedBasicVehicleRole;
 import us.dot.its.jpo.geojsonconverter.pojos.common.ProcessedRequestImportanceLevel;
 import us.dot.its.jpo.geojsonconverter.pojos.common.ProcessedRequestSubRole;
 import us.dot.its.jpo.geojsonconverter.pojos.common.ProcessedVehicleType;
 
 import java.time.*;
+import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
@@ -156,6 +158,11 @@ public class FieldConversions {
             returnValue = angle * 0.0125;
         }
         return returnValue;
+    }
+
+    public static Double convertLaneWidth(LaneWidth laneWidth) {
+        if (laneWidth == null) { return null; }
+        return laneWidth.getValue()*1e-2d;
     }
 
     public static Double convertSpeed(long speed) {
@@ -353,7 +360,7 @@ public class FieldConversions {
     }
 
     public static AccessPointID convertIntersectionAccessPointID(final IntersectionAccessPoint iap) {
-        if (iap == null) return null;
+        if (iap == null) return new AccessPointID(null, null, null);
 
         // CHOICE of LaneID, ConnectionID, or ApproachID
         Integer laneId = null;
@@ -400,6 +407,22 @@ public class FieldConversions {
             return ProcessedRequestImportanceLevel.valueOf(importanceLevel.getName());
         }
         return null;
+    }
+
+    /**
+     * DeltaTime ::= INTEGER (-122 .. 121)
+     * -- Supporting a range of +/- 20 minute in steps of 10 seconds
+     * -- the value of -121 shall be used when more than -20 minutes
+     * -- the value of +120 shall be used when more than +20 minutes
+     * -- the value -122 shall be used when the value is unavailable
+     * @param deltaTime The difference from scheduled time
+     * @return Duration in seconds
+     */
+    public static Duration convertDeltaTime(final DeltaTime deltaTime) {
+        if (deltaTime == null) { return null; }
+        long value = (int)deltaTime.getValue();
+        if (value == -122L) { return null; }
+        return Duration.ofSeconds(value * 10);
     }
 
 

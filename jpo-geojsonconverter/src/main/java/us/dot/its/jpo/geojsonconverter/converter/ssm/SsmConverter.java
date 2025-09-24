@@ -73,12 +73,18 @@ public class SsmConverter {
         SignalRequesterInfo requester = pkg.getRequester();
         processRequester(requester, processed);
 
-        IntersectionAccessPoint inboundOn = pkg.getInboundOn();
-        IntersectionAccessPoint outboundOn = pkg.getOutboundOn();
-        processAccessPoints(inboundOn, outboundOn, processed);
+        AccessPointID inbound = convertIntersectionAccessPointID(pkg.getInboundOn());
+        processed.setInboundOnLaneID(inbound.laneID());
+        processed.setInboundOnApproachID(inbound.approachID());
+        processed.setInboundOnLaneConnectionID(inbound.connectionID());
+
+        AccessPointID outbound = convertIntersectionAccessPointID(pkg.getOutboundOn());
+        processed.setOutboundOnLaneID(outbound.laneID());
+        processed.setOutboundOnApproachID(outbound.approachID());
+        processed.setOutboundOnLaneConnectionID(outbound.connectionID());
 
         PrioritizationResponseStatus status = pkg.getStatus();
-        if (status != null && status.getName() != null) {
+        if (status != null) {
             ProcessedPrioritizationResponseStatus processedStatus
                     = ProcessedPrioritizationResponseStatus.fromName(status.getName());
             processed.setStatus(processedStatus);
@@ -107,33 +113,15 @@ public class SsmConverter {
         processRequestorType(requestorType, processed);
     }
 
-    private void processAccessPoints(final IntersectionAccessPoint inboundOn, final IntersectionAccessPoint outboundOn,
-                                     ProcessedSsm processed) {
-        var inbound = convertIntersectionAccessPointID(inboundOn);
-        processed.setInboundOnLaneID(inbound.laneID());
-        processed.setInboundOnApproachID(inbound.approachID());
-        processed.setInboundOnLaneConnectionID(inbound.connectionID());
-
-        var outbound = convertIntersectionAccessPointID(outboundOn);
-        processed.setOutboundOnLaneID(outbound.laneID());
-        processed.setOutboundOnApproachID(outbound.approachID());
-        processed.setOutboundOnLaneConnectionID(outbound.connectionID());
-    }
-
-
 
     private void processETA(final SignalStatusPackage pkg, final ProcessedSsm processed, final int year) {
-        MinuteOfTheYear moy = pkg.getMinute();
-        DSecond dsec = pkg.getSecond();
-        ZonedDateTime ts = convertMinuteOfYearAndDSecond(moy, year, dsec);
+        ZonedDateTime ts = convertMinuteOfYearAndDSecond(pkg.getMinute(), year, pkg.getSecond());
         processed.setEstimatedTimeOfArrival(ts);
         if (pkg.getDuration() != null) {
             Duration duration = Duration.ofMillis(pkg.getDuration().getValue());
             processed.setEstimatedTimeOfArrivalDuration(duration);
         }
     }
-
-
 
     private void processRequestorType(final RequestorType requestorType, final ProcessedSsm processed) {
         // Use this role if top-level role is missing
@@ -146,8 +134,7 @@ public class SsmConverter {
         if (iso != null) {
             processed.setRequesterIso3833VehicleType((int)iso.getValue());
         }
-        RequestImportanceLevel request = requestorType.getRequest();
-        processed.setRequestImportanceLevel(convertRequestImportanceLevel(request));
+        processed.setRequestImportanceLevel(convertRequestImportanceLevel(requestorType.getRequest()));
     }
 
 }

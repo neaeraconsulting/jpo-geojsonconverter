@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import us.dot.its.jpo.geojsonconverter.pojos.common.*;
 
+import java.time.Duration;
 import java.time.ZonedDateTime;
 
 @Data
@@ -29,14 +30,13 @@ public class SrmProperties {
 
     // Payload properties
 
-    // Top-level timestamp of the SRM
+    // Top-level timestamp of the SignalRequestMessage
     private ZonedDateTime timeStamp;
     private Integer sequenceNumber;
 
     // Signal Request Package properties
 
-    // Timestamp of the DF_SignalRequestPackage
-    private ZonedDateTime requestTimeStamp;
+
     private Integer region;
     private Integer intersectionId;
     private Integer requestID;
@@ -73,13 +73,16 @@ public class SrmProperties {
     private ProcessedTransmissionState transmission;
     private Double speed;
 
-    // Descriptive name is optional
-    private String descriptiveName;
-
+    private String name;
+    private String routeName;
     private ProcessedTransitVehicleStatus transitStatus;
     private ProcessedTransitVehicleOccupancy transitOccupancy;
 
     // DE_DeltaTime
-    private Integer transitSchedule;
+    private Duration transitSchedule;
+
+    // Timestamp of the DF_SignalRequestPackage
+    private ZonedDateTime estimatedTimeOfArrival;
+    private Duration estimatedTimeOfArrivalDuration;
 
 }

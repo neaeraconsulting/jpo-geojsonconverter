@@ -4,13 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import us.dot.its.jpo.asn.j2735.r2024.Common.*;
 import us.dot.its.jpo.asn.j2735.r2024.SignalRequestMessage.*;
-import us.dot.its.jpo.asn.j2735.r2024.SignalStatusMessage.SignalStatusMessageMessageFrame;
 import us.dot.its.jpo.geojsonconverter.pojos.common.ProcessedTransmissionState;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.Point;
-import us.dot.its.jpo.geojsonconverter.pojos.geojson.srm.ProcessedSrm;
-import us.dot.its.jpo.geojsonconverter.pojos.geojson.srm.SrmProperties;
-import us.dot.its.jpo.geojsonconverter.pojos.ssm.ProcessedSsm;
+import us.dot.its.jpo.geojsonconverter.pojos.geojson.srm.*;
+import us.dot.its.jpo.geojsonconverter.utils.BitstringUtils;
 
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,8 +53,14 @@ public class SrmConverter {
             var props = new SrmProperties();
             props.setTimeStamp(timeStamp);
             props.setSequenceNumber(sequenceNumber);
-            Point geometry = processRequestorDescription(requestor, props);
-            processSignalRequestPackage(pkg, props);
+            processRequestorDescription(requestor, props);
+            processSignalRequestPackage(pkg, props, year);
+            Point geometry;
+            if (props.getLongitude() != null && props.getLatitude() != null) {
+                geometry = new Point(props.getLongitude(), props.getLatitude());
+            } else {
+                geometry = null;
+            }
             var processed = new ProcessedSrm(geometry, props);
             list.add(processed);
         }
@@ -63,12 +68,40 @@ public class SrmConverter {
         return list;
     }
 
-    private Point processRequestorDescription(final RequestorDescription requestor, SrmProperties props) {
+    private void processRequestorDescription(final RequestorDescription requestor, SrmProperties props) {
         RequestorPositionVector vector = requestor.getPosition();
+        processRequestorPositionVector(vector, props);
 
+        VehicleID id = requestor.getId();
+        props.setVehicleID(convertVehicleID(id));
+
+        DescriptiveName name = requestor.getName();
+        if (name != null) {
+            props.setName(name.getValue());
+        }
+
+        DescriptiveName routeName = requestor.getRouteName();
+        if (routeName != null) {
+            props.setRouteName(routeName.getValue());
+        }
+
+        TransitVehicleOccupancy occupancy = requestor.getTransitOccupancy();
+        if (occupancy != null) {
+            props.setTransitOccupancy(ProcessedTransitVehicleOccupancy.fromName(occupancy.getName()));
+        }
+
+        props.setTransitSchedule(convertDeltaTime(requestor.getTransitSchedule()));
+
+        TransitVehicleStatus status = requestor.getTransitStatus();
+        ProcessedTransitVehicleStatus processedStatus = new ProcessedTransitVehicleStatus();
+        BitstringUtils.processBitstring(processedStatus, status);
+
+        RequestorType type = requestor.getType();
+        processRequestorType(type, props);
+    }
+
+    private void processRequestorPositionVector(RequestorPositionVector vector, SrmProperties props) {
         if (vector != null) {
-
-
             if (vector.getHeading() != null) {
                 props.setHeading(convertHeading(vector.getHeading().getValue()));
             }
@@ -98,31 +131,62 @@ public class SrmConverter {
                 }
             }
         }
+    }
 
-        VehicleID id = requestor.getId();
-        props.setVehicleID(convertVehicleID(id));
+    private void processSignalRequestPackage(final SignalRequestPackage pkg, final SrmProperties props, final int year) {
+        processSignalRequest(pkg.getRequest(), props);
+        processETA(pkg, props, year);
+    }
 
-        DescriptiveName name = requestor.getName();
-        if (name != null) {
-            props.setDescriptiveName(name.getValue());
+    private void processSignalRequest(final SignalRequest request, final SrmProperties props) {
+        if (request == null) return;
+
+        RegionIntersectionId id = convertIntersectionReferenceID(request.getId());
+        props.setRegion(id.region());
+        props.setIntersectionId(id.intersectionId());
+
+        RequestID requestId = request.getRequestID();
+        if (requestId != null) {
+            props.setRequestID((int)requestId.getValue());
         }
-        DescriptiveName routeName = requestor.getRouteName();
 
-        TransitVehicleOccupancy occupancy = requestor.getTransitOccupancy();
-        DeltaTime schedule = requestor.getTransitSchedule();
-        TransitVehicleStatus status = requestor.getTransitStatus();
-        RequestorType type = requestor.getType();
+        PriorityRequestType requestType = request.getRequestType();
+        if (requestType != null) {
+            props.setPriorityRequestType(ProcessedPriorityRequestType.fromName(requestType.getName()));
+        }
 
-        if (props.getLongitude() != null && props.getLatitude() != null) {
-            return new Point(props.getLongitude(), props.getLatitude());
-        } else {
-            return null;
+        AccessPointID inbound = convertIntersectionAccessPointID(request.getInBoundLane());
+        props.setInboundLaneID(inbound.laneID());
+        props.setInboundApproachID(inbound.approachID());
+        props.setInboundLaneConnectionID(inbound.connectionID());
+
+        AccessPointID outbound = convertIntersectionAccessPointID(request.getOutBoundLane());
+        props.setOutboundLaneID(outbound.laneID());
+        props.setOutboundApproachID(outbound.approachID());
+        props.setOutboundLaneConnectionID(outbound.connectionID());
+    }
+
+    private void processETA(final SignalRequestPackage pkg, final SrmProperties props, final int year) {
+        ZonedDateTime ts = convertMinuteOfYearAndDSecond( pkg.getMinute(), year, pkg.getSecond());
+        props.setEstimatedTimeOfArrival(ts);
+        if (pkg.getDuration() != null) {
+            Duration duration = Duration.ofMillis(pkg.getDuration().getValue());
+            props.setEstimatedTimeOfArrivalDuration(duration);
         }
     }
 
-    private void processSignalRequestPackage(SignalRequestPackage pkg, SrmProperties props) {
-
+    private void processRequestorType(RequestorType requestorType, SrmProperties props) {
+        if (requestorType == null) return;
+        props.setRole(convertBasicVehicleRole(requestorType.getRole()));
+        props.setSubrole(convertRequestSubRole(requestorType.getSubrole()));
+        props.setHpmsType(convertVehicleType(requestorType.getHpmsType()));
+        Iso3833VehicleType iso = requestorType.getIso3883();
+        if (iso != null) {
+            props.setIso3833VehicleType((int)iso.getValue());
+        }
+        props.setImportanceLevel(convertRequestImportanceLevel(requestorType.getRequest()));
     }
+
 
 
 }
