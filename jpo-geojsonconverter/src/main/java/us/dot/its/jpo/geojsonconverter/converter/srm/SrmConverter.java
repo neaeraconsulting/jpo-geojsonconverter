@@ -20,25 +20,25 @@ import static us.dot.its.jpo.geojsonconverter.converter.FieldConversions.*;
 @Slf4j
 public class SrmConverter {
 
-    public List<ProcessedSrm> processSrm(final SignalRequestMessageMessageFrame ssmFrame) {
+    public ProcessedSrm processSrm(final SignalRequestMessageMessageFrame ssmFrame) {
         // We don't know what year it is; assume it is this year.
         var now = ZonedDateTime.now();
         return processSrm(ssmFrame, now.getYear());
     }
 
-    public List<ProcessedSrm> processSrm(final SignalRequestMessageMessageFrame srmFrame, final int year) {
+    public ProcessedSrm processSrm(final SignalRequestMessageMessageFrame srmFrame, final int year) {
         var list = new ArrayList<ProcessedSrm>();
 
         if (srmFrame == null) {
             log.error("MessageFrame is null");
-            return list;
+            return null;
         }
 
         SignalRequestMessage srm = srmFrame.getValue();
 
         if (srm == null) {
             log.error("SignalRequestMessage is null");
-            return list;
+            return null;
         }
 
         final Integer sequenceNumber = convertMsgCount(srm.getSequenceNumber());
@@ -47,25 +47,30 @@ public class SrmConverter {
         final ZonedDateTime timeStamp = convertMinuteOfYearAndDSecond(moy, year, dsec);
 
         RequestorDescription requestor = srm.getRequestor();
+        var props = new SrmProperties();
+        processRequestorDescription(requestor, props);
+        props.setTimeStamp(timeStamp);
+        props.setSequenceNumber(sequenceNumber);
 
         SignalRequestList requests = srm.getRequests();
+        List<ProcessedSignalRequest> processedRequests = new ArrayList<>();
         for (SignalRequestPackage pkg : requests) {
-            var props = new SrmProperties();
-            props.setTimeStamp(timeStamp);
-            props.setSequenceNumber(sequenceNumber);
-            processRequestorDescription(requestor, props);
-            processSignalRequestPackage(pkg, props, year);
-            Point geometry;
-            if (props.getLongitude() != null && props.getLatitude() != null) {
-                geometry = new Point(props.getLongitude(), props.getLatitude());
-            } else {
-                geometry = null;
-            }
-            var processed = new ProcessedSrm(geometry, props);
-            list.add(processed);
+            var processedSignalRequest = new ProcessedSignalRequest();
+            processSignalRequestPackage(pkg, processedSignalRequest, year);
+            processedRequests.add(processedSignalRequest);
         }
+        props.setRequests(processedRequests);
 
-        return list;
+        Point geometry;
+        if (props.getLongitude() != null && props.getLatitude() != null) {
+            geometry = new Point(props.getLongitude(), props.getLatitude());
+        } else {
+            geometry = null;
+        }
+        var processed = new ProcessedSrm(geometry, props);
+        list.add(processed);
+
+        return processed;
     }
 
     private void processRequestorDescription(final RequestorDescription requestor, SrmProperties props) {
@@ -134,46 +139,46 @@ public class SrmConverter {
         }
     }
 
-    private void processSignalRequestPackage(final SignalRequestPackage pkg, final SrmProperties props, final int year) {
+    private void processSignalRequestPackage(final SignalRequestPackage pkg, final ProcessedSignalRequest processed, final int year) {
         if (pkg == null) { return; }
-        processSignalRequest(pkg.getRequest(), props);
-        processETA(pkg, props, year);
+        processSignalRequest(pkg.getRequest(), processed);
+        processETA(pkg, processed, year);
     }
 
-    private void processSignalRequest(final SignalRequest request, final SrmProperties props) {
+    private void processSignalRequest(final SignalRequest request, final ProcessedSignalRequest processed) {
         if (request == null) return;
 
         RegionIntersectionId id = convertIntersectionReferenceID(request.getId());
-        props.setRegion(id.region());
-        props.setIntersectionId(id.intersectionId());
+        processed.setRegion(id.region());
+        processed.setIntersectionId(id.intersectionId());
 
         RequestID requestId = request.getRequestID();
         if (requestId != null) {
-            props.setRequestID((int)requestId.getValue());
+            processed.setRequestID((int)requestId.getValue());
         }
 
         PriorityRequestType requestType = request.getRequestType();
         if (requestType != null) {
-            props.setPriorityRequestType(ProcessedPriorityRequestType.fromName(requestType.getName()));
+            processed.setPriorityRequestType(ProcessedPriorityRequestType.fromName(requestType.getName()));
         }
 
         AccessPointID inbound = convertIntersectionAccessPointID(request.getInBoundLane());
-        props.setInboundLaneID(inbound.laneID());
-        props.setInboundApproachID(inbound.approachID());
-        props.setInboundLaneConnectionID(inbound.connectionID());
+        processed.setInboundLaneID(inbound.laneID());
+        processed.setInboundApproachID(inbound.approachID());
+        processed.setInboundLaneConnectionID(inbound.connectionID());
 
         AccessPointID outbound = convertIntersectionAccessPointID(request.getOutBoundLane());
-        props.setOutboundLaneID(outbound.laneID());
-        props.setOutboundApproachID(outbound.approachID());
-        props.setOutboundLaneConnectionID(outbound.connectionID());
+        processed.setOutboundLaneID(outbound.laneID());
+        processed.setOutboundApproachID(outbound.approachID());
+        processed.setOutboundLaneConnectionID(outbound.connectionID());
     }
 
-    private void processETA(final SignalRequestPackage pkg, final SrmProperties props, final int year) {
+    private void processETA(final SignalRequestPackage pkg, final ProcessedSignalRequest processed, final int year) {
         ZonedDateTime ts = convertMinuteOfYearAndDSecond( pkg.getMinute(), year, pkg.getSecond());
-        props.setEstimatedTimeOfArrival(ts);
+        processed.setEstimatedTimeOfArrival(ts);
         if (pkg.getDuration() != null) {
             Duration duration = Duration.ofMillis(pkg.getDuration().getValue());
-            props.setEstimatedTimeOfArrivalDuration(duration);
+            processed.setEstimatedTimeOfArrivalDuration(duration);
         }
     }
 

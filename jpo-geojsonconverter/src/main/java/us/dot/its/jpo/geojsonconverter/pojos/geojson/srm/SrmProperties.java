@@ -11,6 +11,7 @@ import us.dot.its.jpo.geojsonconverter.pojos.common.*;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -33,26 +34,6 @@ public class SrmProperties {
     // Top-level timestamp of the SignalRequestMessage
     private ZonedDateTime timeStamp;
     private Integer sequenceNumber;
-
-    // Signal Request Package properties
-
-
-    private Integer region;
-    private Integer intersectionId;
-    private Integer requestID;
-    private ProcessedPriorityRequestType priorityRequestType;
-
-    // Intersection Access Point may be either LaneID, ApproachID, or LaneConnectionID
-
-    // Inbound access point is required
-    private Integer inboundLaneID;
-    private Integer inboundApproachID;
-    private Integer inboundLaneConnectionID;
-
-    // Outbound access point is optional
-    private Integer outboundLaneID;
-    private Integer outboundApproachID;
-    private Integer outboundLaneConnectionID;
 
     // Fields from DF_RequestorDescription
     // VehicleID is required.  It may be a TemporaryID or StationID.
@@ -81,8 +62,6 @@ public class SrmProperties {
     // DE_DeltaTime
     private Duration transitSchedule;
 
-    // Timestamp of the DF_SignalRequestPackage
-    private ZonedDateTime estimatedTimeOfArrival;
-    private Duration estimatedTimeOfArrivalDuration;
+    private List<ProcessedSignalRequest> requests;
 
 }

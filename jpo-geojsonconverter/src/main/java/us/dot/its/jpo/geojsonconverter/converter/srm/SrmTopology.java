@@ -48,7 +48,7 @@ public class SrmTopology {
                     }
                     return rawMessageFrame;
                 })
-                .flatMap(new SrmTransformer(converter))
+                .map(new SrmTransformer(converter))
                 .to(srmProcessedJsonTopic,
                         Produced.with(RsuIntersectionKey(),
                                 JsonSerdes.ProcessedSrm(),
