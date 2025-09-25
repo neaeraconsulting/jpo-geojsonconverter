@@ -49,7 +49,7 @@ public class SsmTopology {
                     }
                     return rawMessageFrame;
                 })
-                .flatMap(new SsmTransformer(converter))
+                .map(new SsmTransformer(converter))
                 .to(ssmProcessedJsonTopic,
                     Produced.with(
                         RsuIntersectionKey(),

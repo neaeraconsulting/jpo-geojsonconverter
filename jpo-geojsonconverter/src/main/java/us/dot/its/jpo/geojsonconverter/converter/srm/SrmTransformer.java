@@ -17,6 +17,7 @@ import us.dot.its.jpo.ode.model.OdeMessageFramePayload;
 
 import java.time.Instant;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.*;
 
@@ -49,8 +50,18 @@ public class SrmTransformer
                 OdeMessageFrameMetadata metadata = rawValue.getMetadata();
                 OdeMessageFramePayload payload = rawValue.getPayload();
                 SignalRequestMessageMessageFrame ssmMessageFrame = (SignalRequestMessageMessageFrame)payload.getData();
-                JsonValidatorResult validationResults = rawSrm.getValidationResults();
-                return createProcessedSrm(ssmMessageFrame, metadata, validationResults);
+                KeyValue<RsuVehicleIdKey, ProcessedSrm> processedSrm = createProcessedSrm(ssmMessageFrame, metadata);
+                converter.jsonValidation(processedSrm.value.getProperties(), rawSrm.getValidationResults());
+                return processedSrm;
+            } else {
+                var processed = new ProcessedSrm(null, new SrmProperties());
+                ZonedDateTime utcDateTime = ZonedDateTime.now(ZoneOffset.UTC);
+                processed.getProperties().setOdeReceivedAt(utcDateTime);
+                converter.jsonValidation(processed.getProperties(), rawSrm.getValidationResults());
+                processed.getProperties().addValidationMessage(rawSrm.getFailedMessage());
+                RsuVehicleIdKey key = new RsuVehicleIdKey();
+                key.setRsuId("ERROR");
+                return KeyValue.pair(key, processed);
             }
         } catch (Exception e) {
             log.error("Error converting SRM to Processed SRM", e);
@@ -61,14 +72,12 @@ public class SrmTransformer
     }
 
     private KeyValue<RsuVehicleIdKey, ProcessedSrm> createProcessedSrm(
-            SignalRequestMessageMessageFrame srm, OdeMessageFrameMetadata metadata, JsonValidatorResult validationResults) {
+            SignalRequestMessageMessageFrame srm, OdeMessageFrameMetadata metadata) {
         final ZonedDateTime odeReceivedAt = Instant.parse(metadata.getOdeReceivedAt()).atZone(ZoneId.of("UTC"));
         final int year = odeReceivedAt.getYear();
 
         // Process message frame
         ProcessedSrm processedSrm =  converter.processSrm(srm, year);
-
-        List<KeyValue<RsuIntersectionKey, ProcessedSrm>> keyValueList = new ArrayList<>();
 
         // Add metadata
         SrmProperties properties = processedSrm.getProperties();

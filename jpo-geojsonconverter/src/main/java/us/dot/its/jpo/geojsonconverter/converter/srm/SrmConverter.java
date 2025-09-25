@@ -1,17 +1,22 @@
 package us.dot.its.jpo.geojsonconverter.converter.srm;
 
+import com.networknt.schema.ValidationMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import us.dot.its.jpo.asn.j2735.r2024.Common.*;
 import us.dot.its.jpo.asn.j2735.r2024.SignalRequestMessage.*;
+import us.dot.its.jpo.geojsonconverter.pojos.ProcessedValidationMessage;
 import us.dot.its.jpo.geojsonconverter.pojos.common.ProcessedTransmissionState;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.Point;
+import us.dot.its.jpo.geojsonconverter.pojos.geojson.rtcm.RTCMProperties;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.srm.*;
 import us.dot.its.jpo.geojsonconverter.utils.BitstringUtils;
+import us.dot.its.jpo.geojsonconverter.validator.JsonValidatorResult;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static us.dot.its.jpo.geojsonconverter.converter.FieldConversions.*;
@@ -194,6 +199,27 @@ public class SrmConverter {
         props.setImportanceLevel(convertRequestImportanceLevel(requestorType.getRequest()));
     }
 
-
+    /**
+     * Add JSON schema validation results for J2735 and Metadata validation.
+     * @param properties The properties to add validation messages to
+     * @param validatorResult the schema validator result
+     */
+    public void jsonValidation(SrmProperties properties, JsonValidatorResult validatorResult) {
+        var messages = new ArrayList<ProcessedValidationMessage>();
+        for (Exception exception : validatorResult.getExceptions()) {
+            var msg = new ProcessedValidationMessage();
+            msg.setMessage(exception.getMessage());
+            msg.setException(Arrays.toString(exception.getStackTrace()));
+            messages.add(msg);
+        }
+        for (ValidationMessage vm : validatorResult.getValidationMessages()) {
+            var msg = new ProcessedValidationMessage();
+            msg.setMessage(vm.getMessage());
+            msg.setSchemaPath(vm.getSchemaPath());
+            msg.setJsonPath(vm.getPath());
+            messages.add(msg);
+        }
+        properties.addValidationMessages(messages);
+    }
 
 }

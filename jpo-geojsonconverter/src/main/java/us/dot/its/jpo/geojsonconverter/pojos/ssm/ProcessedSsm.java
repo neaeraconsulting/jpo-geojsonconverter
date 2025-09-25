@@ -11,6 +11,7 @@ import us.dot.its.jpo.geojsonconverter.pojos.common.*;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -33,7 +34,6 @@ public class ProcessedSsm {
     private int schemaVersion = -1;
     private final String messageType = "SSM";
     private String asn1;
-    private List<ProcessedValidationMessage> validationMessages;
 
     // ------------------------------------------------------------------------
     // Metadata from the ODE header
@@ -70,4 +70,31 @@ public class ProcessedSsm {
     private Integer intersectionId;
 
     private List<ProcessedSignalStatus> statusList;
+
+    /* -----------------------------------------------------------------------
+        Validation
+    ------------------------------------------------------------------------*/
+    private List<ProcessedValidationMessage> validationMessages = new ArrayList<>();
+
+    private boolean cti4501Conformant = true;
+
+    public void addValidationMessage(ProcessedValidationMessage message) {
+        if (validationMessages == null) {
+            validationMessages = new ArrayList<ProcessedValidationMessage>();
+        }
+        validationMessages.add(message);
+    }
+
+    public void addValidationMessages(List<ProcessedValidationMessage> messages) {
+        if (validationMessages == null) {
+            validationMessages = new ArrayList<>();
+        }
+        validationMessages.addAll(messages);
+    }
+
+    public void addValidationMessage(String message) {
+        var validationMessage = new ProcessedValidationMessage();
+        validationMessage.setMessage(message);
+        addValidationMessage(validationMessage);
+    }
 }
