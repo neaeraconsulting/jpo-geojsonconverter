@@ -1,11 +1,11 @@
 package us.dot.its.jpo.geojsonconverter.converter.srm;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.kstream.KeyValueMapper;
 import us.dot.its.jpo.asn.j2735.r2024.SignalRequestMessage.SignalRequestMessageMessageFrame;
 import us.dot.its.jpo.geojsonconverter.partitioner.RsuIntersectionKey;
+import us.dot.its.jpo.geojsonconverter.partitioner.RsuVehicleIdKey;
 import us.dot.its.jpo.geojsonconverter.pojos.common.DeserializedRawMessageFrame;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.srm.ProcessedSrm;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.srm.SrmProperties;
@@ -20,9 +20,20 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
 
+/**
+ * KeyValueMapper that converts a keyless stream of SRM MessageFrames to a Key-Value Pair.
+ * <dl>
+ *     <dh>Key</dh>
+ *     <dd>RsuVehicleIdKey - The key contains the RSU ID and Vehicle ID. Note we don't use
+ *     IntersectionId/Region in the key, because in the most general case a ProcessedSrm7 can have
+ *     multiple requests with different IntersectionIDs</dd>
+ *     <dh>Value</dh>
+ *     <dd>A {@link ProcessedSrm}</dd>
+ * </dl>>
+ */
 @Slf4j
 public class SrmTransformer
-    implements KeyValueMapper<Void, DeserializedRawMessageFrame, KeyValue<RsuIntersectionKey, ProcessedSrm>> {
+    implements KeyValueMapper<Void, DeserializedRawMessageFrame, KeyValue<RsuVehicleIdKey, ProcessedSrm>> {
 
     private final SrmConverter converter;
 
@@ -31,7 +42,7 @@ public class SrmTransformer
     }
 
     @Override
-    public KeyValue<RsuIntersectionKey, ProcessedSrm> apply(Void rawKey, DeserializedRawMessageFrame rawSrm) {
+    public KeyValue<RsuVehicleIdKey, ProcessedSrm> apply(Void rawKey, DeserializedRawMessageFrame rawSrm) {
         try {
             if (!rawSrm.isValidationFailure()) {
                 OdeMessageFrameData rawValue = rawSrm.getOdeMessageFrameData();
@@ -44,10 +55,12 @@ public class SrmTransformer
         } catch (Exception e) {
             log.error("Error converting SRM to Processed SRM", e);
         }
-        return new ArrayList<>();
+        var key = new RsuVehicleIdKey();
+        key.setRsuId("ERROR");
+        return KeyValue.pair(key, null);
     }
 
-    private KeyValue<RsuIntersectionKey, ProcessedSrm> createProcessedSrm(
+    private KeyValue<RsuVehicleIdKey, ProcessedSrm> createProcessedSrm(
             SignalRequestMessageMessageFrame srm, OdeMessageFrameMetadata metadata, JsonValidatorResult validationResults) {
         final ZonedDateTime odeReceivedAt = Instant.parse(metadata.getOdeReceivedAt()).atZone(ZoneId.of("UTC"));
         final int year = odeReceivedAt.getYear();
@@ -65,30 +78,9 @@ public class SrmTransformer
         properties.setOriginIp(originIp);
         properties.setSchemaVersion(ProcessedSchemaVersions.PROCESSED_SSM_SCHEMA_VERSION);
 
-        var requests = properties.getRequests();
-        RsuIntersectionKey key = null;
-        if (requests != null && !requests.isEmpty()) {
-            SortedSet<RsuIntersectionKey> keySet = new TreeSet<>();
-            requests.forEach(request ->
-                    keySet.add(
-                            new RsuIntersectionKey(
-                                    originIp,
-                                    request.getIntersectionId(),
-                                    request.getRegion())));
-
-            key = keySet.first();
-
-            // Warn if the requests are for more than one intersection
-            if (keySet.size() > 1) {
-                log.warn("The ProcessedSrm contains requests for more than one intersection: {}.  " +
-                        "Using {} as the topic key.  Topologies that consume this topic will need to repartition  to" +
-                        "perform intersection-based joins.", StringUtils.join(keySet, ", "), key);
-            }
-        } else {
-            key = new RsuIntersectionKey();
-            key.setRsuId(originIp);
-            log.warn("The ProcessedSrm has no requests {}", processedSrm);
-        }
+        // Note we don't use IntersectionId/Region in the key, because in the most general case the ProcessedSrm have
+        // multiple requests with different IntersectionIDs
+        RsuVehicleIdKey key = new RsuVehicleIdKey(properties.getOriginIp(), properties.getVehicleID());
 
        return new KeyValue<>(key, processedSrm);
     }

@@ -14,9 +14,11 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 /**
- * A processed J2735 SignalStatusMessage.
- * <p>Similar to a SPAT, the SSM is associated with an intersection, but does not contain geographic information
- * itself.</p>
+ * A Java object representing a processed J2735 MSG_SignalStatusMessage.
+ * <p>The SSM may contain responses to multiple requests from multiple vehicles.</p>
+ * <p>Similar to a SPAT, the SSM is associated with an intersection, but does not contain any geographic information
+ * itself, therefore this is a plain Java object, not a GeoJSON object.  It must be matched with a corresponding MAP
+ * message to find the intersection location.</p>
  */
 @Data
 @NoArgsConstructor

@@ -10,10 +10,13 @@ import us.dot.its.jpo.geojsonconverter.pojos.geojson.BaseFeature;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.Point;
 
 /**
- * A point feature representing a processed J2735 SignalRequestMessageFrame.
- * <p>The geometry is the point location of the vehicle that broadcast the SRM.
- * Note, however, that position is optional in J2735 DF_RequestorDescription, so the geometry
+ * A point feature representing a processed J2735 MSG_SignalRequestMessage.
+ * <p>Similar to BSMs, the geometry is the point location of the vehicle that broadcast the SRM.</p>
+ * <p>But note that unlike BSMs, the position is optional in J2735 DF_RequestorDescription, so the geometry
  * may be null.</p>
+ * <p>The SRM may contain multiple requests that may represent multiple lane connections of the
+ * same intersection, or multiple intersections.  These are represented by a list of
+ * {@link ProcessedSignalRequest}s in the {@link SrmProperties}</p>
  */
 @Generated
 @JsonInclude(JsonInclude.Include.NON_NULL)

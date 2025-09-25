@@ -7,8 +7,8 @@ import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.Produced;
-import us.dot.its.jpo.geojsonconverter.partitioner.IntersectionIdPartitioner;
-import us.dot.its.jpo.geojsonconverter.partitioner.RsuIntersectionKey;
+import us.dot.its.jpo.geojsonconverter.partitioner.RsuIdPartitioner;
+import us.dot.its.jpo.geojsonconverter.partitioner.RsuVehicleIdKey;
 import us.dot.its.jpo.geojsonconverter.pojos.common.DeserializedRawMessageFrame;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.srm.ProcessedSrm;
 import us.dot.its.jpo.geojsonconverter.serialization.JsonSerdes;
@@ -16,7 +16,7 @@ import us.dot.its.jpo.geojsonconverter.validator.JsonValidatorResult;
 import us.dot.its.jpo.geojsonconverter.validator.SrmJsonValidator;
 
 import static us.dot.its.jpo.geojsonconverter.serialization.JsonSerdes.OdeMessageFrame;
-import static us.dot.its.jpo.geojsonconverter.serialization.JsonSerdes.RsuIntersectionKey;
+import static us.dot.its.jpo.geojsonconverter.serialization.JsonSerdes.RsuVehicleIdKey;
 
 @Slf4j
 public class SrmTopology {
@@ -50,9 +50,9 @@ public class SrmTopology {
                 })
                 .map(new SrmTransformer(converter))
                 .to(srmProcessedJsonTopic,
-                        Produced.with(RsuIntersectionKey(),
+                        Produced.with(RsuVehicleIdKey(),
                                 JsonSerdes.ProcessedSrm(),
-                                new IntersectionIdPartitioner<RsuIntersectionKey, ProcessedSrm>()));
+                                new RsuIdPartitioner<RsuVehicleIdKey, ProcessedSrm>()));
         return builder.build();
     }
 }
