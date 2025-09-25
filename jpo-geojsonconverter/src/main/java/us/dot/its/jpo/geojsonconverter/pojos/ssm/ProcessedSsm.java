@@ -19,6 +19,9 @@ import java.util.List;
  * <p>Similar to a SPAT, the SSM is associated with an intersection, but does not contain any geographic information
  * itself, therefore this is a plain Java object, not a GeoJSON object.  It must be matched with a corresponding MAP
  * message to find the intersection location.</p>
+ * <p>It is possible, in theory, for an SSM to contain SignalRequests for more than one intersection, but that
+ * scenario is not supported by this library.  If an SSM containing multiple intersection were received, all but the
+ * first one would be discarded by the converter (similar to the behavior for SPATs).</p>
  */
 @Data
 @NoArgsConstructor
@@ -66,35 +69,5 @@ public class ProcessedSsm {
      */
     private Integer intersectionId;
 
-    // Fields from DF_SignalRequesterInfo
-    private String vehicleID;
-    private Integer requestID;
-    private Integer requesterSequenceNumber;
-    private ProcessedBasicVehicleRole requesterRole;
-    private ProcessedRequestSubRole requesterSubrole;
-    private ProcessedRequestImportanceLevel requestImportanceLevel;
-    private Integer requesterIso3833VehicleType;
-    private ProcessedVehicleType requesterHpmsType;
-
-    // Fields from inboundOn IntersectionAccessPoint
-    private Integer inboundOnLaneID;
-    private Integer inboundOnApproachID;
-    private Integer inboundOnLaneConnectionID;
-
-    // Fields from outboundOn IntersectionAccessPoint
-    private Integer outboundOnLaneID;
-    private Integer outboundOnApproachID;
-    private Integer outboundOnLaneConnectionID;
-
-    /**
-     * ETA from the SignalStatusPackage MinuteOfYear and second/DSecond fields
-     */
-    private ZonedDateTime estimatedTimeOfArrival;
-
-    /**
-     * From DF_SignalStatusPackage.duration
-     */
-    private Duration estimatedTimeOfArrivalDuration;
-
-    private ProcessedPrioritizationResponseStatus status;
+    private List<ProcessedSignalStatus> statusList;
 }

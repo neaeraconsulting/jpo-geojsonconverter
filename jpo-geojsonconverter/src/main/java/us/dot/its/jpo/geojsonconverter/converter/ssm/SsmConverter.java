@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import us.dot.its.jpo.asn.j2735.r2024.Common.*;
 import us.dot.its.jpo.asn.j2735.r2024.SignalStatusMessage.*;
 import us.dot.its.jpo.geojsonconverter.pojos.common.ProcessedPrioritizationResponseStatus;
+import us.dot.its.jpo.geojsonconverter.pojos.ssm.ProcessedSignalStatus;
 import us.dot.its.jpo.geojsonconverter.pojos.ssm.ProcessedSsm;
 
 import java.time.Duration;
@@ -18,57 +19,79 @@ import static us.dot.its.jpo.geojsonconverter.converter.FieldConversions.*;
 @Slf4j
 public class SsmConverter {
 
-    public List<ProcessedSsm> processSsm(final SignalStatusMessageMessageFrame ssmFrame) {
+    public ProcessedSsm processSsm(final SignalStatusMessageMessageFrame ssmFrame) {
         // We don't know what year it is; assume it is this year.
         var now = ZonedDateTime.now();
         return processSsm(ssmFrame, now.getYear());
     }
 
-    public List<ProcessedSsm> processSsm(final SignalStatusMessageMessageFrame ssmFrame, final int year) {
-        var list = new ArrayList<ProcessedSsm>();
-
-
+    public ProcessedSsm processSsm(final SignalStatusMessageMessageFrame ssmFrame, final int year) {
         if (ssmFrame == null) {
             log.error("SSM Message Frame is null");
-            return list;
+            return null;
         }
 
         SignalStatusMessage ssm = ssmFrame.getValue();
 
         if (ssm == null) {
             log.error("SignalStatusMessage is null");
-            return list;
+            return null;
         }
 
+        ProcessedSsm processedSsm = new ProcessedSsm();
+
         final Integer sequenceNumber = convertMsgCount(ssm.getSequenceNumber());
+        processedSsm.setSequenceNumber(sequenceNumber);
 
         MinuteOfTheYear moy = ssm.getTimeStamp();
         DSecond dsec = ssm.getSecond();
         final ZonedDateTime timeStamp = convertMinuteOfYearAndDSecond(moy, year, dsec);
+        processedSsm.setTimeStamp(timeStamp);
 
         SignalStatusList sslist = ssm.getStatus();
-        if (sslist == null) return list;
-        for (var status : sslist) {
-            final Integer statusSequenceNumber = convertMsgCount(status.getSequenceNumber());
-            final RegionIntersectionId regInt = convertIntersectionReferenceID(status.getId());
-            SignalStatusPackageList packageList = status.getSigStatus();
-            if (packageList == null) continue;
-            for (SignalStatusPackage pkg : packageList) {
-                var processed = new ProcessedSsm();
-                processed.setSequenceNumber(sequenceNumber);
-                processed.setTimeStamp(timeStamp);
-                processed.setStatusSequenceNumber(statusSequenceNumber);
-                processed.setRegion(regInt.region());
-                processed.setIntersectionId(regInt.intersectionId());
-                processSignalStatusPackage(pkg, processed,year);
-                list.add(processed);
-            }
+        if (sslist == null) {
+            log.error("SignalStatusList is null");
+            return processedSsm;
         }
-        return list;
+
+        if (sslist.size() > 0) {
+            SignalStatus signalStatus = sslist.getFirst();
+            final Integer statusSequenceNumber = convertMsgCount(signalStatus.getSequenceNumber());
+            final RegionIntersectionId regInt = convertIntersectionReferenceID(signalStatus.getId());
+
+            processedSsm.setStatusSequenceNumber(statusSequenceNumber);
+            processedSsm.setRegion(regInt.region());
+            processedSsm.setIntersectionId(regInt.intersectionId());
+
+            SignalStatusPackageList packageList = signalStatus.getSigStatus();
+            if (packageList == null) {
+                log.error("SignalStatusPackageList is null");
+                return processedSsm;
+            }
+
+            List<ProcessedSignalStatus> processedSignalStatusList = new ArrayList<>();
+            for (SignalStatusPackage pkg : packageList) {
+                var processed = new ProcessedSignalStatus();
+                processSignalStatusPackage(pkg, processed, year);
+                processedSignalStatusList.add(processed);
+            }
+            processedSsm.setStatusList(processedSignalStatusList);
+
+            // Warn if more than one intersection in SSM
+            if (sslist.size() > 1) {
+                log.warn("There is more than one intersection in the SSM.  This is unsupported.  The ProcessedSsm only " +
+                        "contains the first intersection: {}", ssmFrame);
+            }
+        } else {
+            // Abnormal case: no intersections
+            log.error("The SignalStatusList is empty");
+        }
+
+        return processedSsm;
     }
 
 
-    private void processSignalStatusPackage(final SignalStatusPackage pkg, final ProcessedSsm processed, final int year) {
+    private void processSignalStatusPackage(final SignalStatusPackage pkg, final ProcessedSignalStatus processed, final int year) {
         if (pkg == null) { return; }
         SignalRequesterInfo requester = pkg.getRequester();
         processRequester(requester, processed);
@@ -95,7 +118,7 @@ public class SsmConverter {
 
     }
 
-    private void processRequester(final SignalRequesterInfo requester, final ProcessedSsm processed) {
+    private void processRequester(final SignalRequesterInfo requester, final ProcessedSignalStatus processed) {
         if (requester == null) { return; }
         VehicleID vehicleId = requester.getId();
         processed.setVehicleID(convertVehicleID(vehicleId));
@@ -115,7 +138,7 @@ public class SsmConverter {
     }
 
 
-    private void processETA(final SignalStatusPackage pkg, final ProcessedSsm processed, final int year) {
+    private void processETA(final SignalStatusPackage pkg, final ProcessedSignalStatus processed, final int year) {
         if (pkg == null) { return; }
         ZonedDateTime ts = convertMinuteOfYearAndDSecond(pkg.getMinute(), year, pkg.getSecond());
         processed.setEstimatedTimeOfArrival(ts);
@@ -125,7 +148,7 @@ public class SsmConverter {
         }
     }
 
-    private void processRequestorType(final RequestorType requestorType, final ProcessedSsm processed) {
+    private void processRequestorType(final RequestorType requestorType, final ProcessedSignalStatus processed) {
         // Use this role if top-level role is missing
         if (requestorType == null) { return; }
         if (processed.getRequesterRole() == null) {

@@ -14,8 +14,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.runners.Parameterized.Parameters;
 import static org.junit.runners.Parameterized.Parameter;
 
@@ -36,9 +35,10 @@ public class SsmConverterTest {
         SsmConverter ssmConverter = new SsmConverter();
         SignalStatusMessageMessageFrame messageFrame =
                 mapper.readValue(ssmJson, SignalStatusMessageMessageFrame.class);
-        List<ProcessedSsm> processedSsm = ssmConverter.processSsm(messageFrame);
+        ProcessedSsm processedSsm = ssmConverter.processSsm(messageFrame);
         assertThat(processedSsm, notNullValue());
-        assertThat(processedSsm.size(), equalTo(expectNumberOfRequests));
+        assertThat(processedSsm, hasProperty("statusList", notNullValue()));
+        assertThat(processedSsm.getStatusList(), hasSize(equalTo(expectNumberOfRequests)));
     }
 
     @Parameters
