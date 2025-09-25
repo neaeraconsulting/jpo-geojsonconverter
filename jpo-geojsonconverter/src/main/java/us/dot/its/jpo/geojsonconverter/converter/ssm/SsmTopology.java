@@ -3,11 +3,9 @@ package us.dot.its.jpo.geojsonconverter.converter.ssm;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.common.utils.Bytes;
-import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.Consumed;
-import org.apache.kafka.streams.kstream.KeyValueMapper;
 import org.apache.kafka.streams.kstream.Produced;
 import us.dot.its.jpo.geojsonconverter.partitioner.IntersectionIdPartitioner;
 import us.dot.its.jpo.geojsonconverter.partitioner.RsuIntersectionKey;
@@ -26,7 +24,8 @@ public class SsmTopology {
     public static Topology build(
             String ssmOdeJsonTopic,
             String ssmProcessedJsonTopic,
-            SsmJsonValidator ssmJsonValidator) {
+            SsmJsonValidator ssmJsonValidator,
+            SsmConverter converter) {
         var builder = new StreamsBuilder();
         var rawOdeSsmStream = builder.stream(ssmOdeJsonTopic, Consumed.with(Serdes.Void(), Serdes.Bytes()));
         var validatedOdeSsmStream = rawOdeSsmStream.mapValues((Void key, Bytes value) -> {
@@ -49,7 +48,7 @@ public class SsmTopology {
         });
 
         var processedSsmStream =
-                validatedOdeSsmStream.flatMap(new SsmTransformer());
+                validatedOdeSsmStream.flatMap(new SsmTransformer(converter));
 
         processedSsmStream.to(ssmProcessedJsonTopic,
                 Produced.with(

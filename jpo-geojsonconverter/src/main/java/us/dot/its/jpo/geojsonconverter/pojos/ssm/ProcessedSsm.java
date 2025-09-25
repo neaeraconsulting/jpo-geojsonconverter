@@ -6,10 +6,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Generated;
 import lombok.NoArgsConstructor;
+import us.dot.its.jpo.geojsonconverter.pojos.ProcessedValidationMessage;
 import us.dot.its.jpo.geojsonconverter.pojos.common.*;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
+import java.util.List;
 
 /**
  * A processed J2735 SignalStatusMessage.
@@ -25,12 +27,14 @@ import java.time.ZonedDateTime;
 public class ProcessedSsm {
     private int schemaVersion = -1;
     private final String messageType = "SSM";
+    private String asn1;
+    private List<ProcessedValidationMessage> validationMessages;
 
     // ------------------------------------------------------------------------
     // Metadata from the ODE header
     private ZonedDateTime odeReceivedAt;
     private String originIp;
-    private String asn1;
+
 
     // ------------------------------------------------------------------------
     // Data from the MessageFrame payload
