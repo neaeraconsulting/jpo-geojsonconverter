@@ -20,7 +20,7 @@ import static us.dot.its.jpo.geojsonconverter.converter.FieldConversions.*;
 @Slf4j
 public class SrmConverter {
 
-    public List<ProcessedSrm> processedSsm(final SignalRequestMessageMessageFrame ssmFrame) {
+    public List<ProcessedSrm> processSrm(final SignalRequestMessageMessageFrame ssmFrame) {
         // We don't know what year it is; assume it is this year.
         var now = ZonedDateTime.now();
         return processSrm(ssmFrame, now.getYear());
@@ -69,6 +69,7 @@ public class SrmConverter {
     }
 
     private void processRequestorDescription(final RequestorDescription requestor, SrmProperties props) {
+        if (requestor == null) { return; }
         RequestorPositionVector vector = requestor.getPosition();
         processRequestorPositionVector(vector, props);
 
@@ -134,6 +135,7 @@ public class SrmConverter {
     }
 
     private void processSignalRequestPackage(final SignalRequestPackage pkg, final SrmProperties props, final int year) {
+        if (pkg == null) { return; }
         processSignalRequest(pkg.getRequest(), props);
         processETA(pkg, props, year);
     }

@@ -69,7 +69,7 @@ public class SsmConverter {
 
 
     private void processSignalStatusPackage(final SignalStatusPackage pkg, final ProcessedSsm processed, final int year) {
-
+        if (pkg == null) { return; }
         SignalRequesterInfo requester = pkg.getRequester();
         processRequester(requester, processed);
 
@@ -96,6 +96,7 @@ public class SsmConverter {
     }
 
     private void processRequester(final SignalRequesterInfo requester, final ProcessedSsm processed) {
+        if (requester == null) { return; }
         VehicleID vehicleId = requester.getId();
         processed.setVehicleID(convertVehicleID(vehicleId));
 
@@ -115,6 +116,7 @@ public class SsmConverter {
 
 
     private void processETA(final SignalStatusPackage pkg, final ProcessedSsm processed, final int year) {
+        if (pkg == null) { return; }
         ZonedDateTime ts = convertMinuteOfYearAndDSecond(pkg.getMinute(), year, pkg.getSecond());
         processed.setEstimatedTimeOfArrival(ts);
         if (pkg.getDuration() != null) {
@@ -125,6 +127,7 @@ public class SsmConverter {
 
     private void processRequestorType(final RequestorType requestorType, final ProcessedSsm processed) {
         // Use this role if top-level role is missing
+        if (requestorType == null) { return; }
         if (processed.getRequesterRole() == null) {
             processed.setRequesterRole(convertBasicVehicleRole(requestorType.getRole()));
         }
