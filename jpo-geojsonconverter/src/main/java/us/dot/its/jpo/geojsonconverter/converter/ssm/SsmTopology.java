@@ -27,31 +27,31 @@ public class SsmTopology {
             SsmJsonValidator ssmJsonValidator,
             SsmConverter converter) {
         var builder = new StreamsBuilder();
-        var rawOdeSsmStream = builder.stream(ssmOdeJsonTopic, Consumed.with(Serdes.Void(), Serdes.Bytes()));
-        var validatedOdeSsmStream = rawOdeSsmStream.mapValues((Void key, Bytes value) -> {
-            var rawMessageFrame = new DeserializedRawMessageFrame();
-            try (var serdes = OdeMessageFrame()) {
-                JsonValidatorResult validationResults = ssmJsonValidator.validate(value.get());
-                rawMessageFrame.setOdeMessageFrameData(
-                        serdes.deserializer().deserialize(ssmOdeJsonTopic, value.get()));
-                rawMessageFrame.setValidationResults(validationResults);
-                log.debug(validationResults.describeResults());
-            } catch (Exception e) {
-                JsonValidatorResult validatorResult = new JsonValidatorResult();
-                validatorResult.addException(e);
-                rawMessageFrame.setValidationResults(validatorResult);
-                rawMessageFrame.setValidationFailure(true);
-                rawMessageFrame.setFailedMessage(e.getMessage());
-                log.error("Error in SSM validation: ", e);
-            }
-            return rawMessageFrame;
-        });
 
-        var processedSsmStream =
-                validatedOdeSsmStream.flatMap(new SsmTransformer(converter));
-
-        processedSsmStream.to(ssmProcessedJsonTopic,
-                Produced.with(
+        builder
+                .stream(ssmOdeJsonTopic,
+                        Consumed.with(Serdes.Void(), Serdes.Bytes()))
+                .mapValues((Void key, Bytes value) -> {
+                    var rawMessageFrame = new DeserializedRawMessageFrame();
+                    try (var serdes = OdeMessageFrame()) {
+                        JsonValidatorResult validationResults = ssmJsonValidator.validate(value.get());
+                        rawMessageFrame.setOdeMessageFrameData(
+                                serdes.deserializer().deserialize(ssmOdeJsonTopic, value.get()));
+                        rawMessageFrame.setValidationResults(validationResults);
+                        log.debug(validationResults.describeResults());
+                    } catch (Exception e) {
+                        JsonValidatorResult validatorResult = new JsonValidatorResult();
+                        validatorResult.addException(e);
+                        rawMessageFrame.setValidationResults(validatorResult);
+                        rawMessageFrame.setValidationFailure(true);
+                        rawMessageFrame.setFailedMessage(e.getMessage());
+                        log.error("Error in SSM validation: ", e);
+                    }
+                    return rawMessageFrame;
+                })
+                .flatMap(new SsmTransformer(converter))
+                .to(ssmProcessedJsonTopic,
+                    Produced.with(
                         RsuIntersectionKey(),
                         JsonSerdes.ProcessedSsm(),
                         new IntersectionIdPartitioner<RsuIntersectionKey, ProcessedSsm>()));

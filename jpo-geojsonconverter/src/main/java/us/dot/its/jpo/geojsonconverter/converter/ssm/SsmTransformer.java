@@ -26,7 +26,8 @@ import java.util.List;
  * The transformation is not stateful, so this doesn't need to be a processor.
  */
 @Slf4j
-public class SsmTransformer implements KeyValueMapper<Void, DeserializedRawMessageFrame, Iterable<KeyValue<RsuIntersectionKey, ProcessedSsm>>> {
+public class SsmTransformer
+        implements KeyValueMapper<Void, DeserializedRawMessageFrame, Iterable<KeyValue<RsuIntersectionKey, ProcessedSsm>>> {
 
     private final SsmConverter converter;
 
