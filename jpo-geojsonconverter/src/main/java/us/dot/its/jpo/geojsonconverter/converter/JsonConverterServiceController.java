@@ -147,7 +147,7 @@ public class JsonConverterServiceController {
             // SSM
             logger.info("Creating the ProcessedSsm Kafka Streams topology");
             Topology ssmTopology = SsmTopology.build(
-                    geojsonProps.getKafkaTopicOdeSrmJson(),
+                    geojsonProps.getKafkaTopicOdeSsmJson(),
                     geojsonProps.getKafkaTopicProcessedSsm(),
                     ssmJsonValidator,
                     ssmConverter);

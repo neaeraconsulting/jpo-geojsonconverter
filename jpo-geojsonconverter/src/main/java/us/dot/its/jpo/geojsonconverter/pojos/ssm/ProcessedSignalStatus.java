@@ -1,5 +1,6 @@
 package us.dot.its.jpo.geojsonconverter.pojos.ssm;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
@@ -54,7 +55,7 @@ public class ProcessedSignalStatus {
     /**
      * From DF_SignalStatusPackage.duration
      */
-    private Duration estimatedTimeOfArrivalDuration;
+    private Duration estimatedTimeOfArrivalDurationSeconds;
 
     private ProcessedPrioritizationResponseStatus status;
 }

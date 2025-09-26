@@ -40,6 +40,7 @@ public class SsmTransformer
                 OdeMessageFrameData rawValue = rawSsm.getOdeMessageFrameData();
                 OdeMessageFrameMetadata metadata = rawValue.getMetadata();
                 OdeMessageFramePayload payload = rawValue.getPayload();
+                log.info("payload: {}", payload.getData());
                 SignalStatusMessageMessageFrame ssmMessageFrame = (SignalStatusMessageMessageFrame)payload.getData();
                 KeyValue<RsuIntersectionKey, ProcessedSsm> processedSsm
                         = createProcessedSsm(ssmMessageFrame, metadata);
@@ -79,8 +80,14 @@ public class SsmTransformer
 
         var key = new RsuIntersectionKey();
         key.setRsuId(metadata.getOriginIp());
-        key.setIntersectionId(processedSsm.getIntersectionId());
-        key.setRegion(processedSsm.getRegion());
+        Integer intersectionId = processedSsm.getIntersectionId();
+        if (intersectionId != null) {
+            key.setIntersectionId(intersectionId);
+        }
+        Integer region = processedSsm.getRegion();
+        if (region != null) {
+            key.setRegion(region);
+        }
 
         return new KeyValue<>(key, processedSsm);
     }

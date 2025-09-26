@@ -76,8 +76,6 @@ public class ProcessedSsm {
     ------------------------------------------------------------------------*/
     private List<ProcessedValidationMessage> validationMessages = new ArrayList<>();
 
-    private boolean cti4501Conformant = true;
-
     public void addValidationMessage(ProcessedValidationMessage message) {
         if (validationMessages == null) {
             validationMessages = new ArrayList<ProcessedValidationMessage>();

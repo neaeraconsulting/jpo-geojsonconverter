@@ -54,7 +54,10 @@ public class SrmProperties {
     private Double elevation;
     private Double heading;
     private ProcessedTransmissionState transmission;
-    private Double speed;
+    /**
+     * Speed in meters/second.
+     */
+    private Double speedMetersPerSecond;
 
     private String name;
     private String routeName;
@@ -62,7 +65,7 @@ public class SrmProperties {
     private ProcessedTransitVehicleOccupancy transitOccupancy;
 
     // DE_DeltaTime
-    private Duration transitSchedule;
+    private Duration transitScheduleSeconds;
 
     private List<ProcessedSignalRequest> requests;
 
@@ -70,8 +73,6 @@ public class SrmProperties {
         Validation
     ------------------------------------------------------------------------*/
     private List<ProcessedValidationMessage> validationMessages = new ArrayList<>();
-
-    private boolean cti4501Conformant = true;
 
     public void addValidationMessage(ProcessedValidationMessage message) {
         if (validationMessages == null) {

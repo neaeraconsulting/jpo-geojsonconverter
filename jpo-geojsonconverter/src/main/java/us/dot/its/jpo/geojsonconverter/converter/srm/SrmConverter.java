@@ -8,7 +8,6 @@ import us.dot.its.jpo.asn.j2735.r2024.SignalRequestMessage.*;
 import us.dot.its.jpo.geojsonconverter.pojos.ProcessedValidationMessage;
 import us.dot.its.jpo.geojsonconverter.pojos.common.ProcessedTransmissionState;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.Point;
-import us.dot.its.jpo.geojsonconverter.pojos.geojson.rtcm.RTCMProperties;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.srm.*;
 import us.dot.its.jpo.geojsonconverter.utils.BitstringUtils;
 import us.dot.its.jpo.geojsonconverter.validator.JsonValidatorResult;
@@ -101,7 +100,7 @@ public class SrmConverter {
             props.setTransitOccupancy(ProcessedTransitVehicleOccupancy.fromName(occupancy.getName()));
         }
 
-        props.setTransitSchedule(convertDeltaTime(requestor.getTransitSchedule()));
+        props.setTransitScheduleSeconds(convertDeltaTime(requestor.getTransitSchedule()));
 
         TransitVehicleStatus status = requestor.getTransitStatus();
         ProcessedTransitVehicleStatus processedStatus = new ProcessedTransitVehicleStatus();
@@ -121,7 +120,7 @@ public class SrmConverter {
             if (tSpeed != null) {
                 Velocity speed = tSpeed.getSpeed();
                 if (speed != null) {
-                    props.setSpeed(convertSpeed(speed.getValue()));
+                    props.setSpeedMetersPerSecond(convertSpeed(speed.getValue()));
                 }
                 TransmissionState transmission = tSpeed.getTransmisson();
                 if (transmission != null) {
@@ -183,7 +182,7 @@ public class SrmConverter {
         processed.setEstimatedTimeOfArrival(ts);
         if (pkg.getDuration() != null) {
             Duration duration = Duration.ofMillis(pkg.getDuration().getValue());
-            processed.setEstimatedTimeOfArrivalDuration(duration);
+            processed.setEstimatedTimeOfArrivalDurationSeconds(duration);
         }
     }
 

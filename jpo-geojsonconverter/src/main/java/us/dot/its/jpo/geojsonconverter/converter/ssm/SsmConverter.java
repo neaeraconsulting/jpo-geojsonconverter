@@ -148,7 +148,7 @@ public class SsmConverter {
         processed.setEstimatedTimeOfArrival(ts);
         if (pkg.getDuration() != null) {
             Duration duration = Duration.ofMillis(pkg.getDuration().getValue());
-            processed.setEstimatedTimeOfArrivalDuration(duration);
+            processed.setEstimatedTimeOfArrivalDurationSeconds(duration);
         }
     }
 
