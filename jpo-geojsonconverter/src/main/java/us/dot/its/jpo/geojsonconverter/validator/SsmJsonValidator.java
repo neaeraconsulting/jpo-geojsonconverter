@@ -12,7 +12,7 @@ public class SsmJsonValidator extends AbstractJsonValidator {
     /**
      * @param jsonSchemaResource The json schema file in resources/schemas.
      */
-    protected SsmJsonValidator(@Value("${schema.ssm}") Resource jsonSchemaResource) {
+    public SsmJsonValidator(@Value("${schema.ssm}") Resource jsonSchemaResource) {
         super(jsonSchemaResource);
     }
 }

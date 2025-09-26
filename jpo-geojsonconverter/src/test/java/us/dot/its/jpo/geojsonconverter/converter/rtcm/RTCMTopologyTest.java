@@ -34,7 +34,7 @@ import static org.junit.Assert.*;
 @RunWith(Parameterized.class)
 public class RTCMTopologyTest {
 
-    final String inputTopicName = "topio.OdeRtcmJson";
+    final String inputTopicName = "topic.OdeRtcmJson";
     final String outputTopicName = "topic.ProcessedRtcm";
 
     @Parameter(0)

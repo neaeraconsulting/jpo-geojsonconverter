@@ -13,7 +13,7 @@ public class SrmJsonValidator extends AbstractJsonValidator {
      * @param jsonSchemaResource The json schema file in resources/schemas.
      *                           Injected by Spring DI.
      */
-    protected SrmJsonValidator(@Value("${schema.srm}") Resource jsonSchemaResource) {
+    public SrmJsonValidator(@Value("${schema.srm}") Resource jsonSchemaResource) {
         super(jsonSchemaResource);
     }
 }
