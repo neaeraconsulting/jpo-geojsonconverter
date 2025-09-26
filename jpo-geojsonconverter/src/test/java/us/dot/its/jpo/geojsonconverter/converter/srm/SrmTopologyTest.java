@@ -40,10 +40,18 @@ public class SrmTopologyTest {
     @Parameter(0)
     public String inputJson;
 
+    @Parameter(1)
+    public int expectNumberOfRequests;
+
+    @Parameter(2)
+    public boolean expectValid;
+
     @Parameters
     public static Collection<Object[]> params() throws IOException {
         return Arrays.asList(new Object[][] {
-                { loadResource("json/valid.srm.json") }
+                { loadResource("json/valid.srm.json"), 1, true },
+                { loadResource("json/valid.srm-multi.json"), 2, true },
+                { loadResource("json/invalid.srm.json"), 1, false}
         });
     }
 
@@ -75,7 +83,15 @@ public class SrmTopologyTest {
             assertThat(properties.getAsn1(), notNullValue());
             assertThat(properties.getOdeReceivedAt(), notNullValue());
             assertThat(properties.getMessageType(), equalTo("SRM"));
-            assertThat(properties.getRequests(), hasSize(greaterThan(0)));
+            assertThat(properties.getRequests(), hasSize(equalTo(expectNumberOfRequests)));
+            if (expectValid) {
+                assertThat("expected valid message but has validation messages",
+                        properties.getValidationMessages(), hasSize(equalTo(0)));
+            } else {
+                assertThat("expected invalid message but has no validation messages",
+                        properties.getValidationMessages(), hasSize(greaterThan(0)));
+            }
+
 
             Point geometry = processedSrm.getGeometry();
             assertThat(geometry, notNullValue());

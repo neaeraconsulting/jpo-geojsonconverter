@@ -43,10 +43,18 @@ public class SsmTopologyTest {
     @Parameter(0)
     public String inputJson;
 
+    @Parameter(1)
+    public int expectNumberOfRequests;
+
+    @Parameter(2)
+    public boolean expectValid;
+
     @Parameters
     public static Collection<Object[]> params() throws IOException {
         return Arrays.asList(new Object[][] {
-                { loadResource("json/valid.ssm.json") }
+                { loadResource("json/valid.ssm.json"), 1, true },
+                { loadResource("json/valid.ssm-multi.json"), 2, true },
+                { loadResource("json/invalid.ssm.json"), 1, false },
         });
     }
 
@@ -77,6 +85,13 @@ public class SsmTopologyTest {
             assertThat(processedSsm.getOdeReceivedAt(), notNullValue());
             assertThat(processedSsm.getMessageType(), equalTo("SSM"));
             assertThat(processedSsm.getStatusList(), hasSize(greaterThan(0)));
+            if (expectValid) {
+                assertThat("expected valid message but has validation messages",
+                        processedSsm.getValidationMessages(), hasSize(equalTo(0)));
+            } else {
+                assertThat("expected invalid message but has no validation messages",
+                        processedSsm.getValidationMessages(), hasSize(greaterThan(0)));
+            }
         }
     }
 
