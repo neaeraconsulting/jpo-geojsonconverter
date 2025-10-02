@@ -14,15 +14,9 @@ import org.junit.runners.Parameterized.Parameters;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import us.dot.its.jpo.geojsonconverter.converter.srm.SrmConverter;
-import us.dot.its.jpo.geojsonconverter.converter.srm.SrmTopology;
 import us.dot.its.jpo.geojsonconverter.partitioner.RsuVehicleIdKey;
-import us.dot.its.jpo.geojsonconverter.pojos.geojson.Point;
-import us.dot.its.jpo.geojsonconverter.pojos.geojson.srm.ProcessedSrm;
-import us.dot.its.jpo.geojsonconverter.pojos.geojson.srm.SrmProperties;
 import us.dot.its.jpo.geojsonconverter.pojos.ssm.ProcessedSsm;
 import us.dot.its.jpo.geojsonconverter.serialization.deserializers.JsonDeserializer;
-import us.dot.its.jpo.geojsonconverter.validator.SrmJsonValidator;
 import us.dot.its.jpo.geojsonconverter.validator.SsmJsonValidator;
 
 import java.io.IOException;
