@@ -322,7 +322,6 @@ public class FieldConversions {
         if (minuteDate == null) return null;
         if (dSecond == null) return minuteDate;
         SecondNanos secondNanos = convertDSecond(dSecond);
-        if (secondNanos == null) return minuteDate;
         return minuteDate
                 .withSecond(secondNanos.secondOfMinute())
                 .withNano(secondNanos.nanoOfSecond());
