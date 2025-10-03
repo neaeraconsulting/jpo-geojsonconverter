@@ -335,6 +335,7 @@ public class FieldConversions {
     /**
      * Convert Minute of Year to ZonedDateTime.
      * Requires knowing what year it is.
+     * Value of 527040 represents "invalid"
      * @param minuteOfTheYear DE_MinuteOfYear
      * @param year The year
      * @return ZonedDateTime for the year at the beginning of the minute
@@ -342,6 +343,7 @@ public class FieldConversions {
     public static ZonedDateTime convertMinuteOfYear(final MinuteOfTheYear minuteOfTheYear, final int year) { //
         if (minuteOfTheYear == null) return null;
         final long moy = minuteOfTheYear.getValue();
+        if (moy == 527040L) return null;
         final String dateString = String.format("%d-01-01T00:00:00.00Z", year);
         final ZonedDateTime yearDate = Instant.parse(dateString).atZone(ZoneId.of("UTC"));
         return yearDate.plusMinutes(moy);
