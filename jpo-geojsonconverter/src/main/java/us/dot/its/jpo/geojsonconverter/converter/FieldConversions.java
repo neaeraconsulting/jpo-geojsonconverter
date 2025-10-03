@@ -317,15 +317,14 @@ public class FieldConversions {
         final int dayOfYear = (moy / MINUTES_PER_DAY) + 1;
         final boolean isLastDayOfYear = dayOfYear >= 365; // or second to last if leap year
 
-        // J2735 (2024) - Section 7.109: Says DE_Minute of the year is the "current year in the time system being used
-        // (typically UTC time)" so we assume it is in fact UTC time.
+        // J2735 (2024) - Section 7.109: Says DE_Minute of the year is the minute of the "current year in the time
+        // system being used (typically UTC time)" so we assume it is in fact UTC time.
         final ZonedDateTime utcIngestTime = ingestTime.withZoneSameInstant(ZoneOffset.UTC);
         final int ingestDayOfYear = utcIngestTime.getDayOfYear();
         final boolean isIngestFirstDayOfYear = (ingestDayOfYear == 1);
 
         int year = utcIngestTime.getYear();
-        // If it is first or last day of the year and ingest day of year differs from the message day of year
-        // guess the message was produced last year.
+        // If message produced on last day of year, and ingested on first day of year, it was produced last year.
         if (isLastDayOfYear && isIngestFirstDayOfYear) {
             --year;
         }
