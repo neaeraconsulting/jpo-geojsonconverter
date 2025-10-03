@@ -40,7 +40,6 @@ public class SsmTransformer
                 OdeMessageFrameData rawValue = rawSsm.getOdeMessageFrameData();
                 OdeMessageFrameMetadata metadata = rawValue.getMetadata();
                 OdeMessageFramePayload payload = rawValue.getPayload();
-                log.info("payload: {}", payload.getData());
                 SignalStatusMessageMessageFrame ssmMessageFrame = (SignalStatusMessageMessageFrame)payload.getData();
                 KeyValue<RsuIntersectionKey, ProcessedSsm> processedSsm
                         = createProcessedSsm(ssmMessageFrame, metadata);
