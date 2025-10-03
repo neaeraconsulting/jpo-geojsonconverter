@@ -12,6 +12,8 @@ import us.dot.its.jpo.geojsonconverter.pojos.ssm.ProcessedSsm;
 import us.dot.its.jpo.geojsonconverter.validator.JsonValidatorResult;
 
 import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,13 +25,21 @@ import static us.dot.its.jpo.geojsonconverter.converter.FieldConversions.*;
 @Slf4j
 public class SsmConverter {
 
+
+
     public ProcessedSsm processSsm(final SignalStatusMessageMessageFrame ssmFrame) {
-        // We don't know what year it is; assume it is this year.
+        // We don't know what year it is; pass in the current time as a basis to guess the year.
         var now = ZonedDateTime.now();
-        return processSsm(ssmFrame, now.getYear());
+        return processSsm(ssmFrame, now);
     }
 
-    public ProcessedSsm processSsm(final SignalStatusMessageMessageFrame ssmFrame, final int year) {
+    /**
+     * Process an SSM MessageFrame
+     * @param ssmFrame SSM Message Frame
+     * @param ingestTime The message ingest time to use to guess the year
+     * @return the ProcessedSsm
+     */
+    public ProcessedSsm processSsm(final SignalStatusMessageMessageFrame ssmFrame, final ZonedDateTime ingestTime) {
         if (ssmFrame == null) {
             log.error("SSM Message Frame is null");
             return null;
@@ -49,7 +59,9 @@ public class SsmConverter {
 
         MinuteOfTheYear moy = ssm.getTimeStamp();
         DSecond dsec = ssm.getSecond();
-        final ZonedDateTime timeStamp = convertMinuteOfYearAndDSecond(moy, year, dsec);
+
+        final ZonedDateTime timeStamp = convertMinuteOfYearAndDSecond(moy, ingestTime, dsec);
+        final int year = timeStamp != null ? timeStamp.getYear() : ZonedDateTime.now(ZoneOffset.UTC).getYear();
         processedSsm.setTimeStamp(timeStamp);
 
         SignalStatusList sslist = ssm.getStatus();

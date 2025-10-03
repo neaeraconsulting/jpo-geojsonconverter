@@ -67,10 +67,9 @@ public class SsmTransformer
                  OdeMessageFrameMetadata metadata) {
 
         final ZonedDateTime odeReceivedAt = Instant.parse(metadata.getOdeReceivedAt()).atZone(ZoneId.of("UTC"));
-        final int year = odeReceivedAt.getYear();
 
         // Process message frame
-        ProcessedSsm processedSsm =  converter.processSsm(ssm, year);
+        ProcessedSsm processedSsm =  converter.processSsm(ssm, odeReceivedAt);
 
         // Add metadata
         processedSsm.setOdeReceivedAt(odeReceivedAt);

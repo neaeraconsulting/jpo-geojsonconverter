@@ -4,13 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.kstream.KeyValueMapper;
 import us.dot.its.jpo.asn.j2735.r2024.SignalRequestMessage.SignalRequestMessageMessageFrame;
-import us.dot.its.jpo.geojsonconverter.partitioner.RsuIntersectionKey;
 import us.dot.its.jpo.geojsonconverter.partitioner.RsuVehicleIdKey;
 import us.dot.its.jpo.geojsonconverter.pojos.common.DeserializedRawMessageFrame;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.srm.ProcessedSrm;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.srm.SrmProperties;
 import us.dot.its.jpo.geojsonconverter.utils.ProcessedSchemaVersions;
-import us.dot.its.jpo.geojsonconverter.validator.JsonValidatorResult;
 import us.dot.its.jpo.ode.model.OdeMessageFrameData;
 import us.dot.its.jpo.ode.model.OdeMessageFrameMetadata;
 import us.dot.its.jpo.ode.model.OdeMessageFramePayload;
@@ -19,7 +17,6 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.*;
 
 /**
  * KeyValueMapper that converts a keyless stream of SRM MessageFrames to a Key-Value Pair.
@@ -74,10 +71,9 @@ public class SrmTransformer
     private KeyValue<RsuVehicleIdKey, ProcessedSrm> createProcessedSrm(
             SignalRequestMessageMessageFrame srm, OdeMessageFrameMetadata metadata) {
         final ZonedDateTime odeReceivedAt = Instant.parse(metadata.getOdeReceivedAt()).atZone(ZoneId.of("UTC"));
-        final int year = odeReceivedAt.getYear();
 
         // Process message frame
-        ProcessedSrm processedSrm =  converter.processSrm(srm, year);
+        ProcessedSrm processedSrm =  converter.processSrm(srm, odeReceivedAt);
 
         // Add metadata
         SrmProperties properties = processedSrm.getProperties();

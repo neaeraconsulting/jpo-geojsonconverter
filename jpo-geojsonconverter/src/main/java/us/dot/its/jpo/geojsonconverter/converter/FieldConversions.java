@@ -302,6 +302,37 @@ public class FieldConversions {
         return ZoneOffset.ofHoursMinutes(offsetHours, offsetMinutes);
     }
 
+    final static int MINUTES_PER_DAY = 24 * 60;
+
+    /**
+     * Produce a ZonedDateTime from a minute of the year, and ingest time, adjusting for the edge case where the
+     * message is produced on New Year's Eve and ingested on New Year's Day.
+     * @param minuteOfTheYear J2735 Minute-of-the-year Integer
+     * @param ingestTime The ingest time
+     * @return A ZonedDateTime for the minute of the year
+     */
+    public static ZonedDateTime convertMinuteOfYear(final MinuteOfTheYear minuteOfTheYear, final ZonedDateTime ingestTime) {
+        if (minuteOfTheYear == null) return null;
+        final int moy = (int)minuteOfTheYear.getValue();
+        final int dayOfYear = (moy / MINUTES_PER_DAY) + 1;
+        final boolean isLastDayOfYear = dayOfYear >= 365; // or second to last if leap year
+
+        // J2735 (2024) - Section 7.109: Says DE_Minute of the year is the "current year in the time system being used
+        // (typically UTC time)" so we assume it is in fact UTC time.
+        final ZonedDateTime utcIngestTime = ingestTime.withZoneSameInstant(ZoneOffset.UTC);
+        final int ingestDayOfYear = utcIngestTime.getDayOfYear();
+        final boolean isIngestFirstDayOfYear = (ingestDayOfYear == 1);
+
+        int year = utcIngestTime.getYear();
+        // If it is first or last day of the year and ingest day of year differs from the message day of year
+        // guess the message was produced last year.
+        if (isLastDayOfYear && isIngestFirstDayOfYear) {
+            --year;
+        }
+
+        return convertMinuteOfYear(minuteOfTheYear, year);
+    }
+
     /**
      * Convert Minute of Year to ZonedDateTime.
      * Requires knowing what year it is.
@@ -317,8 +348,18 @@ public class FieldConversions {
         return yearDate.plusMinutes(moy);
     }
 
+    public static ZonedDateTime convertMinuteOfYearAndDSecond(final MinuteOfTheYear minuteOfTheYear,
+                                                              final ZonedDateTime ingestTime, final DSecond dSecond) {
+        ZonedDateTime minuteDate = convertMinuteOfYear(minuteOfTheYear, ingestTime);
+        return convertMinuteOfYearAndDSecond(minuteDate, dSecond);
+    }
+
     public static ZonedDateTime convertMinuteOfYearAndDSecond(final MinuteOfTheYear minuteOfTheYear, final int year, final DSecond dSecond) {
         ZonedDateTime minuteDate = convertMinuteOfYear(minuteOfTheYear, year);
+        return convertMinuteOfYearAndDSecond(minuteDate, dSecond);
+    }
+
+    private static ZonedDateTime convertMinuteOfYearAndDSecond(final ZonedDateTime minuteDate, final DSecond dSecond) {
         if (minuteDate == null) return null;
         if (dSecond == null) return minuteDate;
         SecondNanos secondNanos = convertDSecond(dSecond);
@@ -326,6 +367,8 @@ public class FieldConversions {
                 .withSecond(secondNanos.secondOfMinute())
                 .withNano(secondNanos.nanoOfSecond());
     }
+
+
 
     public static Integer convertMsgCount(final MsgCount msgCount) {
         if (msgCount == null) return null;

@@ -13,6 +13,7 @@ import us.dot.its.jpo.geojsonconverter.utils.BitstringUtils;
 import us.dot.its.jpo.geojsonconverter.validator.JsonValidatorResult;
 
 import java.time.Duration;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,12 +26,12 @@ import static us.dot.its.jpo.geojsonconverter.converter.FieldConversions.*;
 public class SrmConverter {
 
     public ProcessedSrm processSrm(final SignalRequestMessageMessageFrame ssmFrame) {
-        // We don't know what year it is; assume it is this year.
+        // We don't know what year it is; pass in the current time as a basis to guess the year.
         var now = ZonedDateTime.now();
-        return processSrm(ssmFrame, now.getYear());
+        return processSrm(ssmFrame, now);
     }
 
-    public ProcessedSrm processSrm(final SignalRequestMessageMessageFrame srmFrame, final int year) {
+    public ProcessedSrm processSrm(final SignalRequestMessageMessageFrame srmFrame, final ZonedDateTime ingestTime) {
         var list = new ArrayList<ProcessedSrm>();
 
         if (srmFrame == null) {
@@ -48,7 +49,8 @@ public class SrmConverter {
         final Integer sequenceNumber = convertMsgCount(srm.getSequenceNumber());
         MinuteOfTheYear moy = srm.getTimeStamp();
         DSecond dsec = srm.getSecond();
-        final ZonedDateTime timeStamp = convertMinuteOfYearAndDSecond(moy, year, dsec);
+        final ZonedDateTime timeStamp = convertMinuteOfYearAndDSecond(moy, ingestTime, dsec);
+        final int year = timeStamp != null ? timeStamp.getYear() : ZonedDateTime.now(ZoneOffset.UTC).getYear();
 
         RequestorDescription requestor = srm.getRequestor();
         var props = new SrmProperties();
