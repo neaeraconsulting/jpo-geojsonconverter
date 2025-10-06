@@ -6,9 +6,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import us.dot.its.jpo.asn.j2735.r2024.SignalStatusMessage.SignalStatusMessageMessageFrame;
 import us.dot.its.jpo.geojsonconverter.pojos.ssm.ProcessedSsm;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -16,6 +23,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.runners.Parameterized.Parameters;
 import static org.junit.runners.Parameterized.Parameter;
+import static us.dot.its.jpo.geojsonconverter.TestResourceUtil.loadResource;
 
 @Slf4j
 @RunWith(Parameterized.class)
@@ -41,50 +49,14 @@ public class SsmConverterTest {
     }
 
     @Parameters
-    public static Collection<Object[]> params() {
+    public static Collection<Object[]> params() throws IOException {
+        final String ssmJson = loadResource("classpath:json/ssm.message-frame.json");
+        final String ssmJsonMulti = loadResource("classpath:json/ssm.message-frame.multi.json");
         return Arrays.asList(new Object[][] {
-                { SSM, 1}
+                { ssmJson, 1},
+                { ssmJsonMulti, 2}
         });
     }
 
-    public static final String SSM = """
-            {
-              "messageId": 30,
-              "value": {
-                "SignalStatusMessage": {
-                  "timeStamp": 374789,
-                  "second": 31000,
-                  "sequenceNumber": 15,
-                  "status": [
-                    {
-                      "sequenceNumber": 30,
-                      "id": {
-                        "id": 12114
-                      },
-                      "sigStatus": [
-                        {
-                          "requester": {
-                            "id": {
-                              "stationID": 2031825062
-                            },
-                            "request": 5,
-                            "sequenceNumber": 5,
-                            "role": "publicTransport"
-                          },
-                          "inboundOn": {
-                            "lane": 1
-                          },
-                          "outboundOn": {
-                            "lane": 16
-                          },
-                          "duration": 34325,
-                          "status": "granted"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              }
-            }
-            """;
+
 }
