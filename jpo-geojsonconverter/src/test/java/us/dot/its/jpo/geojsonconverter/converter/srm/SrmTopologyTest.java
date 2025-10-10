@@ -57,8 +57,7 @@ public class SrmTopologyTest {
 
     @Test
     public void topologyTest() {
-        Resource jsonSchemaResource = getResource("schemas/srm.schema.json");
-        SrmJsonValidator validator = new SrmJsonValidator(jsonSchemaResource);
+        SrmJsonValidator validator = new SrmJsonValidator("classpath:schemas/srm.schema.json");
         SrmConverter converter = new SrmConverter();
         Topology topology = SrmTopology.build(inputTopicName, outputTopicName, validator, converter);
         try (var driver = new TopologyTestDriver(topology)) {

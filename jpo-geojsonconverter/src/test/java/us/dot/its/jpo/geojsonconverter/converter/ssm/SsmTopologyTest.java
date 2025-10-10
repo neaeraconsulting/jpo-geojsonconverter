@@ -54,8 +54,7 @@ public class SsmTopologyTest {
 
     @Test
     public void topologyTest() {
-        Resource jsonSchemaResource = getResource("schemas/ssm.schema.json");
-        SsmJsonValidator validator = new SsmJsonValidator(jsonSchemaResource);
+        SsmJsonValidator validator = new SsmJsonValidator("classpath:schemas/ssm.schema.json");
         SsmConverter converter = new SsmConverter();
         Topology topology = SsmTopology.build(inputTopicName, outputTopicName, validator, converter);
         try (var driver = new TopologyTestDriver(topology)) {

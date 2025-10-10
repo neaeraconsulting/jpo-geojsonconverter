@@ -9,16 +9,6 @@ spring.main.web-application-type: servlet
 # Unused feature
 spring.groovy.template.check-template-location: false
 
-# JSON Schema resource paths
-schema:
-  bsm: classpath:schemas/bsm.schema.json
-  map: classpath:schemas/map.schema.json
-  spat: classpath:schemas/spat.schema.json
-  psm: classpath:schemas/psm.schema.json
-  rtcm: classpath:schemas/rtcm.schema.json
-  srm: classpath:schemas/srm.schema.json
-  ssm: classpath:schemas/ssm.schema.json
-
 # Geometry JSON output mode (GEOJSON_ONLY or WKT)
 geometry.output.mode: GEOJSON_ONLY
 

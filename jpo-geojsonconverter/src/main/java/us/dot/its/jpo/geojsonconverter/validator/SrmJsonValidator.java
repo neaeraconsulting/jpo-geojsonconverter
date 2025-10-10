@@ -1,7 +1,9 @@
 package us.dot.its.jpo.geojsonconverter.validator;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
 /**
@@ -9,11 +11,17 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class SrmJsonValidator extends AbstractJsonValidator {
-    /**
-     * @param jsonSchemaResource The json schema file in resources/schemas.
-     *                           Injected by Spring DI.
-     */
-    public SrmJsonValidator(@Value("${schema.srm}") Resource jsonSchemaResource) {
-        super(jsonSchemaResource);
+
+
+    public SrmJsonValidator() {
+        super("classpath:schemas/srm.schema.json");
     }
+
+    /**
+     * @param schemaLocation The json schema classpath
+     */
+    public SrmJsonValidator(String schemaLocation) {
+        super(schemaLocation);
+    }
+
 }

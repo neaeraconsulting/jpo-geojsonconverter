@@ -9,10 +9,15 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class SsmJsonValidator extends AbstractJsonValidator {
+
+    public SsmJsonValidator() {
+        super("classpath:schemas/ssm.schema.json");
+    }
+
     /**
-     * @param jsonSchemaResource The json schema file in resources/schemas.
+     * @param schemaLocation The json schema classpath
      */
-    public SsmJsonValidator(@Value("${schema.ssm}") Resource jsonSchemaResource) {
-        super(jsonSchemaResource);
+    public SsmJsonValidator(String schemaLocation) {
+        super(schemaLocation);
     }
 }

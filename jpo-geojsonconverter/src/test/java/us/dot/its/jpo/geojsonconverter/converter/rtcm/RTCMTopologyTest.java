@@ -61,9 +61,7 @@ public class RTCMTopologyTest {
 
     @Test
     public void topologyTest() {
-        Resource jsonSchemaResource = getResource("schemas/rtcm.schema.json");
-        log.debug("jsonSchemaResource: {}", jsonSchemaResource);
-        RTCMJsonValidator validator = new RTCMJsonValidator(jsonSchemaResource);
+        RTCMJsonValidator validator = new RTCMJsonValidator("classpath:schemas/rtcm.schema.json");
         RTCMDecoder decoder = new RTCMDecoder(false);
         RTCMConverter converter = new RTCMConverter(decoder);
         Topology topology = RTCMTopology.build(inputTopicName, outputTopicName, validator, converter);
