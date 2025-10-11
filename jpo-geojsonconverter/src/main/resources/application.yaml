@@ -9,14 +9,6 @@ spring.main.web-application-type: servlet
 # Unused feature
 spring.groovy.template.check-template-location: false
 
-# JSON Schema resource paths
-schema:
-  bsm: classpath:schemas/bsm.schema.json
-  map: classpath:schemas/map.schema.json
-  spat: classpath:schemas/spat.schema.json
-  psm: classpath:schemas/psm.schema.json
-  rtcm: classpath:schemas/rtcm.schema.json
-
 # Geometry JSON output mode (GEOJSON_ONLY or WKT)
 geometry.output.mode: GEOJSON_ONLY
 
@@ -44,6 +36,12 @@ kafka.topics:
     - name: topic.ProcessedRtcm
       cleanupPolicy: delete
       retentionMs: 300000
+    - name: topic.ProcessedSrm
+      cleanupPolicy: delete
+      retentionMs: 300000
+    - name: topic.ProcessedSsm
+      cleanupPolicy: delete
+      retentionMs: 300000
 
 # Jackson Properties
 spring.jackson.serialization.write-dates-as-timestamps: false
@@ -58,3 +56,7 @@ rtcm.full.decode: true
 geojsonconverter:
   kafka-topic-ode-rtcm-json: topic.OdeRtcmJson
   kafka-topic-processed-rtcm: topic.ProcessedRtcm
+  kafka-topic-ode-srm-json: topic.OdeSrmJson
+  kafka-topic-processed-srm: topic.ProcessedSrm
+  kafka-topic-ode-ssm-json: topic.OdeSsmJson
+  kafka-topic-processed-ssm: topic.ProcessedSsm
