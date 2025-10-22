@@ -80,7 +80,8 @@ public class ProcessedSsm {
     private List<ProcessedSignalStatus> statusList;
 
     /*
-     * ----------------------------------------------------------------------- Validation
+     * ------------------------------------------------------------------------ 
+     * Validation
      * ------------------------------------------------------------------------
      */
     private List<ProcessedValidationMessage> validationMessages = new ArrayList<>();
