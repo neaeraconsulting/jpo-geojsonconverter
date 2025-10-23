@@ -1,7 +1,7 @@
 JPO GeoJSON Converter Release Notes
 ----------------------------
 
-Version 3.1.0
+Version 3.2.0
 ----------------------------------------
 
 ### **Summary**
@@ -21,6 +21,7 @@ Enhancements in this release:
 - [CDOT PR 26](https://github.com/CDOT-CV/jpo-geojsonconverter/pull/26): Updating time generation logic to function with null DSecond
 - [CDOT PR 27](https://github.com/CDOT-CV/jpo-geojsonconverter/pull/27): Handling edge case where key is negative
 - [CDOT PR 29](https://github.com/CDOT-CV/jpo-geojsonconverter/pull/29): Processed SRM & SSM
+- [CDOT PR 31](https://github.com/CDOT-CV/jpo-geojsonconverter/pull/31): Processed SSM Serialization
 
 Version 2.1.1 - HOTFIX
 ----------------------------------------
