@@ -5,7 +5,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 /**
- * JSON validator for RTCM messasges.
+ * JSON validator for RTCM messages.
  * Validates J2735 requirements and ODE metadata.
  */
 @Service
