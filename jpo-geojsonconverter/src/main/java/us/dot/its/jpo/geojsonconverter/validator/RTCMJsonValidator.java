@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 public class RTCMJsonValidator extends AbstractJsonValidator {
 
     public RTCMJsonValidator() {
-        super("classpath:schemas/srm.schema.json");
+        super("classpath:schemas/rtcm.schema.json");
     }
 
     /**
