@@ -1,6 +1,16 @@
 JPO GeoJSON Converter Release Notes
 ----------------------------
 
+Version 3.2.1 - HOTFIX
+----------------------------------------
+
+### **Summary**
+
+Hotfix that fixes RTCM validation using the incorrect json schema.
+
+- TBD: Link to PR
+
+
 Version 3.2.0
 ----------------------------------------
 
