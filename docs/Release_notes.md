@@ -6,10 +6,9 @@ Version 3.2.1 - HOTFIX
 
 ### **Summary**
 
-Hotfix that fixes RTCM validation using the incorrect json schema.
+Fixes RTCM validation using the incorrect json schema.
 
-- TBD: Link to PR
-
+- [Changes in hotfix 3.2.1](https://github.com/usdot-jpo-ode/jpo-geojsonconverter/compare/master...neaeraconsulting:jpo-geojsonconverter:hotfix/2025-12-29)
 
 Version 3.2.0
 ----------------------------------------
