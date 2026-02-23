@@ -1,6 +1,6 @@
 package us.dot.its.jpo.geojsonconverter.converter.map;
 
-import com.networknt.schema.ValidationMessage;
+import com.networknt.schema.Error;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -120,11 +120,17 @@ public class MapProcessedJsonConverter
             object.setException(Arrays.toString(exception.getStackTrace()));
             processedSpatValidationMessages.add(object);
         }
-        for (ValidationMessage vm : validationMessages.getValidationMessages()) {
+        for (Error vm : validationMessages.getValidationMessages()) {
             ProcessedValidationMessage object = new ProcessedValidationMessage();
             object.setMessage(vm.getMessage());
-            object.setSchemaPath(vm.getSchemaPath());
-            object.setJsonPath(vm.getPath());
+            final var schemaLocation = vm.getSchemaLocation();
+            if (schemaLocation != null) {
+                object.setSchemaPath(schemaLocation.toString());
+            }
+            final var evaluationPath = vm.getEvaluationPath();
+            if (evaluationPath != null) {
+                object.setJsonPath(vm.getEvaluationPath().toString());
+            }
 
             processedSpatValidationMessages.add(object);
         }
