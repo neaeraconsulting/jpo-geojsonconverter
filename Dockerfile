@@ -31,14 +31,20 @@ COPY --from=builder /home/jpo-geojsonconverter/target/jpo-geojsonconverter.jar /
 RUN apk update
 RUN apk add gpsd-clients
 
+# ENTRYPOINT ["java", \
+# 	"-Djava.rmi.server.hostname=$DOCKER_HOST_IP", \
+# 	"-Dcom.sun.management.jmxremote.port=9090", \
+# 	"-Dcom.sun.management.jmxremote.rmi.port=9090", \
+# 	"-Dcom.sun.management.jmxremote", \
+# 	"-Dcom.sun.management.jmxremote.local.only=true", \
+# 	"-Dcom.sun.management.jmxremote.authenticate=false", \
+# 	"-Dcom.sun.management.jmxremote.ssl=false", \
+# 	"-Dlogback.configurationFile=/home/logback.xml", \
+# 	"-jar", \
+# 	"/home/jpo-geojsonconverter.jar"]
+
+# No JMX
 ENTRYPOINT ["java", \
-	"-Djava.rmi.server.hostname=$DOCKER_HOST_IP", \
-	"-Dcom.sun.management.jmxremote.port=9090", \
-	"-Dcom.sun.management.jmxremote.rmi.port=9090", \
-	"-Dcom.sun.management.jmxremote", \
-	"-Dcom.sun.management.jmxremote.local.only=true", \
-	"-Dcom.sun.management.jmxremote.authenticate=false", \
-	"-Dcom.sun.management.jmxremote.ssl=false", \
 	"-Dlogback.configurationFile=/home/logback.xml", \
 	"-jar", \
 	"/home/jpo-geojsonconverter.jar"]
