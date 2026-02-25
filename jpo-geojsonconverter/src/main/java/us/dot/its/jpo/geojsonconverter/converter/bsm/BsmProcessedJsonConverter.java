@@ -15,7 +15,7 @@ import org.apache.kafka.streams.processor.ProcessorContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.networknt.schema.ValidationMessage;
+import com.networknt.schema.Error;
 
 import us.dot.its.jpo.asn.j2735.r2024.Common.*;
 import us.dot.its.jpo.geojsonconverter.pojos.common.*;
@@ -114,11 +114,17 @@ public class BsmProcessedJsonConverter
             object.setException(exception.getStackTrace().toString());
             processedBsmValidationMessages.add(object);
         }
-        for (ValidationMessage vm : validationMessages.getValidationMessages()) {
+        for (Error vm : validationMessages.getValidationMessages()) {
             ProcessedValidationMessage object = new ProcessedValidationMessage();
             object.setMessage(vm.getMessage());
-            object.setSchemaPath(vm.getSchemaPath());
-            object.setJsonPath(vm.getPath());
+            final var schemaLocation = vm.getSchemaLocation();
+            if (schemaLocation != null) {
+                object.setSchemaPath(schemaLocation.toString());
+            }
+            final var evaluationPath = vm.getEvaluationPath();
+            if (evaluationPath != null) {
+                object.setJsonPath(vm.getEvaluationPath().toString());
+            }
 
             processedBsmValidationMessages.add(object);
         }

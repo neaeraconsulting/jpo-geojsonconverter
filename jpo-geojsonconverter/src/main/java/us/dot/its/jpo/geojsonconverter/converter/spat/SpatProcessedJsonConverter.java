@@ -30,7 +30,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.networknt.schema.ValidationMessage;
+import com.networknt.schema.Error;
 
 public class SpatProcessedJsonConverter
         implements Transformer<Void, DeserializedRawSpat, KeyValue<RsuIntersectionKey, ProcessedSpat>> {
@@ -120,11 +120,17 @@ public class SpatProcessedJsonConverter
             object.setException(exception.getStackTrace().toString());
             processedSpatValidationMessages.add(object);
         }
-        for (ValidationMessage vm : validationMessages.getValidationMessages()) {
+        for (Error vm : validationMessages.getValidationMessages()) {
             ProcessedValidationMessage object = new ProcessedValidationMessage();
             object.setMessage(vm.getMessage());
-            object.setSchemaPath(vm.getSchemaPath());
-            object.setJsonPath(vm.getPath());
+            final var schemaLocation = vm.getSchemaLocation();
+            if (schemaLocation != null) {
+                object.setSchemaPath(schemaLocation.toString());
+            }
+            final var evaluationPath = vm.getEvaluationPath();
+            if (evaluationPath != null) {
+                object.setJsonPath(vm.getEvaluationPath().toString());
+            }
 
             processedSpatValidationMessages.add(object);
         }

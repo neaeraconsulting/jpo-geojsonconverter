@@ -63,6 +63,9 @@ public class SsmJsonValidatorTest extends AbstractJsonValidatorTest {
     @Test
     public void testException() {
         SsmJsonValidator badValidator = new SsmJsonValidator(null);
+
+        System.out.println("Class Path: " + System.getProperty("java.class.path"));
+
         var result = badValidator.validate("invalid");
         assertFalse("An exception should have happened", result.isValid());
     }
