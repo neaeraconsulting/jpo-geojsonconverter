@@ -282,8 +282,10 @@ public class CTI4501Validator {
                     }
                 }
             } else {
-                validationMap.put("laneSet.connectsTo",
-                        createValidationMessage("The laneSet 'connectsTo' DF_ConnectsToList is missing for lane ID " + lane.getLaneID()));
+                final Long laneId = lane.getLaneID() != null ? lane.getLaneID().getValue() : null;
+                final String validationKey = "laneSet.connectsTo." + laneId;
+                validationMap.put(validationKey,
+                        createValidationMessage("The laneSet 'connectsTo' DF_ConnectsToList is missing for lane ID " + laneId));
             }
         }
 
