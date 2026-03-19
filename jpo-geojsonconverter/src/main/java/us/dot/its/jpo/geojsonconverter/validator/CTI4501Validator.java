@@ -281,9 +281,9 @@ public class CTI4501Validator {
                                 createValidationMessage("The connectsTo 'signalGroup' DE_SignalGroupID is missing"));
                     }
                 }
-            } else if (!validationMap.containsKey("laneSet.connectsTo")) {
+            } else {
                 validationMap.put("laneSet.connectsTo",
-                        createValidationMessage("The laneSet 'connectsTo' DF_ConnectsToList is missing"));
+                        createValidationMessage("The laneSet 'connectsTo' DF_ConnectsToList is missing for lane ID " + lane.getLaneID()));
             }
         }
 
