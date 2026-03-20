@@ -337,11 +337,8 @@ public class CTI4501Validator {
                     validationMap.put(validationKey,
                             createValidationMessage(
                                     (String.format("The laneSet 'connectsTo' DF_ConnectsToList is missing for lane ID %s, " +
-                                            "lane type: %s " +
-                                            "is bike lane: %s, vehicle lane: %s, crosswalk: %s, sidewalk: %s, " +
-                                                    "tracked vehicle: %s, median: %s, parking: %s, striping: %s",
-                                            laneId, laneType, isBikeLane, isVehicleLane, isCrosswalk, isSidewalk,
-                                            isTrackedVehicleLane, isMedian, isParking, isStriping))));
+                                            "lane type: %s " ,
+                                            laneId, laneType))));
 
                 } else {
                     // Ignore egress or sidewalk/crosswalk lanes without connections
