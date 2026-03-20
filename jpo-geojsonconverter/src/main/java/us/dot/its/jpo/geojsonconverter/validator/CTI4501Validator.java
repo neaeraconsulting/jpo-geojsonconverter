@@ -6,10 +6,7 @@ import java.util.List;
 import us.dot.its.jpo.asn.j2735.r2024.Common.LaneDataAttribute;
 import us.dot.its.jpo.asn.j2735.r2024.Common.NodeXY;
 import us.dot.its.jpo.asn.j2735.r2024.Common.RegulatorySpeedLimit;
-import us.dot.its.jpo.asn.j2735.r2024.MapData.Connection;
-import us.dot.its.jpo.asn.j2735.r2024.MapData.GenericLane;
-import us.dot.its.jpo.asn.j2735.r2024.MapData.IntersectionGeometry;
-import us.dot.its.jpo.asn.j2735.r2024.MapData.MapData;
+import us.dot.its.jpo.asn.j2735.r2024.MapData.*;
 import us.dot.its.jpo.asn.j2735.r2024.SPAT.IntersectionState;
 import us.dot.its.jpo.asn.j2735.r2024.SPAT.MovementEvent;
 import us.dot.its.jpo.asn.j2735.r2024.SPAT.MovementState;
@@ -282,10 +279,73 @@ public class CTI4501Validator {
                     }
                 }
             } else {
-                final Long laneId = lane.getLaneID() != null ? lane.getLaneID().getValue() : null;
-                final String validationKey = "laneSet.connectsTo." + laneId;
-                validationMap.put(validationKey,
-                        createValidationMessage("The laneSet 'connectsTo' DF_ConnectsToList is missing for lane ID " + laneId));
+                Long laneId = lane.getLaneID() != null ? lane.getLaneID().getValue() : null;
+                LaneAttributes laneAttribs = lane.getLaneAttributes();
+                LaneDirection directionalUse = laneAttribs != null ? laneAttribs.getDirectionalUse() : null;
+                boolean isIngress = directionalUse != null && directionalUse.isIngressPath();
+                LaneTypeAttributes laneTypeAttribs = laneAttribs != null ? laneAttribs.getLaneType() : null;
+                boolean isBikeLane = false;
+                boolean isVehicleLane = false;
+                boolean isCrosswalk = false;
+                boolean isSidewalk = false;
+                boolean isTrackedVehicleLane = false;
+                boolean isParking = false;
+                boolean isMedian = false;
+                boolean isStriping = false;
+                if (laneTypeAttribs != null) {
+                    isBikeLane = laneTypeAttribs.getBikeLane() != null;
+                    isVehicleLane = laneTypeAttribs.getVehicle() != null;
+                    isCrosswalk = laneTypeAttribs.getCrosswalk() != null;
+                    isSidewalk = laneTypeAttribs.getSidewalk() != null;
+                    isMedian = laneTypeAttribs.getMedian() != null;
+                    isParking = laneTypeAttribs.getParking() != null;
+                    isStriping = laneTypeAttribs.getStriping() != null;
+                    isTrackedVehicleLane = laneTypeAttribs.getTrackedVehicle() != null;
+                }
+                String laneType = isBikeLane ? "bike lane" : isVehicleLane ? "vehicle lane" : isTrackedVehicleLane
+                        ? "tracked vehicle lane" : isCrosswalk ? "crosswalk" : isSidewalk ? "sidewalk" : isParking
+                        ? "parking" : isMedian ? "median" : isStriping ? "striping" : "unknown";
+
+                //
+                // Business logic for deciding whether a lane must have a connectsTo:
+                //
+                // Summary:
+                // vehicle lanes, bike lanes, and sidewalks that are ingress lanes should have connections.
+                //
+                // Reasoning:
+                //
+                // Here we interpret cti-4501 (v1) such that all lanes which vehicles or VRUs travel on, and which are
+                // ingress lanes that pass through the intersection, should have connections to either an egress lane
+                // or a crosswalk.
+                //
+                // Some points are not clear-cut though.
+                //
+                // We count ingress lanes, but ignore egress lanes because it would be redundant to include the
+                // "connectsTo" data structure for both ingress and egress, and CTI-4501 specifically mentions ingress
+                // lanes in this context.
+                //
+                // We ignore medians, striping, and parking lanes because vehicles don't travel on them.
+                //
+                // We ignore crosswalks because of the difficulty of defining if they are "ingress" or "egress".
+                //
+                // We hope that future editions of CTI-4501 will clarify these issues more explicitly.
+                //
+                boolean shouldHaveConnection = isVehicleLane || isBikeLane || isTrackedVehicleLane || isSidewalk;
+                if (isIngress && shouldHaveConnection) {
+
+                    String validationKey = "laneSet.connectsTo." + laneId;
+                    validationMap.put(validationKey,
+                            createValidationMessage(
+                                    (String.format("The laneSet 'connectsTo' DF_ConnectsToList is missing for lane ID %s, " +
+                                            "lane type: %s " +
+                                            "is bike lane: %s, vehicle lane: %s, crosswalk: %s, sidewalk: %s, " +
+                                                    "tracked vehicle: %s, median: %s, parking: %s, striping: %s",
+                                            laneId, laneType, isBikeLane, isVehicleLane, isCrosswalk, isSidewalk,
+                                            isTrackedVehicleLane, isMedian, isParking, isStriping))));
+
+                } else {
+                    // Ignore egress or sidewalk/crosswalk lanes without connections
+                }
             }
         }
 
