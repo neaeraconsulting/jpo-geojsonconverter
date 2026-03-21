@@ -94,6 +94,29 @@ public class CTI4501Validator {
      * Checks for all strictly and conditionally mandatory fields defined in CTI-4501 (page 132)
      * <p>
      * CTI-4501 Document: https://www.ite.org/ITEORG/assets/File/Standards/CTI%204501v0101.pdf
+     * <p>
+     * Notes on the logic for deciding whether a lane must have a 'connectsTo':
+     * <p>
+     * Summary:
+     * vehicle lanes, bike lanes, and sidewalks that are ingress lanes should have connections.
+     * <p>
+     * Reasoning:
+     * <p>
+     * Here we interpret cti-4501 (v1) such that all lanes which vehicles or VRUs travel on, and which are
+     * ingress lanes that pass through the intersection, should have connections to either an egress lane
+     * or a crosswalk.
+     * <p>
+     * Some points are not clear-cut though.
+     * <p>
+     * We count ingress lanes, but ignore egress lanes because it would be redundant to include the
+     * "connectsTo" data structure for both ingress and egress, and CTI-4501 specifically mentions ingress
+     * lanes in this context.
+     * <p>
+     *  We ignore medians, striping, and parking lanes because vehicles don't travel on them.
+     * <p>
+     *  We ignore crosswalks because of the difficulty of defining if they are "ingress" or "egress".
+     * <p>
+     *  We hope that future editions of CTI-4501 will clarify these issues more explicitly.
      *
      * @param mapData The MapData object to be validated for CTI-4501 conformance.
      * @return a list of validation messages describing CTI-4501 conformance issues, or an empty list if conformant.
@@ -306,30 +329,7 @@ public class CTI4501Validator {
                         ? "tracked vehicle lane" : isCrosswalk ? "crosswalk" : isSidewalk ? "sidewalk" : isParking
                         ? "parking" : isMedian ? "median" : isStriping ? "striping" : "unknown";
 
-                //
-                // Business logic for deciding whether a lane must have a connectsTo:
-                //
-                // Summary:
-                // vehicle lanes, bike lanes, and sidewalks that are ingress lanes should have connections.
-                //
-                // Reasoning:
-                //
-                // Here we interpret cti-4501 (v1) such that all lanes which vehicles or VRUs travel on, and which are
-                // ingress lanes that pass through the intersection, should have connections to either an egress lane
-                // or a crosswalk.
-                //
-                // Some points are not clear-cut though.
-                //
-                // We count ingress lanes, but ignore egress lanes because it would be redundant to include the
-                // "connectsTo" data structure for both ingress and egress, and CTI-4501 specifically mentions ingress
-                // lanes in this context.
-                //
-                // We ignore medians, striping, and parking lanes because vehicles don't travel on them.
-                //
-                // We ignore crosswalks because of the difficulty of defining if they are "ingress" or "egress".
-                //
-                // We hope that future editions of CTI-4501 will clarify these issues more explicitly.
-                //
+
                 boolean shouldHaveConnection = isVehicleLane || isBikeLane || isTrackedVehicleLane || isSidewalk;
                 if (isIngress && shouldHaveConnection) {
 
