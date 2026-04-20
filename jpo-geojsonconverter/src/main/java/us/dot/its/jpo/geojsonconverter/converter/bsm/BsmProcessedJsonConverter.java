@@ -8,6 +8,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.kstream.Transformer;
@@ -36,6 +37,7 @@ import us.dot.its.jpo.ode.model.OdeMessageFrameData;
 import us.dot.its.jpo.ode.model.OdeMessageFrameMetadata;
 import us.dot.its.jpo.asn.j2735.r2024.BasicSafetyMessage.BasicSafetyMessageMessageFrame;
 
+@Slf4j
 public class BsmProcessedJsonConverter
         implements Transformer<Void, DeserializedRawBsm, KeyValue<RsuLogKey, ProcessedBsm<Point>>> {
     private static final Logger logger = LoggerFactory.getLogger(BsmProcessedJsonConverter.class);
@@ -120,6 +122,8 @@ public class BsmProcessedJsonConverter
             final var schemaLocation = vm.getSchemaLocation();
             if (schemaLocation != null) {
                 object.setSchemaPath(schemaLocation.toString());
+            } else {
+                log.warn("validationMessage.schemaLocation is null");
             }
             final var evaluationPath = vm.getEvaluationPath();
             if (evaluationPath != null) {
