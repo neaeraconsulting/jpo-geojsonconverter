@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.kstream.Transformer;
@@ -31,6 +33,7 @@ import us.dot.its.jpo.geojsonconverter.validator.JsonValidatorResult;
 import us.dot.its.jpo.ode.model.OdeMessageFrameData;
 import us.dot.its.jpo.ode.model.OdeMessageFrameMetadata;
 
+@Slf4j
 public class MapProcessedJsonConverter
         implements Transformer<Void, DeserializedRawMap, KeyValue<RsuIntersectionKey, ProcessedMap<LineString>>> {
     private static final Logger logger = LoggerFactory.getLogger(MapProcessedJsonConverter.class);
@@ -126,6 +129,8 @@ public class MapProcessedJsonConverter
             final var schemaLocation = vm.getSchemaLocation();
             if (schemaLocation != null) {
                 object.setSchemaPath(schemaLocation.toString());
+            } else {
+                log.warn("validationMessage.schemaLocation is null");
             }
             final var evaluationPath = vm.getEvaluationPath();
             if (evaluationPath != null) {

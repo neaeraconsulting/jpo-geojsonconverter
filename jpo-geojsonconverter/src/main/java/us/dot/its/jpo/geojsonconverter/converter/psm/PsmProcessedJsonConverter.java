@@ -8,6 +8,8 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.kstream.Transformer;
@@ -30,6 +32,7 @@ import us.dot.its.jpo.geojsonconverter.validator.JsonValidatorResult;
 import us.dot.its.jpo.ode.model.OdeMessageFrameData;
 import us.dot.its.jpo.ode.model.OdeMessageFrameMetadata;
 
+@Slf4j
 public class PsmProcessedJsonConverter
         implements Transformer<Void, DeserializedRawPsm, KeyValue<RsuPsmIdKey, ProcessedPsm<Point>>> {
     private static final Logger logger = LoggerFactory.getLogger(PsmProcessedJsonConverter.class);
@@ -112,6 +115,8 @@ public class PsmProcessedJsonConverter
             final var schemaLocation = vm.getSchemaLocation();
             if (schemaLocation != null) {
                 object.setSchemaPath(schemaLocation.toString());
+            } else {
+                log.warn("validationMessage.schemaLocation is null");
             }
             final var evaluationPath = vm.getEvaluationPath();
             if (evaluationPath != null) {

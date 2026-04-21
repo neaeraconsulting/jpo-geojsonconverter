@@ -344,6 +344,8 @@ public class RTCMConverter {
             final var schemaLocation = vm.getSchemaLocation();
             if (schemaLocation != null) {
                 msg.setSchemaPath(schemaLocation.toString());
+            } else {
+                log.warn("validationMessage.schemaLocation is null");
             }
             final var evaluationPath = vm.getEvaluationPath();
             if (evaluationPath != null) {

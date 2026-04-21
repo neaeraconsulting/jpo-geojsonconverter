@@ -54,11 +54,13 @@ public abstract class AbstractJsonValidator {
                                 builder.schemaRegistryConfig(config)
                                 .schemaIdResolvers(resolvers
                                         -> resolvers
-                                            .mapPrefix(
-                                            "https://raw.githubusercontent.com/usdot-jpo-ode/jpo-ode/jpo-ode-5.1.0/jpo-ode-core/src/main/resources/schemas",
-                                            "classpath:/schemas")
-                                        .mapPrefix("https://raw.githubusercontent.com/usdot-jpo-ode/jpo-asn-pojos/refs/heads/master/jpo-asn-jsonschema-generator/src/main/resources/schemas",
-                                                "classpath:/schemas")));
+                                        // Replace url-based schema id with classpath-based schema id
+                                        .mappings(
+                                                // Predicate - replace if this is true
+                                                source -> source.startsWith("https://") && source.contains("/schemas"),
+                                                // Function to transform the schema id
+                                                source -> source.replaceFirst("https://.+/schemas", "classpath:/schemas")
+                                        )));
 
                 jsonSchema = registry.getSchema(inputStream, InputFormat.JSON);
             } 

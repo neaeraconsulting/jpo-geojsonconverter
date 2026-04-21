@@ -1,5 +1,6 @@
 package us.dot.its.jpo.geojsonconverter.converter.spat;
 
+import lombok.extern.slf4j.Slf4j;
 import us.dot.its.jpo.asn.j2735.r2024.Common.IntersectionReferenceID;
 import us.dot.its.jpo.asn.j2735.r2024.Common.SpeedConfidence;
 import us.dot.its.jpo.asn.j2735.r2024.SPAT.*;
@@ -32,6 +33,7 @@ import org.slf4j.LoggerFactory;
 
 import com.networknt.schema.Error;
 
+@Slf4j
 public class SpatProcessedJsonConverter
         implements Transformer<Void, DeserializedRawSpat, KeyValue<RsuIntersectionKey, ProcessedSpat>> {
     private static final Logger logger = LoggerFactory.getLogger(SpatProcessedJsonConverter.class);
@@ -126,6 +128,8 @@ public class SpatProcessedJsonConverter
             final var schemaLocation = vm.getSchemaLocation();
             if (schemaLocation != null) {
                 object.setSchemaPath(schemaLocation.toString());
+            } else {
+                log.warn("validationMessage.schemaLocation is null");
             }
             final var evaluationPath = vm.getEvaluationPath();
             if (evaluationPath != null) {
