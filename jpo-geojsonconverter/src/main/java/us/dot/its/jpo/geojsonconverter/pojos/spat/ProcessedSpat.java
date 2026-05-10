@@ -2,7 +2,11 @@ package us.dot.its.jpo.geojsonconverter.pojos.spat;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
+
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -78,6 +82,20 @@ public class ProcessedSpat {
     private ZonedDateTime utcTimeStamp;
     private List<Integer> enabledLanes = new ArrayList<>();
     private List<ProcessedMovementState> states = null;
+
+    @JsonProperty("utcTimeStampTS")
+    public Instant getUtcTimeStampTS() {
+        return utcTimeStamp != null ? utcTimeStamp.toInstant() : null;
+    }
+
+    @JsonProperty("utcTimeStampTS")
+    public void setUtcTimeStampTS(Instant utcTimeStampTS) {
+        if (utcTimeStampTS == null) {
+            utcTimeStamp = null;
+        } else {
+            utcTimeStamp = ZonedDateTime.ofInstant(utcTimeStampTS, ZoneOffset.UTC);
+        }
+    }
 
     /**
      * Sets both intersection ID and region with null checks
