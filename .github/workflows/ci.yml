@@ -4,7 +4,7 @@ on:
     types: [opened, reopened, synchronize]
   push:
     branches: [develop, master, test-update_ci_workflow]
-
+# test
 jobs:
   sonar:
     runs-on: ubuntu-latest
