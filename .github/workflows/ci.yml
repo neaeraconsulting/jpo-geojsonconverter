@@ -1,5 +1,6 @@
 name: CI
 on: 
+  workflow_dispatch:
   pull_request:
     types: [opened, reopened, synchronize]
   push:
@@ -29,8 +30,8 @@ jobs:
         run: |
           cd jpo-geojsonconverter
           mvn -s settings.xml -e clean org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar \
-            -Dsonar.projectKey=usdot-jpo-ode_jpo-geojsonconverter \
+            -Dsonar.projectKey=${{ github.repository_owner }}_jpo-geojsonconverter \
             -Dsonar.projectName=jpo-geojsonconverter \
-            -Dsonar.organization=usdot-jpo-ode \
+            -Dsonar.organization=${{ github.repository_owner }} \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.branch.name=$GITHUB_REF_NAME
