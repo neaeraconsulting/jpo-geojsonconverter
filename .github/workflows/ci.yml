@@ -4,7 +4,7 @@ on:
   pull_request:
     types: [opened, reopened, synchronize]
   push:
-    branches: [develop, master, test-update_ci_workflow]
+    branches: [develop, master, test-update_ci_workflow2]
 
 jobs:
   sonar:
