@@ -83,6 +83,22 @@ public class ProcessedSpat {
     private List<Integer> enabledLanes = new ArrayList<>();
     private List<ProcessedMovementState> states = null;
 
+    /**
+     * The SPAT timestamp
+     * @deprecated To be removed in a future release, to transition to utcTimeStampTS
+     * of type Instant, to support correct storage as a timestamp in Mongo DB.
+     * @return The timestamp
+     */
+    @Deprecated(since = "3.3.0", forRemoval = true)
+    public ZonedDateTime getUtcTimeStamp() {
+        return utcTimeStamp;
+    }
+
+    @Deprecated(since = "3.3.0", forRemoval = true)
+    public void setUtcTimeStamp(ZonedDateTime utcTimeStamp) {
+        this.utcTimeStamp = utcTimeStamp;
+    }
+
     @JsonProperty("utcTimeStampTS")
     public Instant getUtcTimeStampTS() {
         return utcTimeStamp != null ? utcTimeStamp.toInstant() : null;
