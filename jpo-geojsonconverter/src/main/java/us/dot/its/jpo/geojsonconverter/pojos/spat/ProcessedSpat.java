@@ -51,6 +51,9 @@ import us.dot.its.jpo.geojsonconverter.pojos.common.ProcessedIntersectionReferen
  * status - A bitstring represeting the status of the intersection.
  * <p>
  * utcTimeStamp - The timestamp of the SPaT message in UTC calculated from the SPaT message relative to the
+ * odeReceivedAt. Deprecated, use utcTimeStampTS instead.
+ * <p>
+ * utcTimeStampTS - The timestamp of the SPaT message in UTC calculated from the SPaT message relative to the
  * odeReceivedAt.
  * <p>
  * enabledLanes - List of enabled lanes in the intersection.
@@ -99,6 +102,10 @@ public class ProcessedSpat {
         this.utcTimeStamp = utcTimeStamp;
     }
 
+    /**
+     * The SPAT timestamp
+     * @return The timestamp
+     */
     @JsonProperty("utcTimeStampTS")
     public Instant getUtcTimeStampTS() {
         return utcTimeStamp != null ? utcTimeStamp.toInstant() : null;
