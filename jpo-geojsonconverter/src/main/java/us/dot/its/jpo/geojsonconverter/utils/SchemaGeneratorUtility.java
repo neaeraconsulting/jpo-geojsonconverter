@@ -19,7 +19,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class SchemaGeneratorUtility {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
+        System.exit(run(args));
+    }
+
+    static int run(String[] args) {
         try {
             // Define the classes for which to generate schemas
             Class<?>[] targetClasses =
@@ -80,14 +84,12 @@ public class SchemaGeneratorUtility {
             }
 
             System.out.println("Schema generation completed successfully.");
+            return 0;
         } catch (Exception e) {
             System.err.println("Error generating schemas: " + e.getMessage());
             e.printStackTrace();
-            System.exit(1);
+            return 1;
         }
-
-        // Exit successfully
-        System.exit(0);
     }
 
     private static JsonNode ensureUtcTimeStampTsProperty(JsonNode schema) {
