@@ -36,7 +36,7 @@
         <sonar.language>java</sonar.language>
         <!-- Allow override of github organization when publishing artifacts to github -->
         <github_organization>usdot-jpo-ode</github_organization>
-        <jsonschema.generator.version>4.31.1</jsonschema.generator.version>
+        <jsonschema.generator.version>4.38.0</jsonschema.generator.version>
     </properties>
     <dependencies>
         <!-- Spring Boot Dependencies -->
