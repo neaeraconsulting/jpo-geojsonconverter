@@ -7,7 +7,7 @@ Version 3.3.0
 
 ### **Summary**
 
-This release focuses on improved configurability, validation accuracy, and message processing reliability. Key enhancements include configurable Kafka Streams settings, updated JSON schema validation, improved MAP ingress connection handling, and RTCM validation fixes. The SRM converter has been modernized to remove deprecated functionality. An atomic timestamp field has been added to the ProcessedSpat message to allow for better compatability with MongoDB.
+This release focuses on improved configurability, validation accuracy, and message processing reliability. Key enhancements include configurable Kafka Streams settings, updated JSON schema validation, improved MAP ingress connection handling, and RTCM validation fixes. The SRM converter has been modernized to remove deprecated functionality. An Instant timestamp field has been added to the ProcessedSpat message to allow for better compatability with MongoDB.
 
 Enhancements in this release:
 
