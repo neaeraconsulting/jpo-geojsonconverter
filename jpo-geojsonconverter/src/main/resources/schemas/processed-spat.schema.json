@@ -21,10 +21,6 @@
         },
         "type" : {
           "$ref" : "#/$defs/ProcessedAdvisorySpeedType"
-        },
-        "class()" : {
-          "type" : "integer",
-          "format" : "int32"
         }
       }
     },
