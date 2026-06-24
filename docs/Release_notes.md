@@ -13,7 +13,7 @@ Enhancements in this release:
 
 - [Json schema validator updates](https://github.com/neaeraconsulting/jpo-geojsonconverter/pull/1)
 - [Configurable streams config](https://github.com/neaeraconsulting/jpo-geojsonconverter/pull/2)
-- [Refactor SRM converter to remove deprecated method](https://github.com/neaeraconsulting/jpo-geojsonconverter/pull/3/changes)
+- [Fix bug with SRM timestamp handling](https://github.com/neaeraconsulting/jpo-geojsonconverter/pull/3/changes)
 - [MAP ingress connections logic update](https://github.com/neaeraconsulting/jpo-geojsonconverter/pull/4)
 - [Fix for RTCM Validation](https://github.com/neaeraconsulting/jpo-geojsonconverter/pull/6)
 - [Update CI workflow and README badges](https://github.com/usdot-jpo-ode/jpo-geojsonconverter/pull/112)
