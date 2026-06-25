@@ -524,6 +524,10 @@ public class CTI4501ValidatorTest {
         assertThat(messages, hasItem(containsString("lane type: tracked vehicle lane")));
     }
 
+    // ============================================
+    // Helper methods
+    // ============================================
+
     private List<String> toMessages(List<ProcessedValidationMessage> messages) {
         return messages.stream().map(ProcessedValidationMessage::getMessage).collect(Collectors.toList());
     }
