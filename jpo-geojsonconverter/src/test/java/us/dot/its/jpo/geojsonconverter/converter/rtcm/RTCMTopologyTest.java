@@ -65,9 +65,9 @@ public class RTCMTopologyTest {
     public void topologyTest() {
         RTCMJsonValidator validator = new RTCMJsonValidator("classpath:schemas/rtcm.schema.json");
         RTCMDecoder decoder = new RTCMDecoder(false);
-        var properties = new GeoJsonConverterProperties();
-        properties.setRtcmStandardVersion(RtcmStandard.CTI4501_V1);
-        RTCMConverter converter = new RTCMConverter(decoder, properties);
+        var gjcProps = new GeoJsonConverterProperties();
+        gjcProps.setRtcmStandardVersion(RtcmStandard.CTI4501_V1);
+        RTCMConverter converter = new RTCMConverter(decoder, gjcProps);
         Topology topology = RTCMTopology.build(inputTopicName, outputTopicName, validator, converter);
         try (var driver = new TopologyTestDriver(topology)) {
 
