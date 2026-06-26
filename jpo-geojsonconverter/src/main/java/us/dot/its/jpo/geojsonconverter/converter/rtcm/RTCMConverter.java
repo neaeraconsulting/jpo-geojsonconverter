@@ -260,8 +260,7 @@ public class RTCMConverter {
             // based on the length determinants within them, because there isn't
             // a 1-1 with items in the SEQUENCE-OF
             try {
-                byte[] combindeMessages = decoder.combinePartialMessages(messageList);
-                List<byte[]> splitMessages = decoder.splitMessages(combindeMessages);
+                List<byte[]> splitMessages = decoder.splitMessages(messageList);
                 for (byte[] message : splitMessages) {
                     var decodedMessage = new DecodedRTCMmessage();
                     decodedMessage.setHex(HexFormat.of().formatHex(message));

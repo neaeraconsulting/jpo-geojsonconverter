@@ -37,7 +37,12 @@ public class RTCMDecoder {
 
     private final boolean executableExists;
 
-    public byte[] combinePartialMessages(RTCMmessageList messages) throws RTCMDecodeException {
+    public List<byte[]> splitMessages(RTCMmessageList messageList) throws RTCMDecodeException {
+        byte[] combinedBytes = combinePartialMessages(messageList);
+        return splitCombinedMessages(combinedBytes);
+    }
+
+    private byte[] combinePartialMessages(RTCMmessageList messages) throws RTCMDecodeException {
         List<byte[]> messageByteList = messages.stream()
                 .map(message -> message != null ? message.getOctets() : null)
                 .filter(Objects::nonNull)
@@ -69,7 +74,7 @@ public class RTCMDecoder {
      * @param combinedMessages The concatenated rtcm messages
      * @return the split messages
      */
-    public List<byte[]> splitMessages(final byte[] combinedMessages) throws RTCMDecodeException {
+    private List<byte[]> splitCombinedMessages(final byte[] combinedMessages) throws RTCMDecodeException {
         List<byte[]> messages = new ArrayList<>();
         messageSplitter(combinedMessages, messages);
         return messages;
@@ -77,7 +82,9 @@ public class RTCMDecoder {
 
     private void messageSplitter(final byte[] combinedMessages, List<byte[]> messages) throws RTCMDecodeException {
         if (combinedMessages.length > 0) {
-            int length = decodeLength(combinedMessages);
+            // The length from the determinant doesn't include three bytes at the beginning (preamble, zeroes,
+            // length det) nor three bytes at the end (CRC). Actual length is length + 6.
+            int length = decodeLength(combinedMessages) + 6;
 
             // verify things that must be true for length to be valid
             if (length <= 0) {
@@ -92,6 +99,7 @@ public class RTCMDecoder {
             byte[] message = new byte[length];
             System.arraycopy(combinedMessages, 0, message, 0, length);
             messages.add(message);
+            log.debug("RTCM message length: {}, message: {}", length, hexFormat.formatHex(message));
             int remainderLength = combinedMessages.length - length;
             if (remainderLength > 0) {
                 byte[] remainder = new byte[remainderLength];
@@ -231,7 +239,7 @@ public class RTCMDecoder {
 
 
 
-    private static int unsigned(byte b) {
+    public static int unsigned(byte b) {
         return b & 0xFF;
     }
 
