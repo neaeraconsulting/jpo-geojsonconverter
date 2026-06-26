@@ -66,7 +66,7 @@ public class RTCMDecoder {
 
     /**
      * Split concatenated RTCM messages by reading the length information
-     * @param combinedMessages
+     * @param combinedMessages The concatenated rtcm messages
      * @return the split messages
      */
     public List<byte[]> splitMessages(final byte[] combinedMessages) throws RTCMDecodeException {

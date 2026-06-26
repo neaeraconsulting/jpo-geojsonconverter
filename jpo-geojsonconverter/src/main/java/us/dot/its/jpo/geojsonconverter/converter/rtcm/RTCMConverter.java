@@ -239,6 +239,7 @@ public class RTCMConverter {
         Set<Integer> types = new LinkedHashSet<>();
 
         if (rtcmStandardVersion == RtcmStandard.CTI4501_V1) {
+            // CTI-4501 v1: Each item in the SEQUENCE-OF has a single message
             for (RTCMmessage message : messageList) {
                 var decodedMessage = new DecodedRTCMmessage();
                 decodedMessage.setHex(message.getValue());
@@ -255,6 +256,9 @@ public class RTCMConverter {
                 }
             }
         } else if (rtcmStandardVersion == RtcmStandard.J3258_DRAFT) {
+            // J3258 draft: The messages need to be combined together then split
+            // based on the length determinants within them, because there isn't
+            // a 1-1 with items in the SEQUENCE-OF
             try {
                 byte[] combindeMessages = decoder.combinePartialMessages(messageList);
                 List<byte[]> splitMessages = decoder.splitMessages(combindeMessages);
