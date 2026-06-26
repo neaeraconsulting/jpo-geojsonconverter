@@ -4,24 +4,56 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
+import us.dot.its.jpo.asn.j2735.r2024.Common.Heading;
+import us.dot.its.jpo.asn.j2735.r2024.Common.PositionConfidenceSet;
+import us.dot.its.jpo.asn.j2735.r2024.Common.PositionalAccuracy;
 import us.dot.its.jpo.asn.j2735.r2024.Common.RTCMheader;
 import us.dot.its.jpo.asn.j2735.r2024.Common.RegionalExtension;
+import us.dot.its.jpo.asn.j2735.r2024.Common.SpeedandHeadingandThrottleConfidence;
+import us.dot.its.jpo.asn.j2735.r2024.Common.TimeConfidence;
+import us.dot.its.jpo.asn.j2735.r2024.Common.TransmissionAndSpeed;
 import us.dot.its.jpo.asn.j2735.r2024.RTCMcorrections.RTCMcorrections;
 import us.dot.its.jpo.asn.j2735.r2024.RTCMcorrections.RTCMcorrectionsMessageFrame;
+import us.dot.its.jpo.geojsonconverter.GeoJsonConverterProperties;
 import us.dot.its.jpo.geojsonconverter.pojos.ProcessedValidationMessage;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.rtcm.ProcessedRTCM;
 import us.dot.its.jpo.geojsonconverter.pojos.geojson.rtcm.RTCMProperties;
+import us.dot.its.jpo.geojsonconverter.standards.RtcmStandard;
+import us.dot.its.jpo.geojsonconverter.validator.JsonValidatorResult;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import com.networknt.schema.Error;
 
 @Slf4j
 public class RTCMConverterTest {
 
     private final static ObjectMapper mapper = new ObjectMapper();
+
+
+
+    @Test
+    public void testProcessRtcm_Cti4501Valid() throws JsonProcessingException {
+        RTCMConverter converter = getConverterV1();
+        RTCMcorrectionsMessageFrame messageFrame = buildValidCti4501V1Frame();
+        ProcessedRTCM processedRtcm = converter.processRTCM(messageFrame);
+        assertThat(processedRtcm, notNullValue());
+        RTCMProperties properties = processedRtcm.getProperties();
+        assertThat(properties, notNullValue());
+        assertThat(properties.getMsgCnt(), equalTo(82));
+
+        assertThat(properties.getRev(), equalTo("rtcmRev3"));
+        assertThat(properties.getValidationMessages(), hasSize(equalTo(0)));
+        assertThat(properties.isCti4501Conformant(), equalTo(true));
+        assertThat(properties.getUtcTime(), equalTo(1753482274168L));
+
+        log.info(mapper.writeValueAsString(processedRtcm));
+    }
 
     @Test
     public void testProcessRtcm_InvalidWithMissingDateTime() throws JsonProcessingException {
@@ -45,7 +77,7 @@ public class RTCMConverterTest {
             }
         }
         """;
-        RTCMConverter converter = getConverter();
+        RTCMConverter converter = getConverterV1();
         RTCMcorrectionsMessageFrame messageFrame = mapper.readValue(RTCM, RTCMcorrectionsMessageFrame.class);
         String str = mapper.writeValueAsString(messageFrame);
         log.info(str);
@@ -65,54 +97,7 @@ public class RTCMConverterTest {
         log.info(mapper.writeValueAsString(processedRtcm));
     }
 
-    @Test
-    public void testProcessRtcm_Cti4501Valid() throws JsonProcessingException {
-        final String RTCM_CTI4501_VALID = """
-        {
-            "messageId": 28,
-            "value": {
-                "RTCMcorrections": {
-                    "msgCnt": 82,
-                    "rev": "rtcmRev3",
-                    "anchorPoint": {
-                        "utcTime": {
-                            "year": 2025,
-                            "month": 7,
-                            "day": 25,
-                            "hour": 16,
-                            "minute": 24,
-                            "second": 34168,
-                            "offset": -360
-                        },
-                        "long": -1115094349,
-                        "lat": 406603360,
-                        "elevation": 20630
-                    },
-                    "msgs": [
-                        "D300133ED980037BDD1A80C6358121DD4E499FFC6712E91F0D",
-                        "D3003E409980144144564E554C4C414E54454E4E4120204E4F4E4500000D5452494D424C4520414C4C4F59144E617620352E3434202F20426F6F7420352E3434008C65F9"
-                    ]
-                }
-            }
-        }
-        """;
-        RTCMConverter converter = getConverter();
-        RTCMcorrectionsMessageFrame messageFrame = mapper.readValue(RTCM_CTI4501_VALID, RTCMcorrectionsMessageFrame.class);
-        String str = mapper.writeValueAsString(messageFrame);
-        log.info(str);
-        ProcessedRTCM processedRtcm = converter.processRTCM(messageFrame);
-        assertThat(processedRtcm, notNullValue());
-        RTCMProperties properties = processedRtcm.getProperties();
-        assertThat(properties, notNullValue());
-        assertThat(properties.getMsgCnt(), equalTo(82));
 
-        assertThat(properties.getRev(), equalTo("rtcmRev3"));
-        assertThat(properties.getValidationMessages(), hasSize(equalTo(0)));
-        assertThat(properties.isCti4501Conformant(), equalTo(true));
-        assertThat(properties.getUtcTime(), equalTo(1753482274168L));
-
-        log.info(mapper.writeValueAsString(processedRtcm));
-    }
 
     @Test
     public void testProcessRtcm_Rev2Invalid() throws JsonProcessingException {
@@ -131,7 +116,7 @@ public class RTCMConverterTest {
               }
             }
             """;
-        RTCMConverter converter = getConverter();
+        RTCMConverter converter = getConverterV1();
         RTCMcorrectionsMessageFrame messageFrame = mapper.readValue(RTCM_REV2_INVALID, RTCMcorrectionsMessageFrame.class);
         String str = mapper.writeValueAsString(messageFrame);
         log.info(str);
@@ -153,7 +138,7 @@ public class RTCMConverterTest {
 
     @Test
     public void testProcessRtcm_RTCMFrameNull()  {
-        RTCMConverter converter = getConverter();
+        RTCMConverter converter = getConverterV1();
 
         ProcessedRTCM processedRtcm = converter.processRTCM(null);
 
@@ -168,7 +153,7 @@ public class RTCMConverterTest {
 
     @Test
     public void testProcessRtcm_RTCMcorrectionsNULL() {
-        RTCMConverter converter = getConverter();
+        RTCMConverter converter = getConverterV1();
         RTCMcorrectionsMessageFrame messageFrame = new RTCMcorrectionsMessageFrame();
         messageFrame.setValue(null);
 
@@ -185,8 +170,8 @@ public class RTCMConverterTest {
 
     @Test
     public void testProcessRtcm_rtcmHeaderPresent() throws JsonProcessingException {
-        RTCMConverter converter = getConverter();
-        RTCMcorrectionsMessageFrame messageFrame = buildValidRtcmFrame();
+        RTCMConverter converter = getConverterV1();
+        RTCMcorrectionsMessageFrame messageFrame = buildValidCti4501V1Frame();
         messageFrame.getValue().setRtcmHeader(new RTCMheader());
 
         ProcessedRTCM processedRtcm = converter.processRTCM(messageFrame);
@@ -205,8 +190,8 @@ public class RTCMConverterTest {
 
     @Test
     public void testProcessRtcm_MessageListNull() throws JsonProcessingException {
-        RTCMConverter converter = getConverter();
-        RTCMcorrectionsMessageFrame messageFrame = buildValidRtcmFrame();
+        RTCMConverter converter = getConverterV1();
+        RTCMcorrectionsMessageFrame messageFrame = buildValidCti4501V1Frame();
         messageFrame.getValue().setMsgs(null);
 
         ProcessedRTCM processedRtcm = converter.processRTCM(messageFrame);
@@ -223,8 +208,8 @@ public class RTCMConverterTest {
 
     @Test
     public void testProcessRtcm_RegionalExtensionsPresent() throws JsonProcessingException {
-        RTCMConverter converter = getConverter();
-        RTCMcorrectionsMessageFrame messageFrame = buildValidRtcmFrame();
+        RTCMConverter converter = getConverterV1();
+        RTCMcorrectionsMessageFrame messageFrame = buildValidCti4501V1Frame();
         RTCMcorrections.SequenceOfRegional regional = new RTCMcorrections.SequenceOfRegional();
         regional.add(new RegionalExtension<>(1, "test") {});
         messageFrame.getValue().setRegional(regional);
@@ -243,15 +228,154 @@ public class RTCMConverterTest {
 
     }
 
+    @Test
+    public void testProcessRtcm_FullPositionVector_LongitudeMissing() throws JsonProcessingException {
+        RTCMConverter converter = getConverterV1();
+        RTCMcorrectionsMessageFrame messageFrame = buildValidCti4501V1Frame();
+        messageFrame.getValue().getAnchorPoint().setLong_(null);
 
+        ProcessedRTCM processedRtcm = converter.processRTCM(messageFrame);
 
-    private RTCMConverter getConverter() {
-        RTCMDecoder decoder = new RTCMDecoder(false);
-        return new RTCMConverter(decoder);
+        assertThat(processedRtcm, notNullValue());
+        RTCMProperties properties = processedRtcm.getProperties();
+        assertThat(properties, notNullValue());
+        assertThat(properties.getValidationMessages(), hasSize(greaterThanOrEqualTo(1)));
+        Set<String> messages = properties.getValidationMessages().stream()
+            .map(ProcessedValidationMessage::getMessage)
+            .collect(Collectors.toSet());
+        assertThat(messages, hasItems(containsString("'long' field")));
+        assertThat(properties.isCti4501Conformant(), equalTo(false));
     }
 
-    private RTCMcorrectionsMessageFrame buildValidRtcmFrame() throws JsonProcessingException {
-        final String validRtcm = """
+    @Test
+    public void testProcessRtcm_FullPositionVector_LatitudeMissing() throws JsonProcessingException {
+        RTCMConverter converter = getConverterV1();
+        RTCMcorrectionsMessageFrame messageFrame = buildValidCti4501V1Frame();
+        messageFrame.getValue().getAnchorPoint().setLat(null);
+
+        ProcessedRTCM processedRtcm = converter.processRTCM(messageFrame);
+
+        assertThat(processedRtcm, notNullValue());
+        RTCMProperties properties = processedRtcm.getProperties();
+        assertThat(properties, notNullValue());
+        assertThat(properties.getValidationMessages(), hasSize(greaterThanOrEqualTo(1)));
+        Set<String> messages = properties.getValidationMessages().stream()
+            .map(ProcessedValidationMessage::getMessage)
+            .collect(Collectors.toSet());
+        assertThat(messages, hasItems(containsString("'lat' field")));
+        assertThat(properties.isCti4501Conformant(), equalTo(false));
+    }
+
+    @Test
+    public void testProcessRtcm_FullPositionVector_ElevationMissing() throws JsonProcessingException {
+        RTCMConverter converter = getConverterV1();
+        RTCMcorrectionsMessageFrame messageFrame = buildValidCti4501V1Frame();
+        messageFrame.getValue().getAnchorPoint().setElevation(null);
+
+        ProcessedRTCM processedRtcm = converter.processRTCM(messageFrame);
+
+        assertThat(processedRtcm, notNullValue());
+        RTCMProperties properties = processedRtcm.getProperties();
+        assertThat(properties, notNullValue());
+        assertThat(properties.getValidationMessages(), hasSize(greaterThanOrEqualTo(1)));
+        Set<String> messages = properties.getValidationMessages().stream()
+            .map(ProcessedValidationMessage::getMessage)
+            .collect(Collectors.toSet());
+        assertThat(messages, hasItems(containsString("'elevation' field")));
+        assertThat(properties.isCti4501Conformant(), equalTo(false));
+    }
+
+    @Test
+    public void testProcessRtcm_FullPositionVector_HeadingPresent() throws JsonProcessingException {
+        RTCMcorrectionsMessageFrame messageFrame = buildValidCti4501V1Frame();
+        messageFrame.getValue().getAnchorPoint().setHeading(new Heading(0));
+        assertForbiddenFullPositionField(messageFrame, "'heading' field");
+    }
+
+    @Test
+    public void testProcessRtcm_FullPositionVector_SpeedPresent() throws JsonProcessingException {
+        RTCMcorrectionsMessageFrame messageFrame = buildValidCti4501V1Frame();
+        messageFrame.getValue().getAnchorPoint().setSpeed(new TransmissionAndSpeed());
+        assertForbiddenFullPositionField(messageFrame, "'speed' field");
+    }
+
+    @Test
+    public void testProcessRtcm_FullPositionVector_PosAccuracyPresent() throws JsonProcessingException {
+        RTCMcorrectionsMessageFrame messageFrame = buildValidCti4501V1Frame();
+        messageFrame.getValue().getAnchorPoint().setPosAccuracy(new PositionalAccuracy());
+        assertForbiddenFullPositionField(messageFrame, "'posAccuracy' field");
+    }
+
+    @Test
+    public void testProcessRtcm_FullPositionVector_TimeConfidencePresent() throws JsonProcessingException {
+        RTCMcorrectionsMessageFrame messageFrame = buildValidCti4501V1Frame();
+        messageFrame.getValue().getAnchorPoint().setTimeConfidence(TimeConfidence.UNAVAILABLE);
+        assertForbiddenFullPositionField(messageFrame, "'timeConfidence' field");
+    }
+
+    @Test
+    public void testProcessRtcm_FullPositionVector_PosConfidencePresent() throws JsonProcessingException {
+        RTCMcorrectionsMessageFrame messageFrame = buildValidCti4501V1Frame();
+        messageFrame.getValue().getAnchorPoint().setPosConfidence(new PositionConfidenceSet());
+        assertForbiddenFullPositionField(messageFrame, "'posConfidence' field");
+    }
+
+    @Test
+    public void testProcessRtcm_FullPositionVector_SpeedConfidencePresent() throws JsonProcessingException {
+        RTCMcorrectionsMessageFrame messageFrame = buildValidCti4501V1Frame();
+        messageFrame.getValue().getAnchorPoint().setSpeedConfidence(new SpeedandHeadingandThrottleConfidence());
+        assertForbiddenFullPositionField(messageFrame, "'speedConfidence' field");
+    }
+
+    @Test
+    public void testJsonValidation() {
+        var result = new JsonValidatorResult();
+        result.addException(new Exception("test"));
+        result.addValidationMessages(List.of(Error.builder().message("test").build()));
+        RTCMProperties properties = new RTCMProperties();
+        RTCMConverter converter = getConverterV1();
+
+        converter.jsonValidation(properties, result);
+
+        assertThat(properties.getValidationMessages(), hasSize(equalTo(2)));
+        assertThat(properties.getValidationMessages().getFirst().getMessage(), equalTo("test"));
+        List<String> exceptions = properties.getValidationMessages().stream()
+                .map(ProcessedValidationMessage::getException)
+                .filter(Objects::nonNull)
+                .toList();
+        assertThat(exceptions, hasSize(equalTo(1)));
+    }
+
+
+    private RTCMConverter getConverterV1() {
+        RTCMDecoder decoder = new RTCMDecoder(false);
+        var properties = new GeoJsonConverterProperties();
+        properties.setRtcmStandardVersion(RtcmStandard.CTI4501_V1);
+        return new RTCMConverter(decoder, properties);
+    }
+
+    private RTCMcorrectionsMessageFrame buildValidCti4501V1Frame() throws JsonProcessingException {
+        return mapper.readValue(RTCM_CTI4501_V1_VALID, RTCMcorrectionsMessageFrame.class);
+    }
+
+    private void assertForbiddenFullPositionField(RTCMcorrectionsMessageFrame messageFrame, String expectedMessageFragment) {
+        RTCMConverter converter = getConverterV1();
+
+        ProcessedRTCM processedRtcm = converter.processRTCM(messageFrame);
+
+        assertThat(processedRtcm, notNullValue());
+        RTCMProperties properties = processedRtcm.getProperties();
+        assertThat(properties, notNullValue());
+        assertThat(properties.getValidationMessages(), hasSize(greaterThanOrEqualTo(1)));
+        Set<String> messages = properties.getValidationMessages().stream()
+            .map(ProcessedValidationMessage::getMessage)
+            .collect(Collectors.toSet());
+        assertThat(messages, hasItems(containsString(expectedMessageFragment)));
+        assertThat(properties.isCti4501Conformant(), equalTo(false));
+    }
+
+
+    private final static String RTCM_CTI4501_V1_VALID = """
         {
             "messageId": 28,
             "value": {
@@ -280,6 +404,4 @@ public class RTCMConverterTest {
             }
         }
         """;
-        return mapper.readValue(validRtcm, RTCMcorrectionsMessageFrame.class);
-    }
 }
