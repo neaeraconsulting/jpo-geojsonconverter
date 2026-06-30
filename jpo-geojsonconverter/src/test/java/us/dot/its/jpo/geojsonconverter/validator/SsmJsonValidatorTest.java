@@ -1,5 +1,6 @@
 package us.dot.its.jpo.geojsonconverter.validator;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import static org.junit.Assert.assertFalse;
         "invalid.ssm.json=classpath:json/invalid.ssm.json"})
 @RunWith(SpringRunner.class)
 @ActiveProfiles("test")
+@Slf4j
 public class SsmJsonValidatorTest extends AbstractJsonValidatorTest {
 
     @Autowired
@@ -63,6 +65,9 @@ public class SsmJsonValidatorTest extends AbstractJsonValidatorTest {
     @Test
     public void testException() {
         SsmJsonValidator badValidator = new SsmJsonValidator(null);
+
+        log.debug("Class Path: {}", System.getProperty("java.class.path"));
+
         var result = badValidator.validate("invalid");
         assertFalse("An exception should have happened", result.isValid());
     }

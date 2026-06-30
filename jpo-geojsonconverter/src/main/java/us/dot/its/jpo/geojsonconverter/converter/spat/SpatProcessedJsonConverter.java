@@ -1,5 +1,6 @@
 package us.dot.its.jpo.geojsonconverter.converter.spat;
 
+import lombok.extern.slf4j.Slf4j;
 import us.dot.its.jpo.asn.j2735.r2024.Common.IntersectionReferenceID;
 import us.dot.its.jpo.asn.j2735.r2024.Common.SpeedConfidence;
 import us.dot.its.jpo.asn.j2735.r2024.SPAT.*;
@@ -30,8 +31,9 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.networknt.schema.ValidationMessage;
+import com.networknt.schema.Error;
 
+@Slf4j
 public class SpatProcessedJsonConverter
         implements Transformer<Void, DeserializedRawSpat, KeyValue<RsuIntersectionKey, ProcessedSpat>> {
     private static final Logger logger = LoggerFactory.getLogger(SpatProcessedJsonConverter.class);
@@ -120,11 +122,19 @@ public class SpatProcessedJsonConverter
             object.setException(exception.getStackTrace().toString());
             processedSpatValidationMessages.add(object);
         }
-        for (ValidationMessage vm : validationMessages.getValidationMessages()) {
+        for (Error vm : validationMessages.getValidationMessages()) {
             ProcessedValidationMessage object = new ProcessedValidationMessage();
             object.setMessage(vm.getMessage());
-            object.setSchemaPath(vm.getSchemaPath());
-            object.setJsonPath(vm.getPath());
+            final var schemaLocation = vm.getSchemaLocation();
+            if (schemaLocation != null) {
+                object.setSchemaPath(schemaLocation.toString());
+            } else {
+                log.warn("validationMessage.schemaLocation is null");
+            }
+            final var evaluationPath = vm.getEvaluationPath();
+            if (evaluationPath != null) {
+                object.setJsonPath(vm.getEvaluationPath().toString());
+            }
 
             processedSpatValidationMessages.add(object);
         }
