@@ -61,7 +61,7 @@ public class CTI4501Validator {
         } else if (spatStandardVersion == SpatStandard.CTI4501_V2_DRAFT) {
             if (intersection.getId().getRegion() != null) {
                 validationMap.put("intersection.id.region",
-                        createValidationMessage("The intersections 'id.region' DE_RoadRegulatorID is present. It's use is deprecated in CTI-4501 v2."));
+                        createValidationMessage("The intersections 'id.region' DE_RoadRegulatorID is present. Its use is deprecated in CTI-4501 v2."));
             }
         }
         if (intersection.getTimeStamp() == null) {
@@ -151,7 +151,7 @@ public class CTI4501Validator {
         } else if (mapStandardVersion == MapStandard.CTI4501_V2_DRAFT) {
             if (intersection.getId().getRegion() != null) {
                 validationMap.put("intersection.id.region",
-                        createValidationMessage("The intersections 'id.region' DE_RoadRegulatorID is present. It's use is deprecated in CTI-4501 v2."));
+                        createValidationMessage("The intersections 'id.region' DE_RoadRegulatorID is present. Its use is deprecated in CTI-4501 v2."));
             }
         }
 

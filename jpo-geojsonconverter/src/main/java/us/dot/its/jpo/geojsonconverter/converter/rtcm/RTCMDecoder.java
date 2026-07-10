@@ -81,31 +81,30 @@ public class RTCMDecoder {
     }
 
     private void messageSplitter(final byte[] combinedMessages, List<byte[]> messages) throws RTCMDecodeException {
-        if (combinedMessages.length > 0) {
+        int offset = 0;
+        while (offset < combinedMessages.length) {
+            int remainingLength = combinedMessages.length - offset;
+
             // The length from the determinant doesn't include three bytes at the beginning (preamble, zeroes,
             // length det) nor three bytes at the end (CRC). Actual length is length + 6.
-            int length = decodeLength(combinedMessages) + 6;
+            int length = decodeLength(combinedMessages, offset) + 6;
 
             // verify things that must be true for length to be valid
             if (length <= 0) {
                 throw new RTCMDecodeException("Invalid message length: " + length);
             }
-            if (length > combinedMessages.length) {
+            if (length > remainingLength) {
                 throw new RTCMDecodeException("Length from determinant is greater than the available bytes: "
-                        + length + " > " + combinedMessages.length);
+                        + length + " > " + remainingLength);
             }
 
             // Save the message
             byte[] message = new byte[length];
-            System.arraycopy(combinedMessages, 0, message, 0, length);
+            System.arraycopy(combinedMessages, offset, message, 0, length);
             messages.add(message);
             log.debug("RTCM message length: {}, message: {}", length, hexFormat.formatHex(message));
-            int remainderLength = combinedMessages.length - length;
-            if (remainderLength > 0) {
-                byte[] remainder = new byte[remainderLength];
-                System.arraycopy(combinedMessages, length, remainder, 0, remainder.length);
-                messageSplitter(remainder, messages);
-            }
+
+            offset += length;
         }
     }
 
@@ -124,26 +123,26 @@ public class RTCMDecoder {
         }
     }
 
-    public static int decodeLength(byte[] bytes) throws RTCMDecodeException {
+    public static int decodeLength(byte[] bytes, int offset) throws RTCMDecodeException {
         // Need at least 24 bits (3 bytes) to get the length
-        if (bytes.length < 3) {
+        if (bytes.length - offset < 3) {
             throw new RTCMDecodeException("Not enough bytes to get length from RTCM");
         }
 
         // Preamble: 8 bits
-        int preamble = unsigned(bytes[0]);
+        int preamble = unsigned(bytes[offset]);
         if (preamble != 0xD3) {
             throw new RTCMDecodeException(String.format("Invalid RTCM preamble, can't find length: %02X, should be %02X", preamble, 0xD3));
         }
 
         // Next 6 bits should be zero
-        int zeroBits = unsigned(bytes[1]) >>> 2;
+        int zeroBits = unsigned(bytes[offset + 1]) >>> 2;
         if (zeroBits != 0) {
             throw new RTCMDecodeException(String.format("Invalid zero bits, can't find length: %X", zeroBits));
         }
 
         // Length: 10 bits
-        return ((unsigned(bytes[1]) & 0x03) << 8) | unsigned(bytes[2]);
+        return ((unsigned(bytes[offset + 1]) & 0x03) << 8) | unsigned(bytes[offset + 2]);
     }
 
     /**

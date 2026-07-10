@@ -195,37 +195,37 @@ public class RTCMConverter {
         if (anchor.getHeading() != null) {
             properties.addValidationMessage(
                     conformanceIssue + "The anchorPoint (DF_FullPositionVector) 'heading' field is present " +
-                            "but should not included.");
+                            "but should not be included.");
         }
 
         if (anchor.getSpeed() != null) {
             properties.addValidationMessage(
                     conformanceIssue + "The anchorPoint (DF_FullPositionVector) 'speed' field is present " +
-                            "but should not included.");
+                            "but should not be included.");
         }
 
         if (anchor.getPosAccuracy() != null) {
             properties.addValidationMessage(
                     conformanceIssue + "The anchorPoint (DF_FullPositionVector) 'posAccuracy' field is " +
-                            "present but should not included.");
+                            "present but should not be included.");
         }
 
         if (anchor.getTimeConfidence() != null) {
             properties.addValidationMessage(
                     conformanceIssue + "The anchorPoint (DF_FullPositionVector) 'timeConfidence' field is " +
-                            "present but should not included.");
+                            "present but should not be included.");
         }
 
         if (anchor.getPosConfidence() != null) {
             properties.addValidationMessage(
                     conformanceIssue + "The anchorPoint (DF_FullPositionVector) 'posConfidence' field is " +
-                            "present but should not included.");
+                            "present but should not be included.");
         }
 
         if (anchor.getSpeedConfidence() != null) {
             properties.addValidationMessage(
                     conformanceIssue + "The anchorPoint (DF_FullPositionVector) 'speedConfidence' field is " +
-                            "present but should not included.");
+                            "present but should not be included.");
         }
 
     }
@@ -334,13 +334,13 @@ public class RTCMConverter {
             if (categories.isEmpty()) {
                 log.debug("No CTI 4501 categories found.");
                 properties.addValidationMessage(
-                        "CTI-4501 conformance issue: None of the message types are in categories mentioned in CTI-4501");
+                        conformanceIssue + "None of the message types are in categories mentioned in CTI-4501");
             }
             if (categories.size() > 1) {
                 log.debug("Multiple CTI 4501 categories found.");
                 properties.addValidationMessage(
                         String.format(
-                                "CTI-4501 conformance issue: The message list contains message types from more than" +
+                                conformanceIssue + "The message list contains message types from more than" +
                                         " one category: %s", categories));
             }
             if (categories.size() == 1) {

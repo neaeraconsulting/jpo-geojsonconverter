@@ -59,7 +59,7 @@ public class RTCMDecoderTest {
         ]
         """;
 
-    // RTCMmessages plit up at byte boundaries, but not at RTCM message boundaries, as is allowed in J3258,
+    // RTCMmessages split up at byte boundaries, but not at RTCM message boundaries, as is allowed in J3258,
     // with maximum possible number of messages (5) allowed in J2735.
     private final static String MESSAGE_LIST_J3258_FRAGMENTED = """
         [
