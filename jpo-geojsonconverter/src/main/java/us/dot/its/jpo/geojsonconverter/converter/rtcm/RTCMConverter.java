@@ -40,7 +40,12 @@ public class RTCMConverter {
     public RTCMConverter(RTCMDecoder decoder, GeoJsonConverterProperties properties) {
         this.decoder = decoder;
         this.rtcmStandardVersion = properties.getRtcmStandardVersion();
-        this.spec = rtcmStandardVersion.getShortName();
+        if (rtcmStandardVersion != null) {
+            this.spec = rtcmStandardVersion.getShortName();
+        } else {
+            log.error("properties.rtcmStandardVersion is null");
+            this.spec = "unknown standard version";
+        }
         this.conformanceIssue = spec + " conformance issue: ";
     }
 
