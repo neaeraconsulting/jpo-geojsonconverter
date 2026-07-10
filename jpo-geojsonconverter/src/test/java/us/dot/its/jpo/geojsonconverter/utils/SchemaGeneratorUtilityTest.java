@@ -60,7 +60,9 @@ public class SchemaGeneratorUtilityTest {
     public void run_withoutArgs_usesDefaultPathAndReturnsZero() throws Exception {
         Path tempWorkingDir = Files.createTempDirectory("schema-generator-default-path-test-");
         Path defaultSchemaDir = tempWorkingDir.resolve("src/main/resources/schemas");
-        String javaExecutable = Path.of(System.getProperty("java.home"), "bin", "java.exe").toString();
+        boolean isWindows = System.getProperty("os.name", "").toLowerCase().contains("win");
+        String javaExecutableName = isWindows ? "java.exe" : "java";
+        String javaExecutable = Path.of(System.getProperty("java.home"), "bin", javaExecutableName).toString();
         String classpath = System.getProperty("java.class.path");
 
         ProcessBuilder processBuilder = new ProcessBuilder(List.of(
