@@ -297,48 +297,51 @@ public class RTCMConverter {
         //
         // Groups should not be mixed.
         //
-        LinkedHashSet<String> categories = new LinkedHashSet<>();
-        boolean isDescriptors = categorize(DESCRIPTOR_TYPES, types);
-        if (isDescriptors) {
-            categories.add("Descriptor types: 1005, 1006, 1013, 1033");
-        }
-        boolean isMsm4 = categorize(MSM4_TYPES, types);
-        if (isMsm4) {
-            categories.add("MSM4");
-        }
-        boolean isMsm5 = categorize(MSM5_TYPES, types);
-        if (isMsm5) {
-            categories.add("MSM5");
-        }
-        boolean isMsm6 = categorize(MSM6_TYPES, types);
-        if (isMsm6) {
-            categories.add("MSM6");
-        }
-        boolean isMsm7 = categorize(MSM7_TYPES, types);
-        if (isMsm7) {
-            categories.add("MSM7");
-        }
+        // These grouping rules are CTI-4501 specific and don't apply to J3258.
+        if (rtcmStandardVersion == RtcmStandard.CTI4501_V1) {
+            LinkedHashSet<String> categories = new LinkedHashSet<>();
+            boolean isDescriptors = categorize(DESCRIPTOR_TYPES, types);
+            if (isDescriptors) {
+                categories.add("Descriptor types: 1005, 1006, 1013, 1033");
+            }
+            boolean isMsm4 = categorize(MSM4_TYPES, types);
+            if (isMsm4) {
+                categories.add("MSM4");
+            }
+            boolean isMsm5 = categorize(MSM5_TYPES, types);
+            if (isMsm5) {
+                categories.add("MSM5");
+            }
+            boolean isMsm6 = categorize(MSM6_TYPES, types);
+            if (isMsm6) {
+                categories.add("MSM6");
+            }
+            boolean isMsm7 = categorize(MSM7_TYPES, types);
+            if (isMsm7) {
+                categories.add("MSM7");
+            }
 
-        log.debug("Categories: {}", categories);
+            log.debug("Categories: {}", categories);
 
-        if (categories.isEmpty()) {
-            log.debug("No CTI 4501 categories found.");
-            properties.addValidationMessage(
-                    "CTI-4501 conformance issue: None of the message types are in categories mentioned in CTI-4501");
-        }
-        if (categories.size() > 1) {
-            log.debug("Multiple CTI 4501 categories found.");
-            properties.addValidationMessage(
-                    String.format(
-                            "CTI-4501 conformance issue: The message list contains message types from more than" +
-                                    " one category: %s", categories));
-        }
-        if (categories.size() == 1) {
-            String category = categories.iterator().next();
-            checkMsmTypes(category, types, "MSM4", MSM4_GPS, properties);
-            checkMsmTypes(category, types, "MSM5", MSM5_GPS, properties);
-            checkMsmTypes(category, types, "MSM6", MSM6_GPS, properties);
-            checkMsmTypes(category, types, "MSM7", MSM7_GPS, properties);
+            if (categories.isEmpty()) {
+                log.debug("No CTI 4501 categories found.");
+                properties.addValidationMessage(
+                        "CTI-4501 conformance issue: None of the message types are in categories mentioned in CTI-4501");
+            }
+            if (categories.size() > 1) {
+                log.debug("Multiple CTI 4501 categories found.");
+                properties.addValidationMessage(
+                        String.format(
+                                "CTI-4501 conformance issue: The message list contains message types from more than" +
+                                        " one category: %s", categories));
+            }
+            if (categories.size() == 1) {
+                String category = categories.iterator().next();
+                checkMsmTypes(category, types, "MSM4", MSM4_GPS, properties);
+                checkMsmTypes(category, types, "MSM5", MSM5_GPS, properties);
+                checkMsmTypes(category, types, "MSM6", MSM6_GPS, properties);
+                checkMsmTypes(category, types, "MSM7", MSM7_GPS, properties);
+            }
         }
     }
 
