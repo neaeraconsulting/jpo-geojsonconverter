@@ -54,6 +54,7 @@ public class RTCMConverter {
      * @param rtcmFrame The RTCM message frame
      * @return The processed RTCM
      */
+    @SuppressWarnings("java:S3776") // Ignore Sonar 'cognitive complexity' warning
     public ProcessedRTCM processRTCM(final RTCMcorrectionsMessageFrame rtcmFrame) {
         var properties = new RTCMProperties();
 
@@ -229,9 +230,11 @@ public class RTCMConverter {
 
     }
 
+    @SuppressWarnings("java:S3776") // Ignore Sonar 'cognitive complexity' warning
     private void decodeMessages(RTCMProperties properties, RTCMmessageList messageList) {
         List<DecodedRTCMmessage> decodedMessages = new ArrayList<>();
         Set<Integer> types = new LinkedHashSet<>();
+        final String STATION_ID = "station_id";
 
         if (rtcmStandardVersion == RtcmStandard.CTI4501_V1) {
             // CTI-4501 v1: Each item in the SEQUENCE-OF has a single message
@@ -246,8 +249,8 @@ public class RTCMConverter {
                     types.add(node.get("type").asInt());
                 }
 
-                if (node.has("station_id")) {
-                    properties.setStationId(node.get("station_id").asInt());
+                if (node.has(STATION_ID)) {
+                    properties.setStationId(node.get(STATION_ID).asInt());
                 }
             }
         } else if (rtcmStandardVersion == RtcmStandard.J3258_DRAFT) {
@@ -267,8 +270,8 @@ public class RTCMConverter {
                         types.add(node.get("type").asInt());
                     }
 
-                    if (node.has("station_id")) {
-                        properties.setStationId(node.get("station_id").asInt());
+                    if (node.has(STATION_ID)) {
+                        properties.setStationId(node.get(STATION_ID).asInt());
                     }
                 }
             } catch (RTCMDecodeException e) {

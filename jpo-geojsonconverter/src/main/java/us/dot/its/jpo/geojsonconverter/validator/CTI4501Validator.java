@@ -39,6 +39,7 @@ public class CTI4501Validator {
      * @param spat The SPAT object to be validated for CTI-4501 conformance.
      * @return a list of validation messages describing CTI-4501 conformance issues, or an empty list if conformant.
      */
+    @SuppressWarnings("java:S3776") // Ignore Sonar 'cognitive complexity' warning
     public static List<ProcessedValidationMessage> spatValidation(SPAT spat, SpatStandard spatStandardVersion) {
         HashMap<String, ProcessedValidationMessage> validationMap = new HashMap<>();
 
@@ -130,6 +131,7 @@ public class CTI4501Validator {
      * @param mapData The MapData object to be validated for CTI-4501 conformance.
      * @return a list of validation messages describing CTI-4501 conformance issues, or an empty list if conformant.
      */
+    @SuppressWarnings("java:S3776") // Ignore Sonar 'cognitive complexity' warning
     public static List<ProcessedValidationMessage> mapValidation(MapData mapData, MapStandard mapStandardVersion) {
         HashMap<String, ProcessedValidationMessage> validationMap = new HashMap<>();
 
