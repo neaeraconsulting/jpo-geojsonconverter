@@ -133,7 +133,7 @@ public class RTCMDecoder {
         // Preamble: 8 bits
         int preamble = unsigned(bytes[0]);
         if (preamble != 0xD3) {
-            throw new RTCMDecodeException(String.format("Invalid RTCM preamble, can't find length: %02X, should be %20X", preamble, 0xD3));
+            throw new RTCMDecodeException(String.format("Invalid RTCM preamble, can't find length: %02X, should be %02X", preamble, 0xD3));
         }
 
         // Next 6 bits should be zero
