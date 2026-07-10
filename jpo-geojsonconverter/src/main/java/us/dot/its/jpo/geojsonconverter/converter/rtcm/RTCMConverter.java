@@ -113,22 +113,12 @@ public class RTCMConverter {
         }
 
         final RTCMmessageList messageList = rtcm.getMsgs();
-        if (rtcmStandardVersion == RtcmStandard.CTI4501_V1) {
-            // CTI 4501 v1: Each item in message list contains a single RTCM message,
-            // process them individually
-            if (messageList != null) {
-                decodeMessages(properties, messageList);
-            } else {
-                log.info("RTCM messageList is null");
-            }
-        } else if (rtcmStandardVersion == RtcmStandard.J3258_DRAFT) {
-            // J3258: Messages are concatenated together, need to separate them
-            if (messageList != null) {
-
-            } else {
-                log.info("RTCM messageList is null");
-            }
+        if (messageList != null) {
+            decodeMessages(properties, messageList);
+        } else {
+            log.info("RTCM messageList is null");
         }
+
 
 
         // CTI 4501 v01.01, Sec. 4.3.3.5.1: optional regional extension is forbidden

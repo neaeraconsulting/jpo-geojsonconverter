@@ -56,6 +56,21 @@ public class RTCMConverterTest {
     }
 
     @Test
+    public void testProcessRtcm_J3258Valid() throws JsonProcessingException {
+        RTCMConverter converter = getConverterJ3258();
+        RTCMcorrectionsMessageFrame messageFrame = buildValidJ3258Frame();
+        ProcessedRTCM processedRtcm = converter.processRTCM(messageFrame);
+        assertThat(processedRtcm, notNullValue());
+        RTCMProperties properties = processedRtcm.getProperties();
+        assertThat(properties, notNullValue());
+        assertThat(properties.getMsgCnt(), equalTo(124));
+        assertThat(properties.getRev(), equalTo("rtcmRev3"));
+        assertThat(properties.getValidationMessages(), hasSize(equalTo(0)));
+        assertThat(properties.isCti4501Conformant(), equalTo(true));
+        log.info(mapper.writeValueAsString(processedRtcm));
+    }
+
+    @Test
     public void testProcessRtcm_InvalidWithMissingDateTime() throws JsonProcessingException {
         final String RTCM = """
         {
@@ -354,8 +369,19 @@ public class RTCMConverterTest {
         return new RTCMConverter(decoder, properties);
     }
 
+    private RTCMConverter getConverterJ3258() {
+        RTCMDecoder decoder = new RTCMDecoder(false);
+        var properties = new GeoJsonConverterProperties();
+        properties.setRtcmStandardVersion(RtcmStandard.J3258_DRAFT);
+        return new RTCMConverter(decoder, properties);
+    }
+
     private RTCMcorrectionsMessageFrame buildValidCti4501V1Frame() throws JsonProcessingException {
         return mapper.readValue(RTCM_CTI4501_V1_VALID, RTCMcorrectionsMessageFrame.class);
+    }
+
+    private RTCMcorrectionsMessageFrame buildValidJ3258Frame() throws JsonProcessingException {
+        return mapper.readValue(RTCM_J3258_VALID, RTCMcorrectionsMessageFrame.class);
     }
 
     private void assertForbiddenFullPositionField(RTCMcorrectionsMessageFrame messageFrame, String expectedMessageFragment) {
