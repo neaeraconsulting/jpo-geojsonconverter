@@ -153,13 +153,13 @@ public class GeoJsonConverterProperties implements EnvironmentAware {
     private int streamsConfigCommitIntervalMs;
 
     @Getter @Setter
-    private MapStandard mapStandardVersion;
+    private MapStandard mapStandardVersion = MapStandard.CTI4501_V1;
 
     @Getter @Setter
-    private SpatStandard spatStandardVersion;
+    private SpatStandard spatStandardVersion = SpatStandard.CTI4501_V1;
 
     @Getter @Setter
-    private RtcmStandard rtcmStandardVersion;
+    private RtcmStandard rtcmStandardVersion = RtcmStandard.CTI4501_V1;
 
     public Properties createStreamProperties(String name) {
         Properties streamProps = new Properties();
