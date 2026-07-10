@@ -223,7 +223,7 @@ public class RTCMConverter {
 
         if (anchor.getSpeedConfidence() != null) {
             properties.addValidationMessage(
-                    conformanceIssue + "CTI-4501 conformance issue: The anchorPoint (DF_FullPositionVector) 'speedConfidence' field is " +
+                    conformanceIssue + "The anchorPoint (DF_FullPositionVector) 'speedConfidence' field is " +
                             "present but should not included.");
         }
 
