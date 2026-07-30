@@ -214,6 +214,7 @@ public class MapProcessedJsonConverter
         List<MapFeature<LineString>> mapFeatures = new ArrayList<>();
         for (GenericLane lane : intersection.getLaneSet()) {
             // Create MAP properties
+            log.info("Start processing GenericLane with ID {}, {}", lane.getLaneID() != null ? lane.getLaneID().getValue() : null, lane);
             MapProperties mapProps = new MapProperties();
             if (lane.getNodeList().getNodes() != null) {
                 mapProps.setNodes(nodeConversionList(lane.getNodeList().getNodes()));
@@ -243,6 +244,7 @@ public class MapProcessedJsonConverter
 
             // Create MAP feature and add it to the feature list
             mapFeatures.add(new MapFeature<LineString>(mapProps.getLaneId(), geometry, mapProps));
+            log.info("Finished processing GenericLane with ID {}, {}", lane.getLaneID() != null ? lane.getLaneID().getValue() : null, lane);
         }
 
         return new MapFeatureCollection<LineString>(mapFeatures.toArray(new MapFeature[0]));
@@ -330,7 +332,11 @@ public class MapProcessedJsonConverter
 
         List<ConnectingLanesFeature<LineString>> lanesFeatures = new ArrayList<>();
         for (GenericLane lane : intersection.getLaneSet()) {
-            if (lane.getLaneAttributes().getDirectionalUse().isIngressPath() == true) {
+            boolean isIngress = lane.getLaneAttributes().getDirectionalUse().isIngressPath();
+            // Cover case where a no-travel lane has a connection
+            boolean isEgress = lane.getLaneAttributes().getDirectionalUse().isEgressPath();
+            boolean isNeither = !isIngress && !isEgress;
+            if (isIngress || isNeither) {
                 double[] laneCoordinates = lanePoints.get((int) lane.getLaneID().getValue()); // first point
                 if (lane.getConnectsTo() == null)
                     continue;
