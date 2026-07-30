@@ -12,9 +12,9 @@
 	<logger name="org.springframework.web" level="WARN" />
 	<logger name="org.springframework.test" level="WARN"/>
 	<logger name="us.dot.its.jpo.geojsonconverter.converter.rtcm" level="WARN" />
-	<logger name="us.dot.its.jpo.geojsonconverter" level="INFO" />
+	<logger name="us.dot.its.jpo.geojsonconverter" level="ERROR" />
 
-	<root level="INFO">
+	<root level="ERROR">
 		<appender-ref ref="STDOUT" />
 	</root>
 </configuration>
