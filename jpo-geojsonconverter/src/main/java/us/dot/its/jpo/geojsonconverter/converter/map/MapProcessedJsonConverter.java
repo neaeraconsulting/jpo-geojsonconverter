@@ -8,10 +8,13 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.kstream.Transformer;
 import org.apache.kafka.streams.processor.ProcessorContext;
@@ -336,6 +339,11 @@ public class MapProcessedJsonConverter
             }
         }
 
+        // Tracks (fromLaneId, toLaneId) pairs already emitted, so a connection redundantly declared
+        // from both lanes isn't rendered twice. Only the reverse direction is ever checked, so multiple
+        // connections declared in the same direction (e.g. different signal groups) are unaffected.
+        Set<Pair<Integer, Integer>> emittedConnections = new HashSet<>();
+
         List<ConnectingLanesFeature<LineString>> lanesFeatures = new ArrayList<>();
         for (GenericLane lane : intersection.getLaneSet()) {
             boolean isIngress = lane.getLaneAttributes().getDirectionalUse().isIngressPath();
@@ -364,6 +372,14 @@ public class MapProcessedJsonConverter
                     GenericLane targetLane = laneById.get(targetLaneId);
                     boolean targetIsIngress = targetLane.getLaneAttributes().getDirectionalUse().isIngressPath();
                     boolean targetIsEgress = targetLane.getLaneAttributes().getDirectionalUse().isEgressPath();
+                    boolean targetIsNeither = !targetIsIngress && !targetIsEgress;
+
+                    // Skip if the target lane's own connectsTo list already declared this connection in reverse.
+                    boolean targetCouldAlsoBeCurrent = targetIsIngress || targetIsNeither;
+                    if (targetCouldAlsoBeCurrent && emittedConnections.contains(Pair.of(targetLaneId, laneId))) {
+                        continue;
+                    }
+                    emittedConnections.add(Pair.of(laneId, targetLaneId));
 
                     Coordinate targetFirstPoint = laneFirstPoints.get(targetLaneId);
                     Coordinate targetLastPoint = laneLastPoints.get(targetLaneId);
