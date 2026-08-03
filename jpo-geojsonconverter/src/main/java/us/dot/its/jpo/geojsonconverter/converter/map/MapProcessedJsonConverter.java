@@ -368,8 +368,17 @@ public class MapProcessedJsonConverter
                     laneProps.setSignalGroupId(
                             connection.getSignalGroup() != null ? (int) connection.getSignalGroup().getValue() : null);
 
+                    if (connection.getConnectingLane() == null | connection.getConnectingLane().getLane() == null) {
+                        // skip if connecting lane is null, avoid NPE
+                        continue;
+                    }
+
                     int targetLaneId = (int) connection.getConnectingLane().getLane().getValue();
                     GenericLane targetLane = laneById.get(targetLaneId);
+                    if (targetLane == null) {
+                        // skip if target lane is null, avoid NPE
+                        continue;
+                    }
                     boolean targetIsIngress = targetLane.getLaneAttributes().getDirectionalUse().isIngressPath();
                     boolean targetIsEgress = targetLane.getLaneAttributes().getDirectionalUse().isEgressPath();
                     boolean targetIsNeither = !targetIsIngress && !targetIsEgress;
