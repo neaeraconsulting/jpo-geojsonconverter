@@ -368,7 +368,7 @@ public class MapProcessedJsonConverter
                     laneProps.setSignalGroupId(
                             connection.getSignalGroup() != null ? (int) connection.getSignalGroup().getValue() : null);
 
-                    if (connection.getConnectingLane() == null | connection.getConnectingLane().getLane() == null) {
+                    if (connection.getConnectingLane() == null || connection.getConnectingLane().getLane() == null) {
                         // skip if connecting lane is null, avoid NPE
                         continue;
                     }
