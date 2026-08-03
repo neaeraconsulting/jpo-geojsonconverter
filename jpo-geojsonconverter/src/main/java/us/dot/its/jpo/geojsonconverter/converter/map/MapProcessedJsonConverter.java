@@ -350,7 +350,7 @@ public class MapProcessedJsonConverter
             boolean isEgress = lane.getLaneAttributes().getDirectionalUse().isEgressPath();
             // Cover case where a no-travel lane has a connection.
             // But still ignore the case of egress-only lanes with connections, in case implementors
-            // have redundant connections on ingress an egress.
+            // have redundant connections on ingress and egress.
             boolean isNeither = !isIngress && !isEgress;
             if (isIngress || isNeither) {
                 int laneId = (int) lane.getLaneID().getValue();
