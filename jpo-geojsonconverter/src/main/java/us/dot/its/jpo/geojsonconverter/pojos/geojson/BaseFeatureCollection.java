@@ -6,9 +6,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import us.dot.its.jpo.geojsonconverter.DateJsonMapper;
 
+import lombok.EqualsAndHashCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The base class for geographic feature collections.
+ * <p>Note: derived classes should use `@EqualsAndHashCode(callSuper = true)` for correct equality comparison</p>
+ * @param <TFeature> The feature type
+ */
+@EqualsAndHashCode
 @JsonIgnoreProperties(value={ "type" }, allowGetters=true)
 @JsonPropertyOrder({"type", "features"})
 public abstract class BaseFeatureCollection<TFeature> {
